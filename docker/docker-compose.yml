@@ -1,7 +1,9 @@
+name: core-app
+
 services:
   db:
     image: postgres:16-alpine
-    container_name: progression-db
+    container_name: core-app-db
     environment:
       - POSTGRES_USER=progression
       - POSTGRES_PASSWORD=progression
@@ -19,7 +21,7 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile
-    container_name: progression-backend
+    container_name: core-app-backend
     ports:
       - "3000:3000"
     environment:
@@ -44,7 +46,7 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
-    container_name: progression-frontend
+    container_name: core-app-frontend
     ports:
       - "5173:5173"
     depends_on:

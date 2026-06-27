@@ -8,7 +8,7 @@ COMPOSE_PROD = docker compose -f docker/docker-compose.prod.yml --env-file docke
 init: dc-build dc-up
 	@echo ""
 	@echo "======================================================"
-	@echo "  ✅  Projet Progression initialisé avec succès !"
+	@echo "  ✅  Projet core-app initialisé avec succès !"
 	@echo "======================================================"
 	@echo "  ➡️   API (backend)  : http://localhost:3000"
 	@echo "  ➡️   Web (frontend) : http://localhost:5173"
@@ -46,13 +46,13 @@ dc-clean:
 # ======================= PRODUCTION (VPS) =======================
 # Nécessite docker/.env.prod (cp docker/.env.prod.example docker/.env.prod).
 
-## prod-init : build + démarrage prod (frontend nginx sur le port WEB_PORT)
+## prod-init : build + démarrage prod (Caddy expose 80/443 + HTTPS auto)
 prod-init: prod-build prod-up
 	@echo ""
 	@echo "======================================================"
-	@echo "  ✅  Progression (PROD) démarré !"
+	@echo "  ✅  core-app (PROD) démarré !"
 	@echo "======================================================"
-	@echo "  ➡️   Web : http://<hote>:$${WEB_PORT:-8080}  (API sous /api)"
+	@echo "  ➡️   Web : https://emiliengantois.fr  (API sous /api, HTTPS via Caddy)"
 	@echo "  Logs : make prod-logs   |   Arrêt : make prod-down"
 	@echo "======================================================"
 	@echo ""

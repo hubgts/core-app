@@ -4,12 +4,12 @@
 #
 #   docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up -d --build
 #   (ou : make prod-up / make prod-build — voir Makefile)
-name: progression-prod
+name: core-app-prod
 
 services:
   db:
     image: postgres:16-alpine
-    container_name: progression-prod-db
+    container_name: core-app-prod-db
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${DB_USER}
@@ -30,7 +30,7 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile.prod
-    container_name: progression-prod-backend
+    container_name: core-app-prod-backend
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -59,12 +59,10 @@ services:
       args:
         # Même origine : le front appelle /api, proxifié par nginx vers le back.
         VITE_API_URL: /api
-    container_name: progression-prod-frontend
+    container_name: core-app-prod-frontend
     restart: unless-stopped
-    # Expose nginx sur le port hôte choisi (défaut 8080). Mettre un reverse-proxy
-    # hôte (Caddy/Traefik/nginx) devant pour le TLS, ou mapper WEB_PORT=80.
-    ports:
-      - '${WEB_PORT:-8080}:80'
+    # Pas de port exposé sur l'hôte : nginx n'est joint que par Caddy via le
+    # réseau interne. L'entrée publique (80/443 + TLS) est gérée par Caddy.
     depends_on:
       backend:
         condition: service_started
@@ -75,5 +73,24 @@ services:
       retries: 20
       start_period: 5s
 
+  caddy:
+    image: caddy:2-alpine
+    container_name: core-app-prod-caddy
+    restart: unless-stopped
+    # Seul service exposé publiquement : 80 (redirection + validation Let's
+    # Encrypt) et 443 (HTTPS). Caddy obtient et renouvelle le certificat seul.
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # certificats — À CONSERVER entre redémarrages
+      - caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_started
+
 volumes:
   db_data_prod:
+  caddy_data:
+  caddy_config:
