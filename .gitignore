@@ -12,6 +12,8 @@ npm-debug.log*
 # Env
 .env
 .env.local
+.env.prod
+docker/.env.prod
 
 # OS / IDE
 .DS_Store

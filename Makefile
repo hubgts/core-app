@@ -1,6 +1,8 @@
 COMPOSE = docker compose -f docker/docker-compose.yml
+COMPOSE_PROD = docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod
 
-.PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean
+.PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean \
+        prod-init prod-build prod-up prod-down prod-restart prod-logs prod-ps prod-clean
 
 ## init : construit les images, démarre les conteneurs et attend qu'ils soient prêts
 init: dc-build dc-up
@@ -40,3 +42,44 @@ dc-ps:
 ## dc-clean : arrête tout et supprime les volumes + images locales
 dc-clean:
 	$(COMPOSE) down -v --rmi local
+
+# ======================= PRODUCTION (VPS) =======================
+# Nécessite docker/.env.prod (cp docker/.env.prod.example docker/.env.prod).
+
+## prod-init : build + démarrage prod (frontend nginx sur le port WEB_PORT)
+prod-init: prod-build prod-up
+	@echo ""
+	@echo "======================================================"
+	@echo "  ✅  Progression (PROD) démarré !"
+	@echo "======================================================"
+	@echo "  ➡️   Web : http://<hote>:$${WEB_PORT:-8080}  (API sous /api)"
+	@echo "  Logs : make prod-logs   |   Arrêt : make prod-down"
+	@echo "======================================================"
+	@echo ""
+
+## prod-build : construit les images de production
+prod-build:
+	$(COMPOSE_PROD) build
+
+## prod-up : démarre les conteneurs de prod et attend qu'ils soient sains
+prod-up:
+	$(COMPOSE_PROD) up -d --wait
+
+## prod-down : arrête et supprime les conteneurs de prod
+prod-down:
+	$(COMPOSE_PROD) down
+
+## prod-restart : redémarre la prod (down + up)
+prod-restart: prod-down prod-up
+
+## prod-logs : affiche les logs de prod en direct
+prod-logs:
+	$(COMPOSE_PROD) logs -f
+
+## prod-ps : liste l'état des conteneurs de prod
+prod-ps:
+	$(COMPOSE_PROD) ps
+
+## prod-clean : arrête la prod et supprime volumes + images locales (EFFACE LA BASE !)
+prod-clean:
+	$(COMPOSE_PROD) down -v --rmi local

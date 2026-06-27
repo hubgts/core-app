@@ -1,0 +1,26 @@
+# --- Étape 1 : build TypeScript -> dist/ ---
+FROM node:18-alpine AS build
+WORKDIR /app
+
+# Dépendances complètes (dev incluses) pour compiler avec le Nest CLI
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# --- Étape 2 : image d'exécution (deps de prod uniquement) ---
+FROM node:18-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Code compilé issu de l'étape de build
+COPY --from=build /app/dist ./dist
+
+EXPOSE 3000
+
+# Lance le bundle compilé (pas de recompilation à la volée comme en dev)
+CMD ["node", "dist/main"]
