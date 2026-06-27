@@ -1,0 +1,25 @@
+# Service systemd du backend NestJS (installation native, sans Docker).
+# Installation :
+#   sudo cp deploy/core-app-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now core-app-backend
+#
+# Adapter User= et WorkingDirectory= si le projet n'est pas dans /home/egantois.
+
+[Unit]
+Description=core-app backend (NestJS)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=egantois
+WorkingDirectory=/home/egantois/projects/core-app/backend
+# Secrets et config (DB_*, PORT...) — fichier hors dépôt, voir backend.env.example
+EnvironmentFile=/etc/core-app/backend.env
+ExecStart=/usr/bin/node dist/main
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

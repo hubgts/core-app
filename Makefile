@@ -1,8 +1,7 @@
 COMPOSE = docker compose -f docker/docker-compose.yml
-COMPOSE_PROD = docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod
 
 .PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean \
-        prod-init prod-build prod-up prod-down prod-restart prod-logs prod-ps prod-clean
+        prod-build prod-frontend prod-backend prod-deploy
 
 ## init : construit les images, démarre les conteneurs et attend qu'ils soient prêts
 init: dc-build dc-up
@@ -16,7 +15,7 @@ init: dc-build dc-up
 	@echo "  Logs en direct : make dc-logs   |   Arrêt : make dc-down"
 	@echo ""
 
-## dc-build : construit les images Docker
+## dc-build : construit les images Docker (DEV uniquement)
 dc-build:
 	$(COMPOSE) build
 
@@ -43,43 +42,29 @@ dc-ps:
 dc-clean:
 	$(COMPOSE) down -v --rmi local
 
-# ======================= PRODUCTION (VPS) =======================
-# Nécessite docker/.env.prod (cp docker/.env.prod.example docker/.env.prod).
+# ================== PRODUCTION (VPS, sans Docker) ==================
+# Installation native : Node + PostgreSQL + nginx. Voir docs/deploiement/production.md.
+# Le frontend est servi en statique par nginx (root = /var/www/core-app) ;
+# le backend tourne via systemd (service core-app-backend).
 
-## prod-init : build + démarrage prod (Caddy expose 80/443 + HTTPS auto)
-prod-init: prod-build prod-up
-	@echo ""
-	@echo "======================================================"
-	@echo "  ✅  core-app (PROD) démarré !"
-	@echo "======================================================"
-	@echo "  ➡️   Web : https://emiliengantois.fr  (API sous /api, HTTPS via Caddy)"
-	@echo "  Logs : make prod-logs   |   Arrêt : make prod-down"
-	@echo "======================================================"
-	@echo ""
+WEB_ROOT ?= /var/www/core-app
 
-## prod-build : construit les images de production
+## prod-frontend : build du front (API sous /api) + déploiement dans WEB_ROOT
+prod-frontend:
+	cd frontend && npm ci && VITE_API_URL=/api npm run build
+	sudo mkdir -p $(WEB_ROOT)
+	sudo rsync -a --delete frontend/dist/ $(WEB_ROOT)/
+
+## prod-backend : build du back + (re)démarrage du service systemd
+prod-backend:
+	cd backend && npm ci && npm run build
+	sudo systemctl restart core-app-backend
+
+## prod-build : build front + back (sans déployer le service)
 prod-build:
-	$(COMPOSE_PROD) build
+	cd backend && npm ci && npm run build
+	cd frontend && npm ci && VITE_API_URL=/api npm run build
 
-## prod-up : démarre les conteneurs de prod et attend qu'ils soient sains
-prod-up:
-	$(COMPOSE_PROD) up -d --wait
-
-## prod-down : arrête et supprime les conteneurs de prod
-prod-down:
-	$(COMPOSE_PROD) down
-
-## prod-restart : redémarre la prod (down + up)
-prod-restart: prod-down prod-up
-
-## prod-logs : affiche les logs de prod en direct
-prod-logs:
-	$(COMPOSE_PROD) logs -f
-
-## prod-ps : liste l'état des conteneurs de prod
-prod-ps:
-	$(COMPOSE_PROD) ps
-
-## prod-clean : arrête la prod et supprime volumes + images locales (EFFACE LA BASE !)
-prod-clean:
-	$(COMPOSE_PROD) down -v --rmi local
+## prod-deploy : déploiement complet (front + back) après un git pull
+prod-deploy: prod-backend prod-frontend
+	@echo "✅ Déploiement terminé. nginx sert $(WEB_ROOT), API via systemd."

@@ -1,90 +1,137 @@
-# Déploiement en production (VPS)
+# Déploiement en production (VPS, installation native)
 
-La prod est **isolée du dev** : fichier compose, conteneurs, volume et secrets
-dédiés. Le dev (`make init`, ports 5173/3000) reste utilisable en parallèle sans
-collision.
+La prod tourne **sans Docker** : Node, PostgreSQL et nginx installés directement
+sur le VPS. Le dev local, lui, continue d'utiliser Docker (`make init`) — il n'est
+pas concerné par ce document.
 
-## Principe
+## Architecture
 
-| | Dev | Prod |
-|---|---|---|
-| Fichier compose | `docker/docker-compose.yml` | `docker/docker-compose.prod.yml` |
-| Projet Docker | `core-app` | `core-app-prod` |
-| Volume base | `db_data` | `db_data_prod` |
-| Backend | `nest start` (TS à la volée) | `node dist/main` (compilé, `Dockerfile.prod`) |
-| Frontend | serveur Vite (5173) | build statique servi par **nginx** (`Dockerfile.prod`) |
-| API | `http://localhost:3000` (CORS) | `/api` proxifié par nginx → backend (même origine) |
-| Entrée publique | port Vite/Nest direct | **Caddy** (80/443, HTTPS auto) → frontend |
-| Secrets | en dur dans le compose | `docker/.env.prod` (non versionné) |
-
-Chaîne en prod : **Caddy** (TLS, ports 80/443) → **nginx** (sert le build du
-front + reverse-proxe `/api/` vers `backend:3000`, préfixe retiré) → **backend**.
-Plus de CORS ni d'URL d'API en dur ; ni la base, ni le backend, ni le frontend ne
-sont exposés sur l'hôte — seul Caddy l'est.
-
-## Mise en route
-
-```bash
-cp docker/.env.prod.example docker/.env.prod   # puis éditer (mot de passe DB)
-make prod-init                                 # build + démarrage
+```
+Internet ──80/443──▶ nginx (TLS certbot + Basic Auth htpasswd)
+                        │  ├── /        -> /var/www/core-app (build React statique)
+                        │  └── /api/    -> 127.0.0.1:3000 (backend NestJS, systemd)
+                        ▼
+                   PostgreSQL local (127.0.0.1:5432)
 ```
 
-Prérequis avant le premier démarrage : le DNS du domaine doit pointer vers le VPS
-(enregistrements `A` pour `emiliengantois.fr` et `www`) et les ports **80 et 443**
-ouverts sur le pare-feu. Caddy obtient alors le certificat Let's Encrypt au
-démarrage ; l'app répond sur `https://emiliengantois.fr`.
+| Élément | Mise en œuvre |
+|---|---|
+| Backend | `node dist/main`, lancé par **systemd** (`core-app-backend`) |
+| Frontend | build Vite (`VITE_API_URL=/api`) servi en statique par **nginx** |
+| Base | **PostgreSQL** système, sur `localhost` |
+| Entrée publique | **nginx** (80/443) |
+| HTTPS | **certbot** (Let's Encrypt, renouvellement auto) |
+| Accès protégé | **Basic Auth nginx** via `htpasswd` (`/etc/nginx/.htpasswd`) |
+| Secrets backend | `/etc/core-app/backend.env` (hors dépôt) |
 
-### Variables (`docker/.env.prod`)
+Fichiers de référence dans le dépôt : `deploy/core-app-backend.service`,
+`deploy/nginx.conf`, `deploy/backend.env.example`.
 
-- `DB_USER` / `DB_PASSWORD` / `DB_NAME` — identifiants PostgreSQL de prod.
-
-Le domaine se configure dans `docker/Caddyfile` (pas dans `.env.prod`).
-
-## Commandes
+## Prérequis (à installer une fois)
 
 ```bash
-make prod-build    # (re)construit les images de prod
-make prod-up       # démarre (-d --wait)
-make prod-restart  # down + up
-make prod-logs     # logs en direct
-make prod-ps       # état des conteneurs
-make prod-down     # arrêt
-make prod-clean    # arrêt + suppression volumes/images (EFFACE LA BASE !)
+# Node.js 18 (NodeSource)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# PostgreSQL, nginx, certbot, htpasswd
+sudo apt install -y postgresql nginx certbot python3-certbot-nginx apache2-utils
 ```
-
-> ⚠️ Comme en dev, pas de bind-mount : après une modif de code, **rebuild**
-> (`make prod-build`) — un simple restart ne prend pas le nouveau code.
-
-## TLS / nom de domaine (Caddy)
-
-Le HTTPS est géré par le service **Caddy** (`docker/Caddyfile`), qui obtient et
-**renouvelle automatiquement** le certificat Let's Encrypt — aucune commande à
-lancer. HTTP (80) est redirigé vers HTTPS (443).
-
-- Changer de domaine : éditer `docker/Caddyfile` puis `make prod-restart`.
-- Les certificats sont persistés dans le volume `caddy_data` : **ne pas le
-  supprimer** (sinon nouvelle demande à chaque restart → risque de quota
-  Let's Encrypt).
-- Le DNS doit être propagé **avant** le premier démarrage (vérifier avec
-  `dig emiliengantois.fr` → IP du VPS), sinon la validation du certificat échoue.
-- Pare-feu : ouvrir `80/tcp` et `443/tcp` (le 80 reste nécessaire pour la
-  validation et la redirection).
-
-## Accès protégé (Basic Auth)
-
-Tout le site (front + API) est protégé par un mot de passe géré par Caddy
-(`basic_auth` dans `docker/Caddyfile`). Identifiant et hash bcrypt sont dans
-`docker/.env.prod` (`BASIC_AUTH_USER` / `BASIC_AUTH_HASH`), donc hors du repo.
-
-- Générer le hash : `docker exec -it core-app-prod-caddy caddy hash-password`.
-- Reporter dans `.env.prod` en **doublant chaque `$` en `$$`** (sinon docker
-  compose tronque la valeur), puis `make prod-restart`.
-- Le navigateur renvoie l'identifiant sur les appels `/api` (même origine) :
-  aucune modification de l'app n'est nécessaire.
 
 ## Base de données
 
-TypeORM tourne en `synchronize: true` (pas de migrations) : le schéma est
-créé/ajusté au démarrage du backend. **À surveiller en prod** dès qu'il y a des
-données à préserver — une modif d'entité altère le schéma au redémarrage.
-Sauvegardes recommandées via `pg_dump` sur le conteneur `core-app-prod-db`.
+```bash
+sudo -u postgres psql <<'SQL'
+CREATE USER sunday WITH PASSWORD 'change-moi-mot-de-passe-fort';
+CREATE DATABASE core OWNER sunday;
+SQL
+```
+(Le schéma est créé automatiquement au premier démarrage du backend —
+TypeORM `synchronize: true`.)
+
+## Backend (systemd)
+
+```bash
+cd ~/projects/core-app/backend
+npm ci && npm run build
+
+# Config / secrets (hors dépôt)
+sudo mkdir -p /etc/core-app
+sudo cp ../deploy/backend.env.example /etc/core-app/backend.env
+sudo nano /etc/core-app/backend.env        # renseigner DB_USER/PASSWORD/NAME
+sudo chmod 600 /etc/core-app/backend.env
+
+# Service
+sudo cp ../deploy/core-app-backend.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now core-app-backend
+sudo systemctl status core-app-backend     # doit être "active (running)"
+curl -I http://127.0.0.1:3000              # le backend répond
+```
+
+## Frontend (build statique)
+
+```bash
+cd ~/projects/core-app
+make prod-frontend     # build (VITE_API_URL=/api) + copie dans /var/www/core-app
+```
+
+## nginx + HTTPS + mot de passe
+
+```bash
+# Site nginx
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/core-app
+sudo ln -sf /etc/nginx/sites-available/core-app /etc/nginx/sites-enabled/core-app
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# Mot de passe d'accès (Basic Auth)
+sudo htpasswd -c /etc/nginx/.htpasswd egantois   # demande le mot de passe
+
+# Vérif + activation
+sudo nginx -t && sudo systemctl reload nginx
+
+# Certificat HTTPS (ajoute le bloc 443 et la redirection, renouvellement auto)
+sudo certbot --nginx -d emiliengantois.fr -d www.emiliengantois.fr
+```
+
+Pare-feu : `80/tcp` et `443/tcp` ouverts (`sudo ufw allow 80/tcp 443/tcp`).
+
+## Vérification
+
+```bash
+curl -sI https://emiliengantois.fr | head -1                       # 401 (sans identifiants)
+curl -sI -u egantois:MDP https://emiliengantois.fr | head -1       # 200
+```
+Puis ouvrir `https://emiliengantois.fr` : fenêtre de login, puis l'appli charge
+(les appels `/api` passent avec les mêmes identifiants, même origine).
+
+## Mises à jour
+
+```bash
+cd ~/projects/core-app
+git pull
+make prod-deploy        # rebuild back (+ restart systemd) et front (+ copie nginx)
+```
+Pas besoin de toucher nginx ni certbot pour une simple MAJ de code.
+
+## Ajouter / changer le mot de passe
+
+```bash
+sudo htpasswd /etc/nginx/.htpasswd egantois   # change le mdp d'un user existant
+sudo htpasswd /etc/nginx/.htpasswd autreuser  # ajoute un user (sans -c)
+sudo systemctl reload nginx
+```
+
+## Sauvegardes
+
+```bash
+pg_dump -U sunday -h localhost core > backup_$(date +%F).sql
+```
+
+## Logs / dépannage
+
+```bash
+sudo journalctl -u core-app-backend -f     # logs backend
+sudo tail -f /var/log/nginx/error.log      # logs nginx
+sudo systemctl restart core-app-backend    # redémarrer le backend
+```
