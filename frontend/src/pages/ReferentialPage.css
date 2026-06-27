@@ -1,0 +1,190 @@
+/* Réutilise .page-head, .btn, .field__input, .icon-btn (définis ailleurs). */
+
+.ref-page {
+  max-width: 100%;
+}
+
+.ref-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* --- Liste des référentiels --- */
+.ref-cats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ref-cat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ref-cat:hover {
+  border-color: var(--accent);
+}
+
+.ref-cat.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.ref-cat__icon {
+  font-size: 18px;
+}
+
+/* --- Panneau de gestion --- */
+.ref-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.ref-add {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ref-add .field__input {
+  flex: 1;
+}
+
+.ref-search {
+  margin-bottom: 16px;
+}
+
+.ref-empty {
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 8px 2px;
+}
+
+.ref-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ref-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ref-item:last-child {
+  border-bottom: none;
+}
+
+.ref-item__name {
+  font-size: 15px;
+}
+
+.ref-item__actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.ref-item:hover .ref-item__actions {
+  opacity: 1;
+}
+
+/* --- Catégories de savoir-faire (panneau dédié) --- */
+.refcat__lead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.rcatman__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.rcatman__icon:hover {
+  border-color: var(--accent);
+}
+.rcatman__count {
+  font-size: 12px;
+  color: var(--text-faint);
+  background: var(--surface-3);
+  border-radius: 999px;
+  padding: 2px 9px;
+  min-width: 24px;
+  text-align: center;
+}
+.reditrow__grip {
+  cursor: grab;
+  color: var(--text-faint);
+  font-size: 14px;
+  user-select: none;
+}
+.ref-item {
+  flex-wrap: wrap;
+}
+.rcatman__picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 4px 0 10px;
+}
+.rcatman__picker--row {
+  flex-basis: 100%;
+}
+.rcatman__picker button {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+.rcatman__picker button:hover {
+  background: var(--surface-3);
+}
+
+@media (max-width: 720px) {
+  .ref-layout {
+    grid-template-columns: 1fr;
+  }
+  .ref-cats {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .ref-item__actions {
+    opacity: 1;
+  }
+}

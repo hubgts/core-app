@@ -1,0 +1,432 @@
+.habits-page {
+  max-width: 100%;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.page-head__title {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.page-head__subtitle {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* --- Barre de contrôle (navigation + sélecteurs vue/période) --- */
+.control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.control-bar__nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-bar__label {
+  font-size: 17px;
+  font-weight: 600;
+  min-width: 130px;
+  text-align: center;
+}
+
+.control-bar__switches {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.segmented__btn {
+  border: none;
+  background: none;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.segmented__btn + .segmented__btn {
+  border-left: 1px solid var(--border);
+}
+
+.segmented__btn:hover {
+  background: var(--surface-3);
+}
+
+.segmented__btn.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.icon-btn:hover {
+  background: var(--surface-3);
+}
+
+/* --- Grille --- */
+.grid-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.grid {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.grid th,
+.grid td {
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.grid tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.grid__corner,
+.grid__name {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--surface);
+  text-align: left;
+  min-width: 180px;
+  max-width: 180px;
+}
+
+.grid__corner {
+  z-index: 3;
+  padding: 12px 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--border);
+}
+
+.grid thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  z-index: 1;
+}
+
+.grid__corner {
+  background: var(--surface-2);
+}
+
+.grid__dayhead {
+  width: 34px;
+  padding: 6px 0;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.grid__daynum {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.grid__dayinit {
+  display: block;
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.grid__dayhead.is-weekend,
+.grid__cell.is-weekend {
+  background: var(--surface-3);
+}
+
+.grid__dayhead.is-today {
+  background: var(--accent-soft);
+}
+
+.grid__dayhead.is-today .grid__daynum {
+  color: var(--accent);
+}
+
+.grid__cell.is-today {
+  background: var(--accent-soft);
+}
+
+.grid__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-left: 3px solid var(--accent);
+}
+
+.grid__namecol {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.grid__target {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+/* Séparateur de semaine : trait à gauche de chaque lundi. */
+.grid__dayhead.is-weekstart,
+.grid__cell.is-weekstart {
+  border-left: 1px solid var(--border);
+}
+
+.grid__name:hover {
+  background: var(--surface-3);
+}
+
+.grid__drag {
+  color: var(--text-faint);
+  cursor: grab;
+  font-size: 14px;
+}
+
+.grid__icon {
+  font-size: 16px;
+}
+
+.grid__hname {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid__cell {
+  padding: 3px;
+}
+
+/* --- Cellule cochable --- */
+.cell {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.12s, border-color 0.12s;
+}
+
+.cell:hover:not(:disabled) {
+  border-color: var(--text-faint);
+}
+
+.cell--checked {
+  animation: pop 0.16s ease;
+}
+
+/* Jour futur : permissif (cliquable) mais visuellement atténué. */
+.cell--future:not(.cell--checked) {
+  opacity: 0.5;
+}
+
+/* Période antérieure à la création : grisée + hachurée (« hors suivi »),
+   mais reste cochable. Une infobulle indique la date de création. */
+.cell--precreate:not(.cell--checked) {
+  opacity: 0.5;
+  border-style: dashed;
+  border-color: var(--border);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--surface-3),
+    var(--surface-3) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+}
+
+.cell--precreate.cell--checked {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* --- Rail de droite (avancement hebdo + streak) --- */
+.grid__railhead {
+  padding: 0 10px;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+.grid__rail {
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.streak-badge {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prog-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prog-badge__txt {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.wring__bg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 3;
+}
+
+.wring__fg {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.25s ease;
+}
+
+.wring__tick {
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--text-muted);
+}
+
+/* --- KPIs --- */
+.kpis {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+}
+
+.kpi__value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.kpi__label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* --- État vide --- */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+}
+
+.empty__emoji {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.empty__text {
+  color: var(--text-muted);
+  margin: 0 0 18px;
+}
+
+/* --- Divers --- */
+.muted {
+  color: var(--text-muted);
+}
+
+.banner {
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.banner--error {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--surface);
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 60;
+  animation: toast-in 0.2s ease;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}

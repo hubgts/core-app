@@ -1,0 +1,37 @@
+/* Boîtes de dialogue custom (confirm / prompt / alert) — voir dialogs.jsx.
+   S'appuient sur les classes .modal* partagées de index.css. */
+
+/* Les dialogues peuvent être déclenchés depuis l'intérieur d'une autre modale
+   ou d'un overlay plein écran (mode Cuisine/Réalisation, z-index 90) : ils
+   doivent toujours passer au-dessus de tout. */
+.modal-overlay--top {
+  z-index: 200;
+}
+
+.modal--dialog {
+  max-width: 420px;
+}
+
+.dialog__message {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-line; /* respecte les \n des anciens messages natifs */
+}
+
+/* Espace entre le message et le champ de saisie d'un prompt. */
+.dialog__message + .field__input,
+.dialog__message + .dialog__textarea {
+  margin-top: 14px;
+}
+.modal__title + .field__input,
+.modal__title + .dialog__textarea {
+  margin-top: 2px;
+}
+
+.dialog__textarea {
+  min-height: 90px;
+  resize: vertical;
+  font-family: inherit;
+}

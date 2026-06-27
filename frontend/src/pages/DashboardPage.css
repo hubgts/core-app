@@ -1,0 +1,548 @@
+/* ============================================================
+   Dashboard — vue d'ensemble curated (onglets Aujourd'hui / Semaine)
+   ============================================================ */
+
+.dash {
+  --dash-training: var(--m-training);
+  --dash-habits: var(--m-habits);
+  --dash-finances: var(--m-finances);
+  --dash-betting: var(--m-betting);
+  --dash-knowhow: var(--m-knowhow);
+  --dash-referentiel: var(--m-referentiel);
+  --dash-health: var(--m-health);
+  max-width: 100%;
+}
+
+.dash__loading,
+.dash__error {
+  color: var(--text-muted);
+  padding: 24px 0;
+}
+.dash__error {
+  color: var(--danger);
+}
+
+.dash__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.dash__greet {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dash__title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.dash__wave {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: dash-wave 1.6s ease 0.3s 2;
+}
+@keyframes dash-wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(16deg); }
+  40% { transform: rotate(-8deg); }
+}
+.dash__date {
+  color: var(--text-faint);
+  font-size: 14px;
+  text-transform: capitalize;
+}
+.dash__summary {
+  margin: 6px 0 18px;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* --- Onglets Aujourd'hui / Semaine --- */
+.dtabs {
+  display: inline-flex;
+  background: var(--surface-3);
+  border-radius: 11px;
+  padding: 3px;
+  gap: 2px;
+}
+.dtabs__btn {
+  border: none;
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.dtabs__btn:hover { color: var(--text); }
+.dtabs__btn--active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Tendances */
+.t-up { color: #34d399; }
+.t-down { color: var(--danger); }
+.t-flat { color: var(--text-muted); }
+
+/* --- Rangée 1 : cartes stat (curated par onglet) --- */
+.dash__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+@media (max-width: 1100px) {
+  .dash__stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+.dcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  padding: 20px 20px 18px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--c, var(--accent));
+  border-radius: 16px;
+  background: var(--surface);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.dcard:hover {
+  border-color: color-mix(in srgb, var(--c) 50%, var(--border));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px);
+}
+.dcard--training { --c: var(--dash-training); }
+.dcard--habits { --c: var(--dash-habits); }
+.dcard--finances { --c: var(--dash-finances); }
+.dcard--betting { --c: var(--dash-betting); }
+.dcard--knowhow { --c: var(--dash-knowhow); }
+.dcard--referentiel { --c: var(--dash-referentiel); }
+.dcard--health { --c: var(--dash-health); }
+
+.dcard__top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.dcard__icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+  font-size: 16px;
+}
+.dcard__name {
+  font-weight: 700;
+  font-size: 15px;
+  flex: 1;
+}
+.dcard__go {
+  color: var(--text-faint);
+  font-size: 16px;
+  transition: transform 0.15s, color 0.15s;
+}
+.dcard:hover .dcard__go {
+  color: var(--c);
+  transform: translateX(3px);
+}
+
+.dcard__hero {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.dcard__hero--ring {
+  align-items: center;
+  gap: 14px;
+}
+.dcard__value {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  display: block;
+}
+.dcard__value--money { font-size: 27px; }
+.dcard__value--sm { font-size: 22px; }
+.dcard__unit {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.dcard__sub {
+  color: var(--text-faint);
+  font-weight: 500;
+  display: block;
+}
+
+.dcard__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 7px;
+  background: var(--surface-3);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.dchip.t-up { background: color-mix(in srgb, #34d399 18%, transparent); }
+.dchip.t-down { background: color-mix(in srgb, var(--danger) 18%, transparent); }
+
+.dcard__foot {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.dcard__empty {
+  color: var(--text-faint);
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+/* Anneau */
+.dring-wrap { position: relative; display: grid; place-items: center; flex: none; }
+.dring { display: block; }
+.dring__bg { fill: none; stroke: var(--surface-3); stroke-width: 6; }
+.dring__fg { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray 0.4s ease; }
+.dring__label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* --- Rangées de panneaux --- */
+.dgrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.dpanel {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 18px 20px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+}
+.dpanel--habits,
+.dpanel--session,
+.dpanel--finances {
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.dpanel--habits:hover {
+  border-color: color-mix(in srgb, var(--m-habits) 45%, var(--border));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+.dpanel--session:hover {
+  border-color: color-mix(in srgb, var(--m-training) 45%, var(--border));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+.dpanel--finances:hover {
+  border-color: color-mix(in srgb, var(--m-finances) 45%, var(--border));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* --- Zone finances : patrimoine global + enveloppes --- */
+.dfin {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* --- Patrimoine global (résumé + courbe) --- */
+.dnet {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.dnet__value {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.dnet__unit {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.dpanel--chart .dcard__meta { margin-bottom: 12px; }
+
+/* --- Bloc enveloppes --- */
+.denvs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.denv {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 8px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.denv__icon {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-size: 15px;
+}
+.denv__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.denv__bal {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.denv__trend {
+  flex: none;
+  min-width: 116px;
+  text-align: right;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.denv__arrow { font-size: 14px; }
+
+/* Liste de séances (jour / semaine) */
+.dsessions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.dsession {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 8px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.dsession__day {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--surface-3);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.dsession__icon { font-size: 17px; flex: none; }
+.dsession__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.dsession__title {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsession__sub {
+  font-size: 12px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsession__dur {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.dpanel__rest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px 0;
+  text-align: center;
+}
+.dpanel__resticon { font-size: 30px; opacity: 0.8; }
+.dpanel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.dpanel__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.dpanel__hint {
+  font-size: 13px;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+/* Liste habitudes du jour */
+.dtoday {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.dtoday__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 4px;
+}
+.dtoday__dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: #fff;
+  flex: none;
+}
+.dtoday__name {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.dtoday__name--on {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* --- Habitudes de la semaine : grille de jours --- */
+.dwks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.dwk__legend,
+.dwk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+}
+.dwk__legend {
+  padding-bottom: 2px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.dwk__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dwk__dots {
+  display: flex;
+  gap: 4px;
+  flex: none;
+}
+.dwk__dayhead {
+  width: 20px;
+  text-align: center;
+}
+.dwk__dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: #fff;
+  flex: none;
+}
+.dwk__dot--off { opacity: 0.3; }
+.dwk__dot--miss { border-style: dashed; }
+.dwk__count {
+  width: 40px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  flex: none;
+}
+
+/* --- Responsive --- */
+@media (max-width: 860px) {
+  .dgrid2 { grid-template-columns: 1fr; }
+  .dfin { grid-template-columns: 1fr; }
+  .dash__head { align-items: stretch; }
+  .dtabs { width: 100%; }
+  .dtabs__btn { flex: 1; }
+  .denv__trend { min-width: 0; }
+}
