@@ -77,6 +77,11 @@ services:
     image: caddy:2-alpine
     container_name: core-app-prod-caddy
     restart: unless-stopped
+    environment:
+      # Identifiants Basic Auth, lus dans le Caddyfile via {env.*}.
+      # Valeurs dans docker/.env.prod (le hash a chaque $ doublé en $$).
+      - BASIC_AUTH_USER=${BASIC_AUTH_USER}
+      - BASIC_AUTH_HASH=${BASIC_AUTH_HASH}
     # Seul service exposé publiquement : 80 (redirection + validation Let's
     # Encrypt) et 443 (HTTPS). Caddy obtient et renouvelle le certificat seul.
     ports:

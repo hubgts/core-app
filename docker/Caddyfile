@@ -5,6 +5,13 @@
 
 # Domaine principal : sert l'application (frontend nginx interne).
 emiliengantois.fr {
+	# Mot de passe d'accès au site (identifiant + hash bcrypt).
+	# Définis dans docker/.env.prod (BASIC_AUTH_USER / BASIC_AUTH_HASH),
+	# jamais en clair dans le repo public.
+	basic_auth {
+		{env.BASIC_AUTH_USER} {env.BASIC_AUTH_HASH}
+	}
+
 	reverse_proxy frontend:80
 }
 

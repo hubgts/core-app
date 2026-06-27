@@ -70,6 +70,18 @@ lancer. HTTP (80) est redirigé vers HTTPS (443).
 - Pare-feu : ouvrir `80/tcp` et `443/tcp` (le 80 reste nécessaire pour la
   validation et la redirection).
 
+## Accès protégé (Basic Auth)
+
+Tout le site (front + API) est protégé par un mot de passe géré par Caddy
+(`basic_auth` dans `docker/Caddyfile`). Identifiant et hash bcrypt sont dans
+`docker/.env.prod` (`BASIC_AUTH_USER` / `BASIC_AUTH_HASH`), donc hors du repo.
+
+- Générer le hash : `docker exec -it core-app-prod-caddy caddy hash-password`.
+- Reporter dans `.env.prod` en **doublant chaque `$` en `$$`** (sinon docker
+  compose tronque la valeur), puis `make prod-restart`.
+- Le navigateur renvoie l'identifiant sur les appels `/api` (même origine) :
+  aucune modification de l'app n'est nécessaire.
+
 ## Base de données
 
 TypeORM tourne en `synchronize: true` (pas de migrations) : le schéma est
