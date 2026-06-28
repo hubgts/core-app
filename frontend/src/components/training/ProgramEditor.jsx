@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { trainingApi } from '../../api/training';
 import { PROGRAM_DAYS, TYPE_META } from './constants';
 import ProgramSessionModal from './ProgramSessionModal';
+import Combobox from '../Combobox';
 
 const blankDraft = () => ({
   name: '',
@@ -220,18 +221,19 @@ export default function ProgramEditor({ program, onSaved, onCancel }) {
           <div key={wi} className={`prog-week${w.isDeload ? ' is-deload' : ''}`}>
             <div className="prog-week__head">
               <span className="prog-week__index">S{w.index}{w.isDeload ? ' 🌙' : ''}</span>
-              <select
+              <Combobox
                 className="field__input prog-week__phase"
+                block={false}
                 value={w.phaseIndex ?? ''}
-                onChange={(e) =>
-                  patchWeek(wi, { phaseIndex: e.target.value === '' ? null : Number(e.target.value) })
-                }
-              >
-                <option value="">Hors phase</option>
-                {draft.phases.map((ph, pi) => (
-                  <option key={pi} value={pi}>{ph.name || `Phase ${pi + 1}`}</option>
-                ))}
-              </select>
+                onChange={(v) => patchWeek(wi, { phaseIndex: v === '' ? null : v })}
+                options={[
+                  { value: '', label: 'Hors phase' },
+                  ...draft.phases.map((ph, pi) => ({
+                    value: pi,
+                    label: ph.name || `Phase ${pi + 1}`,
+                  })),
+                ]}
+              />
               <input
                 className="field__input prog-week__obj"
                 value={w.objective}

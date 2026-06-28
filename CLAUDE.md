@@ -71,6 +71,15 @@ specs/                       # spécifications fonctionnelles de référence
   `await alertDialog(message)`. Le `<DialogHost />` est monté une fois dans
   `main.jsx` ; les fonctions sont impératives (pas besoin de hook). Les
   suppressions passent `danger: true`. Rendre le handler `async` au besoin.
+- **Pas de `<select>` natif** : utiliser `<Combobox>`
+  (`frontend/src/components/Combobox.jsx`) — liste déroulante avec recherche
+  intégrée (autocomplete), navigable au clavier. Props : `options` (`[{ value,
+  label, disabled? }]`, la `value` est conservée telle quelle et renvoyée brute),
+  `value`, `onChange(value)`, `placeholder`, `className` (réutilise les classes de
+  champ existantes : `field__input`, `ffield__input`…), `block` (`false` pour un
+  rendu en ligne), `searchable` (le champ de recherche n'apparaît qu'au-delà de
+  7 options par défaut). L'option « vide » se passe comme une option ordinaire
+  (`{ value: '', label: '…' }`).
 - **Mobile-first dans le doute** : l'app est très utilisée sur mobile. La nav est
   un tiroir (hamburger) sous 720px (`Layout.jsx`/`.css`) ; les en-têtes de page
   passent à la ligne sous 640px (règle commune dans `index.css`). Toute grille

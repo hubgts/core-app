@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ALL_MEASUREMENTS, metricMeta } from './constants';
+import Combobox from '../Combobox';
 
 function parseNum(str) {
   const cleaned = String(str).replace(/\s/g, '').replace(',', '.').trim();
@@ -79,11 +80,17 @@ export default function ProfileModal({ profile, onSave, onClose }) {
             </label>
             <label className="hfield">
               <span className="hfield__label">Sexe (optionnel)</span>
-              <select className="hfield__input" value={sex} onChange={(e) => setSex(e.target.value)}>
-                <option value="">—</option>
-                <option value="f">Femme</option>
-                <option value="m">Homme</option>
-              </select>
+              <Combobox
+                className="hfield__input"
+                value={sex}
+                onChange={setSex}
+                placeholder="—"
+                options={[
+                  { value: '', label: '—' },
+                  { value: 'f', label: 'Femme' },
+                  { value: 'm', label: 'Homme' },
+                ]}
+              />
             </label>
           </div>
 

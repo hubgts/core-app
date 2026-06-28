@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { trainingApi } from '../../api/training';
 import { CARDIO_ZONES, PROGRAM_DAYS, TYPE_META, TYPES } from './constants';
 import ExerciseCombobox from './ExerciseCombobox';
+import Combobox from '../Combobox';
 
 const emptySet = () => ({ reps: '', weight: '' });
 const emptyExercise = () => ({ name: '', sets: [emptySet()] });
@@ -275,15 +276,15 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
           <div className="form-row">
             <label className="field">
               <span className="field__label">Jour</span>
-              <select
+              <Combobox
                 className="field__input"
                 value={dayOfWeek}
-                onChange={(e) => setDayOfWeek(Number(e.target.value))}
-              >
-                {PROGRAM_DAYS.map((d) => (
-                  <option key={d.value} value={d.value}>{d.code} — {d.label}</option>
-                ))}
-              </select>
+                onChange={setDayOfWeek}
+                options={PROGRAM_DAYS.map((d) => ({
+                  value: d.value,
+                  label: `${d.code} — ${d.label}`,
+                }))}
+              />
             </label>
             <label className="field">
               <span className="field__label">Nom (optionnel)</span>

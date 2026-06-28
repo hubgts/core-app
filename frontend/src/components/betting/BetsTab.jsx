@@ -12,6 +12,7 @@ import {
 } from './constants';
 import { promptDialog } from '../dialogs';
 import { frenchDayMonth } from '../../utils/date';
+import Combobox from '../Combobox';
 
 const FILTERS = [
   { id: 'all', label: 'Tous' },
@@ -112,16 +113,17 @@ function BetCard({ bet, onSettleBet, onSettleSelection, onDeleteBet }) {
             </span>
             <span className="bsel__odds">{formatOdds(sel.odds)}</span>
             {bet.type === 'combine' && (
-              <select
+              <Combobox
                 className={`bsel__status t-${selTone(sel.status)}`}
+                block={false}
                 value={sel.status}
-                onChange={(e) => onSettleSelection(sel.id, e.target.value)}
+                onChange={(v) => onSettleSelection(sel.id, v)}
                 title="Statut de la sélection"
-              >
-                {Object.entries(SELECTION_STATUS_META).map(([v, m]) => (
-                  <option key={v} value={v}>{m.icon} {m.label}</option>
-                ))}
-              </select>
+                options={Object.entries(SELECTION_STATUS_META).map(([v, m]) => ({
+                  value: v,
+                  label: `${m.icon} ${m.label}`,
+                }))}
+              />
             )}
           </li>
         ))}

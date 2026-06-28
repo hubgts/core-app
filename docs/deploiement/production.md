@@ -27,16 +27,29 @@ Internet ──80/443──▶ nginx (TLS certbot + Basic Auth htpasswd)
 Fichiers de référence dans le dépôt : `deploy/core-app-backend.service`,
 `deploy/nginx.conf`, `deploy/backend.env.example`.
 
+> **Migration depuis une ancienne install Docker** : sauvegarder d'abord la base
+> (`docker exec <db> pg_dump -U sunday core > ~/core-backup.sql`), arrêter la stack
+> (`docker compose ... down -v`), éventuellement désinstaller Docker, puis suivre
+> ce document. Le dump se restaure à l'étape *Base de données*.
+
 ## Prérequis (à installer une fois)
 
 ```bash
-# Node.js 18 (NodeSource)
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Node.js 22 LTS (NodeSource) — Node 18 est en fin de vie
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
 sudo apt install -y nodejs
 
 # PostgreSQL, nginx, certbot, htpasswd
 sudo apt install -y postgresql nginx certbot python3-certbot-nginx apache2-utils
 ```
+
+## Récupérer le code
+
+```bash
+git clone https://github.com/hubgts/core-app.git ~/projects/core-app
+cd ~/projects/core-app
+```
+(Pour une mise à jour : `git pull` dans ce dossier — voir la section *Mises à jour*.)
 
 ## Base de données
 
@@ -48,6 +61,11 @@ SQL
 ```
 (Le schéma est créé automatiquement au premier démarrage du backend —
 TypeORM `synchronize: true`.)
+
+En cas de migration, restaurer le dump **avant** de démarrer le backend :
+```bash
+psql -U sunday -h localhost core < ~/core-backup.sql
+```
 
 ## Backend (systemd)
 

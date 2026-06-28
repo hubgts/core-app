@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { CARD_COLORS, DIFFICULTIES, formatDuration } from './constants';
+import Combobox from '../Combobox';
 
 let keySeq = 0;
 const nextKey = () => `k${keySeq++}`;
@@ -197,34 +198,35 @@ export default function RecipeFormModal({
           <div className="alfield-row">
             <label className="alfield">
               <span className="alfield__label">Type de repas</span>
-              <select
+              <Combobox
                 className="alfield__input"
                 value={mealTypeId}
-                onChange={(e) => setMealTypeId(e.target.value)}
-              >
-                <option value="">Sans type</option>
-                {mealTypes.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.icon} {t.name}
-                  </option>
-                ))}
-              </select>
+                onChange={setMealTypeId}
+                placeholder="Sans type"
+                options={[
+                  { value: '', label: 'Sans type' },
+                  ...mealTypes.map((t) => ({
+                    value: t.id,
+                    label: `${t.icon} ${t.name}`,
+                  })),
+                ]}
+              />
               <span className="alfield__hint">
                 Les types de repas se gèrent dans le Référentiel.
               </span>
             </label>
             <label className="alfield alfield--narrow">
               <span className="alfield__label">Difficulté</span>
-              <select
+              <Combobox
                 className="alfield__input"
                 value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-              >
-                <option value="">—</option>
-                {DIFFICULTIES.map((d) => (
-                  <option key={d.value} value={d.value}>{d.label}</option>
-                ))}
-              </select>
+                onChange={setDifficulty}
+                placeholder="—"
+                options={[
+                  { value: '', label: '—' },
+                  ...DIFFICULTIES.map((d) => ({ value: d.value, label: d.label })),
+                ]}
+              />
             </label>
           </div>
 

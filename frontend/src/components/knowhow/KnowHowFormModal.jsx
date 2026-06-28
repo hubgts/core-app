@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { CARD_COLORS } from './constants';
+import Combobox from '../Combobox';
 
 let keySeq = 0;
 const nextKey = () => `k${keySeq++}`;
@@ -180,18 +181,19 @@ export default function KnowHowFormModal({
           <div className="ffield-row">
             <label className="ffield">
               <span className="ffield__label">Catégorie</span>
-              <select
+              <Combobox
                 className="ffield__input"
                 value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-              >
-                <option value="">Sans catégorie</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.icon} {c.name}
-                  </option>
-                ))}
-              </select>
+                onChange={setCategoryId}
+                placeholder="Sans catégorie"
+                options={[
+                  { value: '', label: 'Sans catégorie' },
+                  ...categories.map((c) => ({
+                    value: c.id,
+                    label: `${c.icon} ${c.name}`,
+                  })),
+                ]}
+              />
               <span className="ffield__hint">
                 Les catégories se gèrent dans le Référentiel.
               </span>

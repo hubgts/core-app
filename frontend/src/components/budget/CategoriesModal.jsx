@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { budgetApi } from '../../api/budget';
 import { BUDGET_COLORS, BUDGET_ICONS, DEFAULT_PLAN, monthLabel } from './constants';
 import { confirmDialog } from '../dialogs';
+import Combobox from '../Combobox';
 
 const clamp = (n) => Math.min(Math.max(Math.round(n), 0), 100);
 
@@ -214,14 +215,15 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
           </label>
           <label className="ffield bplan__kindfield">
             <span className="ffield__label">Type</span>
-            <select
+            <Combobox
               className="ffield__input"
               value={c.kind}
-              onChange={(e) => patchCategory(c.id, { kind: e.target.value })}
-            >
-              <option value="depense">Dépense</option>
-              <option value="epargne">Épargne</option>
-            </select>
+              onChange={(v) => patchCategory(c.id, { kind: v })}
+              options={[
+                { value: 'depense', label: 'Dépense' },
+                { value: 'epargne', label: 'Épargne' },
+              ]}
+            />
           </label>
         </div>
         <div className="ffield">

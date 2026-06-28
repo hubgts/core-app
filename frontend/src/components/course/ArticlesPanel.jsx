@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { courseApi } from '../../api/course';
 import { COMMON_UNITS } from './constants';
 import { confirmDialog, promptDialog } from '../dialogs';
+import Combobox from '../Combobox';
 
 /**
  * Panneau de gestion du référentiel d'articles, intégré à la page Référentiel.
@@ -127,10 +128,16 @@ export default function ArticlesPanel() {
         <datalist id="artman-units">
           {COMMON_UNITS.map((u) => <option key={u} value={u} />)}
         </datalist>
-        <select className="field__input" value={aisleId} onChange={(e) => setAisleId(e.target.value)}>
-          <option value="">Rayon : Autre</option>
-          {aisles.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-        </select>
+        <Combobox
+          className="field__input"
+          block={false}
+          value={aisleId}
+          onChange={setAisleId}
+          options={[
+            { value: '', label: 'Rayon : Autre' },
+            ...aisles.map((a) => ({ value: a.id, label: a.name })),
+          ]}
+        />
         <button type="submit" className="btn btn--primary" disabled={!name.trim()}>Ajouter</button>
       </form>
 

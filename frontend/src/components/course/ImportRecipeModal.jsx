@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { alimentationApi } from '../../api/alimentation';
 import { courseApi } from '../../api/course';
 import { formatMeasure } from './constants';
+import Combobox from '../Combobox';
 
 /**
  * Import d'une recette du module Alimentation vers une liste de courses.
@@ -63,16 +64,13 @@ export default function ImportRecipeModal({ listId, onClose, onDone }) {
 
         <label className="cfield">
           <span className="cfield__label">Recette</span>
-          <select
+          <Combobox
             className="field__input"
             value={recipeId}
-            onChange={(e) => { setRecipeId(e.target.value); setError(''); }}
-          >
-            <option value="">— Choisir une recette —</option>
-            {recipes.map((r) => (
-              <option key={r.id} value={r.id}>{r.title}</option>
-            ))}
-          </select>
+            onChange={(v) => { setRecipeId(v); setError(''); }}
+            placeholder="— Choisir une recette —"
+            options={recipes.map((r) => ({ value: r.id, label: r.title }))}
+          />
         </label>
 
         {preview && (

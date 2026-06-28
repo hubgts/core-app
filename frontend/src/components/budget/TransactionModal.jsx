@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { todayStr } from '../../utils/date';
+import Combobox from '../Combobox';
 
 /**
  * Saisie d'une transaction budget : dépense (rattachée à une catégorie) ou revenu.
@@ -121,17 +122,16 @@ export default function TransactionModal({
           {kind === 'sortie' && (
             <label className="ffield">
               <span className="ffield__label">Catégorie</span>
-              <select
+              <Combobox
                 className="ffield__input"
                 value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.icon ? `${c.icon} ` : ''}{c.name}
-                  </option>
-                ))}
-              </select>
+                onChange={setCategoryId}
+                placeholder="Choisir une catégorie…"
+                options={categories.map((c) => ({
+                  value: c.id,
+                  label: `${c.icon ? `${c.icon} ` : ''}${c.name}`,
+                }))}
+              />
             </label>
           )}
 

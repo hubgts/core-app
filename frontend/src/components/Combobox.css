@@ -1,0 +1,124 @@
+/* Liste déroulante avec recherche (autocomplete) — remplace le <select> natif.
+   Le déclencheur hérite des classes de champ existantes (field__input…) pour
+   rester visuellement identique au reste du formulaire. */
+.combo {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.combo--inline {
+  display: inline-block;
+  width: auto;
+}
+
+.combo__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.combo__trigger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.combo__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.combo__value--ph {
+  color: var(--text-faint);
+}
+
+.combo__chev {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  transition: transform 0.15s;
+}
+.combo.is-open .combo__chev {
+  transform: rotate(180deg);
+}
+
+.combo__panel {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  max-width: min(320px, 90vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+.combo--inline .combo__panel {
+  left: auto;
+  right: 0;
+}
+
+.combo__search {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+.combo__search:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.combo__list {
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  overflow-y: auto;
+  outline: none;
+}
+
+.combo__opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.combo__opt.is-active {
+  background: var(--surface-3);
+}
+.combo__opt.is-selected {
+  color: var(--accent);
+  font-weight: 600;
+}
+.combo__opt:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.combo__empty {
+  padding: 10px;
+  color: var(--text-faint);
+  font-size: 14px;
+  text-align: center;
+}
