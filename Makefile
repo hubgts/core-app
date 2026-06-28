@@ -1,7 +1,8 @@
 COMPOSE = docker compose -f docker/docker-compose.yml
+WEB_ROOT ?= /var/www/core-app
 
 .PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean \
-        prod-build prod-frontend prod-backend prod-deploy
+        update-dev update-prod
 
 ## init : construit les images, démarre les conteneurs et attend qu'ils soient prêts
 init: dc-build dc-up
@@ -42,29 +43,23 @@ dc-ps:
 dc-clean:
 	$(COMPOSE) down -v --rmi local
 
+## update-dev : met à jour le dev (git pull + rebuild images + redémarrage)
+update-dev:
+	git pull
+	$(COMPOSE) up -d --build --wait
+	@echo "✅ Dev à jour : http://localhost:5173 (API :3000)"
+
 # ================== PRODUCTION (VPS, sans Docker) ==================
 # Installation native : Node + PostgreSQL + nginx. Voir docs/deploiement/production.md.
-# Le frontend est servi en statique par nginx (root = /var/www/core-app) ;
-# le backend tourne via systemd (service core-app-backend).
+# Le backend tourne via systemd (core-app-backend) ; le frontend est servi en
+# statique par nginx depuis WEB_ROOT (défaut /var/www/core-app).
 
-WEB_ROOT ?= /var/www/core-app
-
-## prod-frontend : build du front (API sous /api) + déploiement dans WEB_ROOT
-prod-frontend:
+## update-prod : met à jour la prod (git pull + back via systemd + front via nginx)
+update-prod:
+	git pull
+	cd backend && npm ci && npm run build
+	sudo systemctl restart core-app-backend
 	cd frontend && npm ci && VITE_API_URL=/api npm run build
 	sudo mkdir -p $(WEB_ROOT)
 	sudo rsync -a --delete frontend/dist/ $(WEB_ROOT)/
-
-## prod-backend : build du back + (re)démarrage du service systemd
-prod-backend:
-	cd backend && npm ci && npm run build
-	sudo systemctl restart core-app-backend
-
-## prod-build : build front + back (sans déployer le service)
-prod-build:
-	cd backend && npm ci && npm run build
-	cd frontend && npm ci && VITE_API_URL=/api npm run build
-
-## prod-deploy : déploiement complet (front + back) après un git pull
-prod-deploy: prod-backend prod-frontend
-	@echo "✅ Déploiement terminé. nginx sert $(WEB_ROOT), API via systemd."
+	@echo "✅ Prod à jour : backend (systemd) redémarré, front déployé dans $(WEB_ROOT)"

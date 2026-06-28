@@ -89,10 +89,14 @@ curl -I http://127.0.0.1:3000              # le backend répond
 
 ## Frontend (build statique)
 
+Au premier déploiement, fais le build du front et copie-le dans `WEB_ROOT` :
 ```bash
-cd ~/projects/core-app
-make prod-frontend     # build (VITE_API_URL=/api) + copie dans /var/www/core-app
+cd ~/projects/core-app/frontend
+npm ci && VITE_API_URL=/api npm run build
+sudo mkdir -p /var/www/core-app
+sudo rsync -a --delete dist/ /var/www/core-app/
 ```
+(Pour les mises à jour suivantes, `make update-prod` fait tout — voir plus bas.)
 
 ## nginx + HTTPS + mot de passe
 
@@ -127,10 +131,10 @@ Puis ouvrir `https://emiliengantois.fr` : fenêtre de login, puis l'appli charge
 
 ```bash
 cd ~/projects/core-app
-git pull
-make prod-deploy        # rebuild back (+ restart systemd) et front (+ copie nginx)
+make update-prod        # git pull + rebuild back (restart systemd) + rebuild front (copie nginx)
 ```
-Pas besoin de toucher nginx ni certbot pour une simple MAJ de code.
+`make update-prod` fait tout (y compris le `git pull`). Pas besoin de toucher
+nginx ni certbot pour une simple MAJ de code.
 
 ## Ajouter / changer le mot de passe
 
