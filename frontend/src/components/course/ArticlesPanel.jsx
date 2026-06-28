@@ -70,7 +70,10 @@ export default function ArticlesPanel() {
   }
 
   async function rename(a) {
-    const next = await promptDialog({ title: "Renommer l'article", defaultValue: a.name });
+    const next = await promptDialog({
+      title: "Renommer l'article",
+      defaultValue: a.name,
+    });
     if (next == null || !next.trim() || next.trim() === a.name) return;
     run(() => courseApi.updateArticle(a.id, { name: next.trim() }));
   }
@@ -103,7 +106,13 @@ export default function ArticlesPanel() {
   }
 
   async function remove(a) {
-    if (!(await confirmDialog({ message: `Supprimer l'article « ${a.name} » du référentiel ?`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer l'article « ${a.name} » du référentiel ?`,
+        danger: true,
+      }))
+    )
+      return;
     run(() => courseApi.removeArticle(a.id));
   }
 
@@ -126,7 +135,9 @@ export default function ArticlesPanel() {
           onChange={(e) => setUnit(e.target.value)}
         />
         <datalist id="artman-units">
-          {COMMON_UNITS.map((u) => <option key={u} value={u} />)}
+          {COMMON_UNITS.map((u) => (
+            <option key={u} value={u} />
+          ))}
         </datalist>
         <Combobox
           className="field__input"
@@ -138,7 +149,13 @@ export default function ArticlesPanel() {
             ...aisles.map((a) => ({ value: a.id, label: a.name })),
           ]}
         />
-        <button type="submit" className="btn btn--primary" disabled={!name.trim()}>Ajouter</button>
+        <button
+          type="submit"
+          className="btn btn--primary"
+          disabled={!name.trim()}
+        >
+          Ajouter
+        </button>
       </form>
 
       <input
@@ -153,23 +170,47 @@ export default function ArticlesPanel() {
       {loading ? (
         <p className="ref-empty">Chargement…</p>
       ) : articles.length === 0 ? (
-        <p className="ref-empty">{search ? 'Aucun résultat.' : 'Aucun article pour le moment.'}</p>
+        <p className="ref-empty">
+          {search ? 'Aucun résultat.' : 'Aucun article pour le moment.'}
+        </p>
       ) : (
         <ul className="ref-list">
           {articles.map((a) => (
             <li key={a.id} className="ref-item">
               <div className="artman__row">
                 <span className="ref-item__name">{a.name}</span>
-                <button className="artman__unit" onClick={() => changeUnit(a)} title="Changer la mesure">
+                <button
+                  className="artman__unit"
+                  onClick={() => changeUnit(a)}
+                  title="Changer la mesure"
+                >
                   {a.unit || 'sans mesure'}
                 </button>
-                <button className="artman__aisle" onClick={() => changeAisle(a)} title="Changer le rayon">
+                <button
+                  className="artman__aisle"
+                  onClick={() => changeAisle(a)}
+                  title="Changer le rayon"
+                >
                   · {aisleName(a.aisleId)}
                 </button>
               </div>
               <div className="ref-item__actions">
-                <button className="icon-btn" onClick={() => rename(a)} aria-label="Renommer" title="Renommer">✏️</button>
-                <button className="icon-btn" onClick={() => remove(a)} aria-label="Supprimer" title="Supprimer">🗑</button>
+                <button
+                  className="icon-btn"
+                  onClick={() => rename(a)}
+                  aria-label="Renommer"
+                  title="Renommer"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="icon-btn"
+                  onClick={() => remove(a)}
+                  aria-label="Supprimer"
+                  title="Supprimer"
+                >
+                  🗑
+                </button>
               </div>
             </li>
           ))}

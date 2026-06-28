@@ -25,7 +25,13 @@ function ProgressRing({ done, target, color }) {
   const ratio = Math.min(done / target, 1);
   const met = done >= target;
   return (
-    <svg className="wring" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+    <svg
+      className="wring"
+      width="22"
+      height="22"
+      viewBox="0 0 22 22"
+      aria-hidden="true"
+    >
       <circle className="wring__bg" cx="11" cy="11" r={r} />
       <circle
         className="wring__fg"
@@ -36,7 +42,11 @@ function ProgressRing({ done, target, color }) {
         strokeDasharray={`${circ * ratio} ${circ}`}
         transform="rotate(-90 11 11)"
       />
-      {met && <text className="wring__tick" x="11" y="15">✓</text>}
+      {met && (
+        <text className="wring__tick" x="11" y="15">
+          ✓
+        </text>
+      )}
     </svg>
   );
 }
@@ -71,7 +81,11 @@ export default function HabitsPage() {
     }
     return {
       from: ymd(cursor.year, cursor.month, 1),
-      to: ymd(cursor.year, cursor.month, daysInMonth(cursor.year, cursor.month)),
+      to: ymd(
+        cursor.year,
+        cursor.month,
+        daysInMonth(cursor.year, cursor.month),
+      ),
     };
   }, [period, cursor.year, cursor.month]);
 
@@ -175,7 +189,9 @@ export default function HabitsPage() {
     const [moved] = next.splice(from, 1);
     next.splice(dropIndex, 0, moved);
     setHabits(next);
-    habitsApi.reorder(next.map((h) => h.id)).catch((e) => showToast(`Erreur : ${e.message}`));
+    habitsApi
+      .reorder(next.map((h) => h.id))
+      .catch((e) => showToast(`Erreur : ${e.message}`));
   }
 
   // --- KPIs (complétion du mois, RG-10/12) ----------------------------------
@@ -215,7 +231,9 @@ export default function HabitsPage() {
     setCursor({ year: now.getFullYear(), month: now.getMonth() + 1 });
 
   const periodLabel =
-    period === 'year' ? String(cursor.year) : monthLabel(cursor.year, cursor.month);
+    period === 'year'
+      ? String(cursor.year)
+      : monthLabel(cursor.year, cursor.month);
 
   const openMonth = (month) => {
     setCursor((c) => ({ ...c, month }));
@@ -244,10 +262,24 @@ export default function HabitsPage() {
 
       <div className="control-bar">
         <div className="control-bar__nav">
-          <button className="icon-btn" onClick={() => goPeriod(-1)} aria-label="Précédent">‹</button>
+          <button
+            className="icon-btn"
+            onClick={() => goPeriod(-1)}
+            aria-label="Précédent"
+          >
+            ‹
+          </button>
           <span className="control-bar__label">{periodLabel}</span>
-          <button className="icon-btn" onClick={() => goPeriod(1)} aria-label="Suivant">›</button>
-          <button className="btn btn--ghost btn--sm" onClick={goToday}>Aujourd’hui</button>
+          <button
+            className="icon-btn"
+            onClick={() => goPeriod(1)}
+            aria-label="Suivant"
+          >
+            ›
+          </button>
+          <button className="btn btn--ghost btn--sm" onClick={goToday}>
+            Aujourd’hui
+          </button>
         </div>
 
         <div className="control-bar__switches">
@@ -344,96 +376,116 @@ export default function HabitsPage() {
                   Math.round((h.weeklyTarget * monthEligible) / 7),
                 );
                 return (
-                <tr
-                  key={h.id}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => onDrop(idx)}
-                >
-                  <td
-                    className="grid__name"
-                    style={{ '--accent': h.color }}
-                    draggable
-                    onDragStart={() => (dragIndex.current = idx)}
-                    onClick={() => setModal({ open: true, habit: h })}
-                    title="Cliquer pour modifier · glisser pour réordonner"
+                  <tr
+                    key={h.id}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => onDrop(idx)}
                   >
-                    <span className="grid__drag">⠿</span>
-                    <span className="grid__icon">{h.icon}</span>
-                    <span className="grid__namecol">
-                      <span className="grid__hname">{h.name}</span>
-                      {h.weeklyTarget < 7 && (
-                        <span className="grid__target">{h.weeklyTarget}×/sem</span>
-                      )}
-                    </span>
-                  </td>
-
-                  {days.map((d) => {
-                    const dateStr = ymd(cursor.year, cursor.month, d);
-                    const key = `${h.id}|${dateStr}`;
-                    const checked = checks.has(key);
-                    const isFuture = dateStr > today;
-                    const isPre = dateStr < created; // avant la création de l'habitude
-                    const cls = [
-                      'grid__cell',
-                      isWeekend(cursor.year, cursor.month, d) ? 'is-weekend' : '',
-                      dateStr === today ? 'is-today' : '',
-                      isoWeekday(dateStr) === 0 ? 'is-weekstart' : '',
-                    ].join(' ');
-                    const cellCls = [
-                      'cell',
-                      checked ? 'cell--checked' : '',
-                      isPre ? 'cell--precreate' : '',
-                      isFuture ? 'cell--future' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ');
-                    const label = isPre
-                      ? `${h.name}, ${dateStr} (avant création le ${createdFr}), ${checked ? 'coché' : 'non coché'}`
-                      : `${h.name}, ${dateStr}, ${checked ? 'coché' : 'non coché'}`;
-                    return (
-                      <td key={d} className={cls}>
-                        <button
-                          className={cellCls}
-                          style={checked ? { background: h.color, borderColor: h.color } : undefined}
-                          onClick={() => toggle(h, dateStr)}
-                          title={isPre ? `« ${h.name} » créée le ${createdFr} — suivi à partir de cette date` : undefined}
-                          aria-label={label}
-                        >
-                          {checked ? '✓' : ''}
-                        </button>
-                      </td>
-                    );
-                  })}
-
-                  <td className="grid__rail">
-                    <span
-                      className="prog-badge"
-                      title={`Cette semaine : ${h.stats.weekDone}/${h.weeklyTarget}`}
+                    <td
+                      className="grid__name"
+                      style={{ '--accent': h.color }}
+                      draggable
+                      onDragStart={() => (dragIndex.current = idx)}
+                      onClick={() => setModal({ open: true, habit: h })}
+                      title="Cliquer pour modifier · glisser pour réordonner"
                     >
-                      <ProgressRing done={h.stats.weekDone} target={h.weeklyTarget} color={h.color} />
-                      <span className="prog-badge__txt">
-                        {h.stats.weekDone}/{h.weeklyTarget}
+                      <span className="grid__drag">⠿</span>
+                      <span className="grid__icon">{h.icon}</span>
+                      <span className="grid__namecol">
+                        <span className="grid__hname">{h.name}</span>
+                        {h.weeklyTarget < 7 && (
+                          <span className="grid__target">
+                            {h.weeklyTarget}×/sem
+                          </span>
+                        )}
                       </span>
-                    </span>
-                  </td>
-                  <td className="grid__rail">
-                    <span
-                      className="prog-badge"
-                      title={`${monthLabel(cursor.year, cursor.month)} : ${monthDone}/${monthTarget}`}
-                    >
-                      <ProgressRing done={monthDone} target={monthTarget} color={h.color} />
-                      <span className="prog-badge__txt">
-                        {monthDone}/{monthTarget}
+                    </td>
+
+                    {days.map((d) => {
+                      const dateStr = ymd(cursor.year, cursor.month, d);
+                      const key = `${h.id}|${dateStr}`;
+                      const checked = checks.has(key);
+                      const isFuture = dateStr > today;
+                      const isPre = dateStr < created; // avant la création de l'habitude
+                      const cls = [
+                        'grid__cell',
+                        isWeekend(cursor.year, cursor.month, d)
+                          ? 'is-weekend'
+                          : '',
+                        dateStr === today ? 'is-today' : '',
+                        isoWeekday(dateStr) === 0 ? 'is-weekstart' : '',
+                      ].join(' ');
+                      const cellCls = [
+                        'cell',
+                        checked ? 'cell--checked' : '',
+                        isPre ? 'cell--precreate' : '',
+                        isFuture ? 'cell--future' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ');
+                      const label = isPre
+                        ? `${h.name}, ${dateStr} (avant création le ${createdFr}), ${checked ? 'coché' : 'non coché'}`
+                        : `${h.name}, ${dateStr}, ${checked ? 'coché' : 'non coché'}`;
+                      return (
+                        <td key={d} className={cls}>
+                          <button
+                            className={cellCls}
+                            style={
+                              checked
+                                ? { background: h.color, borderColor: h.color }
+                                : undefined
+                            }
+                            onClick={() => toggle(h, dateStr)}
+                            title={
+                              isPre
+                                ? `« ${h.name} » créée le ${createdFr} — suivi à partir de cette date`
+                                : undefined
+                            }
+                            aria-label={label}
+                          >
+                            {checked ? '✓' : ''}
+                          </button>
+                        </td>
+                      );
+                    })}
+
+                    <td className="grid__rail">
+                      <span
+                        className="prog-badge"
+                        title={`Cette semaine : ${h.stats.weekDone}/${h.weeklyTarget}`}
+                      >
+                        <ProgressRing
+                          done={h.stats.weekDone}
+                          target={h.weeklyTarget}
+                          color={h.color}
+                        />
+                        <span className="prog-badge__txt">
+                          {h.stats.weekDone}/{h.weeklyTarget}
+                        </span>
                       </span>
-                    </span>
-                  </td>
-                  <td className="grid__rail">
-                    <span className="streak-badge" title="Série en cours">
-                      🔥 {h.stats.currentStreak}
-                      {h.stats.streakUnit === 'weeks' ? ' sem' : ''}
-                    </span>
-                  </td>
-                </tr>
+                    </td>
+                    <td className="grid__rail">
+                      <span
+                        className="prog-badge"
+                        title={`${monthLabel(cursor.year, cursor.month)} : ${monthDone}/${monthTarget}`}
+                      >
+                        <ProgressRing
+                          done={monthDone}
+                          target={monthTarget}
+                          color={h.color}
+                        />
+                        <span className="prog-badge__txt">
+                          {monthDone}/{monthTarget}
+                        </span>
+                      </span>
+                    </td>
+                    <td className="grid__rail">
+                      <span className="streak-badge" title="Série en cours">
+                        🔥 {h.stats.currentStreak}
+                        {h.stats.streakUnit === 'weeks' ? ' sem' : ''}
+                      </span>
+                    </td>
+                  </tr>
                 );
               })}
             </tbody>

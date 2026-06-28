@@ -22,15 +22,29 @@
   padding: 14px 16px;
   transition: border-color 0.15s;
 }
-.fecard:hover { border-color: var(--accent); }
-.fecard--stale { border-color: color-mix(in srgb, var(--warning, #f59e0b) 50%, var(--border)); }
+.fecard:hover {
+  border-color: var(--accent);
+}
+.fecard--stale {
+  border-color: color-mix(in srgb, var(--warning, #f59e0b) 50%, var(--border));
+}
 
 /* Glisser-déposer (réordonnancement) */
-.fcard-drag { cursor: grab; }
-.fcard-drag:active { cursor: grabbing; }
+.fcard-drag {
+  cursor: grab;
+}
+.fcard-drag:active {
+  cursor: grabbing;
+}
 
-.fecard__fresh { font-weight: 400; color: var(--text-faint); }
-.fecard__fresh--stale { color: var(--warning, #f59e0b); font-weight: 600; }
+.fecard__fresh {
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.fecard__fresh--stale {
+  color: var(--warning, #f59e0b);
+  font-weight: 600;
+}
 
 .fecard__main {
   display: flex;
@@ -81,8 +95,14 @@
   font-size: 17px;
   font-variant-numeric: tabular-nums;
 }
-.fecard__amount--neg { color: var(--danger); }
-.fecard__perf { font-size: 12px; font-weight: 600; margin-top: 2px; }
+.fecard__amount--neg {
+  color: var(--danger);
+}
+.fecard__perf {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 2px;
+}
 
 .fecard__actions {
   display: flex;
@@ -90,7 +110,11 @@
 }
 
 /* --- Barre de progression d'objectif (cartes, drawer, résumé compact) --- */
-.fprog { display: flex; flex-direction: column; gap: 6px; }
+.fprog {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .fprog__track {
   height: 8px;
   border-radius: 999px;
@@ -109,13 +133,27 @@
   gap: 8px;
   font-size: 12px;
 }
-.fprog__nums { color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.fprog__date { color: var(--text-faint); flex: none; }
-.fprog__date--late { color: var(--danger); font-weight: 600; }
-.fprog__pace { font-size: 12px; font-weight: 600; }
+.fprog__nums {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.fprog__date {
+  color: var(--text-faint);
+  flex: none;
+}
+.fprog__date--late {
+  color: var(--danger);
+  font-weight: 600;
+}
+.fprog__pace {
+  font-size: 12px;
+  font-weight: 600;
+}
 
 /* Section des enveloppes archivées (#3) */
-.farch { margin-top: 12px; }
+.farch {
+  margin-top: 12px;
+}
 .farch__toggle {
   border: none;
   background: transparent;
@@ -125,19 +163,37 @@
   cursor: pointer;
   padding: 6px 0;
 }
-.farch__list { margin-top: 8px; opacity: 0.85; }
-.fenv--arch { cursor: default; }
-.fenv--arch:hover { border-color: var(--border); background: var(--surface); }
-.fenv--arch .fenv__name { color: var(--text-muted); }
+.farch__list {
+  margin-top: 8px;
+  opacity: 0.85;
+}
+.fenv--arch {
+  cursor: default;
+}
+.fenv--arch:hover {
+  border-color: var(--border);
+  background: var(--surface);
+}
+.fenv--arch .fenv__name {
+  color: var(--text-muted);
+}
 
 /* Variante compacte (résumé de la vue d'ensemble) : barre seule */
-.fprog--mini { margin: -2px 0 7px; }
-.fprog--mini .fprog__track { height: 5px; }
+.fprog--mini {
+  margin: -2px 0 7px;
+}
+.fprog--mini .fprog__track {
+  height: 5px;
+}
 
 /* Encart objectif dans le drawer */
-.fdrawer__objective { padding: 0 22px 8px; }
+.fdrawer__objective {
+  padding: 0 22px 8px;
+}
 
 /* --- Responsive --- */
 @media (max-width: 620px) {
-  .fcards { grid-template-columns: 1fr; }
+  .fcards {
+    grid-template-columns: 1fr;
+  }
 }

@@ -26,7 +26,9 @@ export default function MeasurementFormModal({
   const isEdit = Boolean(measurement);
   const [date, setDate] = useState(measurement?.date ?? today ?? todayStr());
   const [weight, setWeight] = useState(
-    measurement?.weightKg != null ? String(measurement.weightKg).replace('.', ',') : '',
+    measurement?.weightKg != null
+      ? String(measurement.weightKg).replace('.', ',')
+      : '',
   );
   const [vals, setVals] = useState(() => {
     const init = {};
@@ -58,12 +60,18 @@ export default function MeasurementFormModal({
     try {
       const values = {};
       for (const k of metrics) values[k] = parseNum(vals[k]);
-      payload = { weightKg: parseNum(weight), note: note.trim() || null, values };
+      payload = {
+        weightKg: parseNum(weight),
+        note: note.trim() || null,
+        values,
+      };
     } catch {
       setError('Vérifiez les valeurs saisies (nombres).');
       return;
     }
-    const hasValue = payload.weightKg != null || Object.values(payload.values).some((v) => v != null);
+    const hasValue =
+      payload.weightKg != null ||
+      Object.values(payload.values).some((v) => v != null);
     if (!hasValue) {
       setError('Renseignez au moins le poids ou une mensuration.');
       return;
@@ -80,7 +88,9 @@ export default function MeasurementFormModal({
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
-        <h2 className="modal__title">{isEdit ? 'Modifier la mesure' : 'Nouvelle pesée'}</h2>
+        <h2 className="modal__title">
+          {isEdit ? 'Modifier la mesure' : 'Nouvelle pesée'}
+        </h2>
 
         <form onSubmit={submit}>
           <div className="hfield-row">
@@ -111,9 +121,15 @@ export default function MeasurementFormModal({
 
           {metrics.length > 0 && (
             <div className="hfield">
-              <span className="hfield__label">Mensurations (cm) — optionnel</span>
-              <span className="hfield__hint" style={{ marginTop: 0, marginBottom: 8 }}>
-                Remplis seulement celles que tu mesures ce jour-là — pas besoin de tout faire à chaque fois.
+              <span className="hfield__label">
+                Mensurations (cm) — optionnel
+              </span>
+              <span
+                className="hfield__hint"
+                style={{ marginTop: 0, marginBottom: 8 }}
+              >
+                Remplis seulement celles que tu mesures ce jour-là — pas besoin
+                de tout faire à chaque fois.
               </span>
               <div className="hmeasgrid">
                 {metrics.map((k) => {
@@ -129,7 +145,9 @@ export default function MeasurementFormModal({
                         inputMode="decimal"
                         value={vals[k]}
                         placeholder="—"
-                        onChange={(e) => setVals((s) => ({ ...s, [k]: e.target.value }))}
+                        onChange={(e) =>
+                          setVals((s) => ({ ...s, [k]: e.target.value }))
+                        }
                       />
                     </label>
                   );
@@ -155,16 +173,28 @@ export default function MeasurementFormModal({
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(measurement)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(measurement)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

@@ -15,7 +15,12 @@ import {
   formatSignedMetric,
   deltaClass,
 } from '../components/health/constants';
-import { addDaysStr, frenchFullDate, frenchDayMonth, todayStr } from '../utils/date';
+import {
+  addDaysStr,
+  frenchFullDate,
+  frenchDayMonth,
+  todayStr,
+} from '../utils/date';
 import './HealthPage.css';
 
 export default function HealthPage() {
@@ -114,7 +119,13 @@ export default function HealthPage() {
   }
 
   async function deleteMeasurement(measurement) {
-    if (!(await confirmDialog({ message: `Supprimer la mesure du ${frenchDayMonth(measurement.date)} ?`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer la mesure du ${frenchDayMonth(measurement.date)} ?`,
+        danger: true,
+      }))
+    )
+      return;
     const next = await healthApi.removeMeasurement(measurement.id, today);
     setData(next);
     setMeasureModal(null);
@@ -145,7 +156,9 @@ export default function HealthPage() {
   // Célébration au franchissement de l'objectif.
   function maybeCelebrate(next) {
     if (next.goal?.paceStatus === 'reached' && goal?.paceStatus !== 'reached') {
-      flash(`🎯 Objectif ${formatMetric(next.goal.targetWeightKg, 'weight')} atteint !`);
+      flash(
+        `🎯 Objectif ${formatMetric(next.goal.targetWeightKg, 'weight')} atteint !`,
+      );
     }
   }
 
@@ -157,13 +170,22 @@ export default function HealthPage() {
       <header className="hpage__head">
         <div>
           <h1 className="hpage__title">📏 Mensuration</h1>
-          <p className="hpage__sub">Poids &amp; mensurations qui évoluent avec le muscle — tendance et objectif.</p>
+          <p className="hpage__sub">
+            Poids &amp; mensurations qui évoluent avec le muscle — tendance et
+            objectif.
+          </p>
         </div>
         <div className="hpage__actions">
-          <button className="btn btn--ghost" onClick={() => setProfileModal(true)}>
+          <button
+            className="btn btn--ghost"
+            onClick={() => setProfileModal(true)}
+          >
             ⚙︎ Réglages
           </button>
-          <button className="btn btn--primary" onClick={() => setMeasureModal({})}>
+          <button
+            className="btn btn--primary"
+            onClick={() => setMeasureModal({})}
+          >
             + Mesure
           </button>
         </div>
@@ -176,10 +198,14 @@ export default function HealthPage() {
           <div className="hempty__icon">⚖️</div>
           <h2 className="hempty__title">Enregistre ta première pesée</h2>
           <p className="hempty__text">
-            Le poids du jour est bruité : c'est la <strong>tendance lissée</strong> dans le temps
-            qui compte. Note ton poids régulièrement pour voir la courbe se dessiner.
+            Le poids du jour est bruité : c'est la{' '}
+            <strong>tendance lissée</strong> dans le temps qui compte. Note ton
+            poids régulièrement pour voir la courbe se dessiner.
           </p>
-          <button className="btn btn--primary" onClick={() => setMeasureModal({})}>
+          <button
+            className="btn btn--primary"
+            onClick={() => setMeasureModal({})}
+          >
             + Première mesure
           </button>
         </section>
@@ -188,15 +214,25 @@ export default function HealthPage() {
           {/* KPIs */}
           <section className="hkpis">
             <div className="hkpi hkpi--hero">
-              <span className="hkpi__label">Poids actuel <em>(tendance)</em></span>
-              <span className="hkpi__value">{formatMetric(kpis.currentWeightKg, 'weight')}</span>
+              <span className="hkpi__label">
+                Poids actuel <em>(tendance)</em>
+              </span>
+              <span className="hkpi__value">
+                {formatMetric(kpis.currentWeightKg, 'weight')}
+              </span>
               {kpis.lastRawWeightKg != null && (
-                <span className="hkpi__hint">dernière pesée {formatMetric(kpis.lastRawWeightKg, 'weight')}</span>
+                <span className="hkpi__hint">
+                  dernière pesée {formatMetric(kpis.lastRawWeightKg, 'weight')}
+                </span>
               )}
             </div>
             <Delta label="7 jours" value={kpis.delta7Kg} dir={dir} />
             <Delta label="30 jours" value={kpis.delta30Kg} dir={dir} />
-            <Delta label="Depuis le début" value={kpis.deltaTotalKg} dir={dir} />
+            <Delta
+              label="Depuis le début"
+              value={kpis.deltaTotalKg}
+              dir={dir}
+            />
             {kpis.bmi != null ? (
               <div className="hkpi">
                 <span className="hkpi__label">IMC</span>
@@ -204,7 +240,10 @@ export default function HealthPage() {
                 <span className="hkpi__hint">{kpis.bmiLabel}</span>
               </div>
             ) : (
-              <button className="hkpi hkpi--cta" onClick={() => setProfileModal(true)}>
+              <button
+                className="hkpi hkpi--cta"
+                onClick={() => setProfileModal(true)}
+              >
                 <span className="hkpi__label">IMC</span>
                 <span className="hkpi__value hkpi__value--sm">+ taille</span>
                 <span className="hkpi__hint">renseigner pour l'IMC</span>
@@ -250,7 +289,11 @@ export default function HealthPage() {
                 </h2>
                 <div className="hlegend">
                   <span className="hlegend__item">
-                    <i className="hlegend__line" style={{ background: TREND_COLOR }} /> tendance
+                    <i
+                      className="hlegend__line"
+                      style={{ background: TREND_COLOR }}
+                    />{' '}
+                    tendance
                   </span>
                   <span className="hlegend__item">
                     <i className="hlegend__dot" /> pesée
@@ -264,7 +307,8 @@ export default function HealthPage() {
               </div>
               {chartData.length < 2 && (
                 <p className="hcard__note">
-                  Pas assez de points sur cette période pour une tendance fiable.
+                  Pas assez de points sur cette période pour une tendance
+                  fiable.
                 </p>
               )}
               <MetricChart
@@ -299,15 +343,24 @@ export default function HealthPage() {
                       onClick={() => setMetric(k)}
                     >
                       <div className="hsparkcard__head">
-                        <span className="hsparkcard__name">{mm.icon} {mm.short}</span>
+                        <span className="hsparkcard__name">
+                          {mm.icon} {mm.short}
+                        </span>
                         {sum.delta != null && (
-                          <span className={`hsparkcard__delta t-${deltaClass(sum.delta, null)}`}>
+                          <span
+                            className={`hsparkcard__delta t-${deltaClass(sum.delta, null)}`}
+                          >
                             {formatSignedMetric(sum.delta, k)}
                           </span>
                         )}
                       </div>
-                      <Sparkline data={o.series[k] ?? []} color={HEALTH_COLOR} />
-                      <span className="hsparkcard__value">{formatMetric(sum.last, k)}</span>
+                      <Sparkline
+                        data={o.series[k] ?? []}
+                        color={HEALTH_COLOR}
+                      />
+                      <span className="hsparkcard__value">
+                        {formatMetric(sum.last, k)}
+                      </span>
                     </button>
                   );
                 })}
@@ -327,20 +380,35 @@ export default function HealthPage() {
                     : null;
                 return (
                   <li key={m.id}>
-                    <button className="hhist__row" onClick={() => setMeasureModal({ measurement: m })}>
-                      <span className="hhist__date">{frenchFullDate(m.date)}</span>
+                    <button
+                      className="hhist__row"
+                      onClick={() => setMeasureModal({ measurement: m })}
+                    >
+                      <span className="hhist__date">
+                        {frenchFullDate(m.date)}
+                      </span>
                       <span className="hhist__weight">
-                        {m.weightKg != null ? formatMetric(m.weightKg, 'weight') : '—'}
+                        {m.weightKg != null
+                          ? formatMetric(m.weightKg, 'weight')
+                          : '—'}
                       </span>
                       {wdelta != null && (
-                        <span className={`hhist__delta t-${deltaClass(wdelta, dir)}`}>
+                        <span
+                          className={`hhist__delta t-${deltaClass(wdelta, dir)}`}
+                        >
                           {formatSignedMetric(wdelta, 'weight')}
                         </span>
                       )}
                       {Object.keys(m.values).length > 0 && (
-                        <span className="hhist__tag" title="mensurations">📏 {Object.keys(m.values).length}</span>
+                        <span className="hhist__tag" title="mensurations">
+                          📏 {Object.keys(m.values).length}
+                        </span>
                       )}
-                      {m.note && <span className="hhist__note" title={m.note}>📝</span>}
+                      {m.note && (
+                        <span className="hhist__note" title={m.note}>
+                          📝
+                        </span>
+                      )}
                     </button>
                   </li>
                 );
@@ -373,7 +441,11 @@ export default function HealthPage() {
       )}
 
       {profileModal && (
-        <ProfileModal profile={o.profile} onSave={saveProfile} onClose={() => setProfileModal(false)} />
+        <ProfileModal
+          profile={o.profile}
+          onSave={saveProfile}
+          onClose={() => setProfileModal(false)}
+        />
       )}
 
       {toast && <div className="htoast">{toast}</div>}
@@ -385,7 +457,9 @@ function Delta({ label, value, dir }) {
   return (
     <div className="hkpi">
       <span className="hkpi__label">Δ {label}</span>
-      <span className={`hkpi__value hkpi__value--sm t-${deltaClass(value, dir)}`}>
+      <span
+        className={`hkpi__value hkpi__value--sm t-${deltaClass(value, dir)}`}
+      >
         {value != null ? formatSignedMetric(value, 'weight') : '—'}
       </span>
     </div>
@@ -398,7 +472,8 @@ function GoalPanel({ goal, isWeight, onEdit }) {
     return (
       <div className="hcard hgoal hgoal--muted">
         <p className="hgoal__hint">
-          L'objectif porte sur le <strong>poids</strong>. Sélectionne « Poids » pour le suivre ici.
+          L'objectif porte sur le <strong>poids</strong>. Sélectionne « Poids »
+          pour le suivre ici.
         </p>
       </div>
     );
@@ -408,8 +483,12 @@ function GoalPanel({ goal, isWeight, onEdit }) {
       <div className="hcard hgoal hgoal--empty">
         <span className="hgoal__icon">🎯</span>
         <h3 className="hgoal__title">Fixe-toi un cap</h3>
-        <p className="hgoal__hint">Un objectif de poids, une progression honnête, une date estimée.</p>
-        <button className="btn btn--primary btn--sm" onClick={onEdit}>Définir un objectif</button>
+        <p className="hgoal__hint">
+          Un objectif de poids, une progression honnête, une date estimée.
+        </p>
+        <button className="btn btn--primary btn--sm" onClick={onEdit}>
+          Définir un objectif
+        </button>
       </div>
     );
   }
@@ -420,8 +499,16 @@ function GoalPanel({ goal, isWeight, onEdit }) {
   return (
     <div className={`hcard hgoal${reached ? ' hgoal--reached' : ''}`}>
       <div className="hgoal__top">
-        <h3 className="hgoal__title">🎯 {formatMetric(goal.targetWeightKg, 'weight')}</h3>
-        <button className="hgoal__edit" onClick={onEdit} aria-label="Modifier l'objectif">✎</button>
+        <h3 className="hgoal__title">
+          🎯 {formatMetric(goal.targetWeightKg, 'weight')}
+        </h3>
+        <button
+          className="hgoal__edit"
+          onClick={onEdit}
+          aria-label="Modifier l'objectif"
+        >
+          ✎
+        </button>
       </div>
 
       <div className="hgoal__bar">
@@ -430,12 +517,16 @@ function GoalPanel({ goal, isWeight, onEdit }) {
       <div className="hgoal__pctrow">
         <span className="hgoal__pct">{pct} %</span>
         {goal.remainingKg != null && !reached && (
-          <span className="hgoal__remaining">reste {formatMetric(goal.remainingKg, 'weight')}</span>
+          <span className="hgoal__remaining">
+            reste {formatMetric(goal.remainingKg, 'weight')}
+          </span>
         )}
       </div>
 
       {reached ? (
-        <p className="hgoal__status hgoal__status--ok">✅ Objectif atteint, bravo !</p>
+        <p className="hgoal__status hgoal__status--ok">
+          ✅ Objectif atteint, bravo !
+        </p>
       ) : (
         <ul className="hgoal__facts">
           {goal.weeklyRateKg != null && (
@@ -450,13 +541,17 @@ function GoalPanel({ goal, isWeight, onEdit }) {
           <li>
             <span className="hgoal__factlabel">Estimation</span>
             <span className="hgoal__factval">
-              {goal.eta ? `🎯 ${frenchDayMonth(goal.eta)}` : '— (rythme inverse)'}
+              {goal.eta
+                ? `🎯 ${frenchDayMonth(goal.eta)}`
+                : '— (rythme inverse)'}
             </span>
           </li>
           {goal.targetDate && (
             <li>
               <span className="hgoal__factlabel">Échéance</span>
-              <span className={`hgoal__factval ${goal.paceStatus === 'behind' ? 't-down' : 't-up'}`}>
+              <span
+                className={`hgoal__factval ${goal.paceStatus === 'behind' ? 't-down' : 't-up'}`}
+              >
                 {goal.paceStatus === 'on_track' && '✅ dans les temps'}
                 {goal.paceStatus === 'behind' &&
                   `⚠️ +${goal.requiredWeeklyKg?.toFixed(2)} kg/sem requis`}

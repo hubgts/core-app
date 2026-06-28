@@ -6,12 +6,22 @@ import { todayStr } from '../../utils/date';
  * Création (choix du type + solde initial) ou édition (nom/icône/couleur).
  * Le type est immuable après création.
  */
-export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelete, onClose }) {
+export default function EnvelopeFormModal({
+  envelope,
+  onSave,
+  onArchive,
+  onDelete,
+  onClose,
+}) {
   const isEdit = Boolean(envelope);
   const [type, setType] = useState(envelope?.type ?? 'compte_courant');
   const [name, setName] = useState(envelope?.name ?? '');
-  const [icon, setIcon] = useState(envelope?.icon || TYPE_META[envelope?.type ?? 'compte_courant'].icon);
-  const [color, setColor] = useState(envelope?.color ?? TYPE_META['compte_courant'].color);
+  const [icon, setIcon] = useState(
+    envelope?.icon || TYPE_META[envelope?.type ?? 'compte_courant'].icon,
+  );
+  const [color, setColor] = useState(
+    envelope?.color ?? TYPE_META['compte_courant'].color,
+  );
   const [initialAmount, setInitialAmount] = useState('');
   const [initialGain, setInitialGain] = useState('');
   const [initialDate, setInitialDate] = useState(todayStr());
@@ -36,7 +46,11 @@ export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelet
   // À la création, changer de type ajuste l'icône/couleur par défaut.
   function pickType(t) {
     setType(t);
-    if (!icon || ICONS.includes(icon) === false || icon === TYPE_META[type].icon) {
+    if (
+      !icon ||
+      ICONS.includes(icon) === false ||
+      icon === TYPE_META[type].icon
+    ) {
       setIcon(TYPE_META[t].icon);
     }
     setColor(TYPE_META[t].color);
@@ -52,7 +66,8 @@ export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelet
     setError('');
     // Objectif : vide = pas d'objectif (null pour effacer côté backend).
     const target = {
-      targetAmount: targetAmount.trim() === '' ? null : parseAmount(targetAmount),
+      targetAmount:
+        targetAmount.trim() === '' ? null : parseAmount(targetAmount),
       targetDate: targetDate || null,
     };
     try {
@@ -82,7 +97,9 @@ export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelet
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
-        <h2 className="modal__title">{isEdit ? "Modifier l'enveloppe" : 'Nouvelle enveloppe'}</h2>
+        <h2 className="modal__title">
+          {isEdit ? "Modifier l'enveloppe" : 'Nouvelle enveloppe'}
+        </h2>
 
         <form onSubmit={submit}>
           {!isEdit && (
@@ -127,7 +144,9 @@ export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelet
             <div className="ffield-row">
               <label className="ffield">
                 <span className="ffield__label">
-                  {type === 'investissement' ? 'Valeur initiale (€)' : 'Solde initial (€)'}
+                  {type === 'investissement'
+                    ? 'Valeur initiale (€)'
+                    : 'Solde initial (€)'}
                 </span>
                 <input
                   className="ffield__input"
@@ -152,7 +171,9 @@ export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelet
 
           {!isEdit && type === 'investissement' && (
             <label className="ffield">
-              <span className="ffield__label">Plus-value initiale (€) — comprise dans la valeur</span>
+              <span className="ffield__label">
+                Plus-value initiale (€) — comprise dans la valeur
+              </span>
               <input
                 className="ffield__input"
                 type="text"
@@ -205,8 +226,8 @@ export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelet
               </label>
             </div>
             <span className="ffield__hint">
-              Laissez vide pour ne pas fixer d'objectif. La progression s'affiche sur la
-              carte de l'enveloppe.
+              Laissez vide pour ne pas fixer d'objectif. La progression
+              s'affiche sur la carte de l'enveloppe.
             </span>
           </div>
 
@@ -215,19 +236,35 @@ export default function EnvelopeFormModal({ envelope, onSave, onArchive, onDelet
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--ghost" onClick={() => onArchive(envelope)}>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={() => onArchive(envelope)}
+                >
                   Archiver
                 </button>
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(envelope)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(envelope)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

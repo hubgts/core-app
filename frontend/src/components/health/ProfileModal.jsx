@@ -76,7 +76,9 @@ export default function ProfileModal({ profile, onSave, onClose }) {
                 placeholder="175"
                 onChange={(e) => setHeight(e.target.value)}
               />
-              <span className="hfield__hint">Mesurée une seule fois — sert uniquement à l'IMC.</span>
+              <span className="hfield__hint">
+                Mesurée une seule fois — sert uniquement à l'IMC.
+              </span>
             </label>
             <label className="hfield">
               <span className="hfield__label">Sexe (optionnel)</span>
@@ -94,9 +96,13 @@ export default function ProfileModal({ profile, onSave, onClose }) {
             </label>
           </div>
 
-          <p className="hsection">Mensurations suivies <em>(évoluent avec le muscle)</em></p>
+          <p className="hsection">
+            Mensurations suivies <em>(évoluent avec le muscle)</em>
+          </p>
           <div className="hfield">
-            <span className="hfield__label">Choisis ce que tu mesures régulièrement</span>
+            <span className="hfield__label">
+              Choisis ce que tu mesures régulièrement
+            </span>
             <div className="hchips">
               {ALL_MEASUREMENTS.map((k) => {
                 const meta = metricMeta(k);
@@ -114,7 +120,8 @@ export default function ProfileModal({ profile, onSave, onClose }) {
               })}
             </div>
             <span className="hfield__hint">
-              Les valeurs déjà saisies sont conservées même si tu retires une mensuration.
+              Les valeurs déjà saisies sont conservées même si tu retires une
+              mensuration.
             </span>
           </div>
 
@@ -122,10 +129,18 @@ export default function ProfileModal({ profile, onSave, onClose }) {
 
           <div className="modal__actions">
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

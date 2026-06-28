@@ -5,7 +5,8 @@ export const CATEGORY_KINDS: BudgetCategoryKind[] = ['depense', 'epargne'];
 export const TRANSACTION_KINDS: BudgetTransactionKind[] = ['entree', 'sortie'];
 
 /** Statut d'une catégorie sur un mois (vs sa cible). */
-export type CategoryStatus = 'within' | 'over' | 'reached' | 'insufficient' | null;
+export type CategoryStatus =
+  'within' | 'over' | 'reached' | 'insufficient' | null;
 
 export interface CategoryInput {
   name?: string;

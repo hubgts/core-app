@@ -36,7 +36,13 @@ function Ring({ ratio, color, size = 54, children }) {
   const c = size / 2;
   return (
     <div className="dring-wrap" style={{ width: size, height: size }}>
-      <svg className="dring" width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+      <svg
+        className="dring"
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        aria-hidden="true"
+      >
         <circle className="dring__bg" cx={c} cy={c} r={r} />
         <circle
           className="dring__fg"
@@ -97,7 +103,11 @@ function PatrimoinePanel({ finances, navigate }) {
   const oneYear = finances.kpis?.oneYear;
   const obj = finances.netObjective;
   return (
-    <button className="dpanel dpanel--finances dpanel--chart" onClick={() => navigate('/finances')} aria-label="Patrimoine">
+    <button
+      className="dpanel dpanel--finances dpanel--chart"
+      onClick={() => navigate('/finances')}
+      aria-label="Patrimoine"
+    >
       <div className="dpanel__head">
         <h2 className="dpanel__title">Patrimoine global</h2>
         <span className="dpanel__hint">12 mois</span>
@@ -109,11 +119,14 @@ function PatrimoinePanel({ finances, navigate }) {
       <div className="dcard__meta">
         {v && (
           <span className={`dchip t-${trendClass(v.amount)}`}>
-            ce mois {formatSignedEur(v.amount)}{v.pct != null && ` (${formatSignedPct(v.pct)})`}
+            ce mois {formatSignedEur(v.amount)}
+            {v.pct != null && ` (${formatSignedPct(v.pct)})`}
           </span>
         )}
         {oneYear && (
-          <span className={`dchip t-${trendClass(oneYear.amount)}`}>1 an {formatSignedEur(oneYear.amount)}</span>
+          <span className={`dchip t-${trendClass(oneYear.amount)}`}>
+            1 an {formatSignedEur(oneYear.amount)}
+          </span>
         )}
         {obj && (
           <span className={`dchip${obj.reached ? ' t-up' : ''}`}>
@@ -121,7 +134,11 @@ function PatrimoinePanel({ finances, navigate }) {
           </span>
         )}
       </div>
-      <NetWorthChart data={finances.evolution} valueKey="net" color={COLORS.accent} />
+      <NetWorthChart
+        data={finances.evolution}
+        valueKey="net"
+        color={COLORS.accent}
+      />
     </button>
   );
 }
@@ -132,10 +149,16 @@ function PatrimoinePanel({ finances, navigate }) {
 function EnvelopesPanel({ finances, navigate }) {
   const envelopes = finances.envelopes ?? [];
   return (
-    <button className="dpanel dpanel--finances" onClick={() => navigate('/finances')} aria-label="Finances">
+    <button
+      className="dpanel dpanel--finances"
+      onClick={() => navigate('/finances')}
+      aria-label="Finances"
+    >
       <div className="dpanel__head">
         <h2 className="dpanel__title">Mes enveloppes</h2>
-        <span className="dpanel__hint">{formatEur(finances.netWorth)} net · tendance 30 j</span>
+        <span className="dpanel__hint">
+          {formatEur(finances.netWorth)} net · tendance 30 j
+        </span>
       </div>
       {envelopes.length > 0 ? (
         <ul className="denvs">
@@ -143,11 +166,16 @@ function EnvelopesPanel({ finances, navigate }) {
             const t = envTrend(e);
             return (
               <li key={e.id} className="denv">
-                <span className="denv__icon" style={{ background: e.color || 'var(--surface-3)' }}>
+                <span
+                  className="denv__icon"
+                  style={{ background: e.color || 'var(--surface-3)' }}
+                >
                   {e.icon || '💼'}
                 </span>
                 <span className="denv__name">{e.name}</span>
-                <span className="denv__bal">{e.balance != null ? formatEur(e.balance) : '—'}</span>
+                <span className="denv__bal">
+                  {e.balance != null ? formatEur(e.balance) : '—'}
+                </span>
                 <span className={`denv__trend t-${t.cls}`}>
                   <span className="denv__arrow">{t.arrow}</span> {t.text}
                 </span>
@@ -205,7 +233,9 @@ export default function DashboardPage() {
     <div className="dash">
       <header className="dash__head">
         <div className="dash__greet">
-          <h1 className="dash__title">Bonjour Emilien <span className="dash__wave">👋</span></h1>
+          <h1 className="dash__title">
+            Bonjour Emilien <span className="dash__wave">👋</span>
+          </h1>
           <span className="dash__date">{frenchFullDate(today)}</span>
         </div>
         <div className="dtabs" role="tablist">
@@ -235,7 +265,13 @@ export default function DashboardPage() {
       ) : tab === 'today' ? (
         <TodayView data={data} today={today} navigate={navigate} />
       ) : (
-        <WeekView data={data} today={today} weekFrom={weekFrom} weekTo={weekTo} navigate={navigate} />
+        <WeekView
+          data={data}
+          today={today}
+          weekFrom={weekFrom}
+          weekTo={weekTo}
+          navigate={navigate}
+        />
       )}
     </div>
   );
@@ -250,11 +286,15 @@ function TodayView({ data, today, navigate }) {
   const doneToday = habits.filter((h) => checks.has(`${h.id}|${today}`)).length;
   const totalHabits = habits.length;
   const todaySessions = events.filter((e) => e.date === today);
-  const todayDuration = formatDuration(todaySessions.reduce((s, e) => s + (e.durationMin || 0), 0));
+  const todayDuration = formatDuration(
+    todaySessions.reduce((s, e) => s + (e.durationMin || 0), 0),
+  );
 
   const summary = [
     totalHabits > 0 ? `${doneToday}/${totalHabits} habitudes` : null,
-    todaySessions.length > 0 ? `${todaySessions.length} séance${todaySessions.length > 1 ? 's' : ''}` : 'repos',
+    todaySessions.length > 0
+      ? `${todaySessions.length} séance${todaySessions.length > 1 ? 's' : ''}`
+      : 'repos',
   ].filter(Boolean);
 
   return (
@@ -263,10 +303,16 @@ function TodayView({ data, today, navigate }) {
 
       <section className="dgrid2">
         {/* Habitudes du jour — renseignées ou non */}
-        <button className="dpanel dpanel--habits" onClick={() => navigate('/habitudes')} aria-label="Habitudes">
+        <button
+          className="dpanel dpanel--habits"
+          onClick={() => navigate('/habitudes')}
+          aria-label="Habitudes"
+        >
           <div className="dpanel__head">
             <h2 className="dpanel__title">Habitudes du jour</h2>
-            <span className="dpanel__hint">{doneToday}/{totalHabits} faites</span>
+            <span className="dpanel__hint">
+              {doneToday}/{totalHabits} faites
+            </span>
           </div>
           {habits.length > 0 ? (
             <ul className="dtoday">
@@ -276,12 +322,19 @@ function TodayView({ data, today, navigate }) {
                   <li key={h.id} className="dtoday__row">
                     <span
                       className={`dtoday__dot${done ? ' dtoday__dot--on' : ''}`}
-                      style={done ? { background: h.color, borderColor: h.color } : { borderColor: h.color }}
+                      style={
+                        done
+                          ? { background: h.color, borderColor: h.color }
+                          : { borderColor: h.color }
+                      }
                     >
                       {done ? '✓' : ''}
                     </span>
-                    <span className={`dtoday__name${done ? ' dtoday__name--on' : ''}`}>
-                      {h.icon ? `${h.icon} ` : ''}{h.name}
+                    <span
+                      className={`dtoday__name${done ? ' dtoday__name--on' : ''}`}
+                    >
+                      {h.icon ? `${h.icon} ` : ''}
+                      {h.name}
                     </span>
                   </li>
                 );
@@ -293,16 +346,27 @@ function TodayView({ data, today, navigate }) {
         </button>
 
         {/* Séance du jour ou repos */}
-        <button className="dpanel dpanel--session" onClick={() => navigate('/entrainement')} aria-label="Entraînement">
+        <button
+          className="dpanel dpanel--session"
+          onClick={() => navigate('/entrainement')}
+          aria-label="Entraînement"
+        >
           <div className="dpanel__head">
             <h2 className="dpanel__title">Séance du jour</h2>
-            <span className="dpanel__hint">{todaySessions.length ? (todayDuration ?? `${todaySessions.length} séance${todaySessions.length > 1 ? 's' : ''}`) : 'repos'}</span>
+            <span className="dpanel__hint">
+              {todaySessions.length
+                ? (todayDuration ??
+                  `${todaySessions.length} séance${todaySessions.length > 1 ? 's' : ''}`)
+                : 'repos'}
+            </span>
           </div>
           {todaySessions.length > 0 ? (
             <ul className="dsessions">
               {todaySessions.map((s) => (
                 <li key={s.id} className="dsession">
-                  <span className="dsession__icon">{TRAINING_TYPE[s.type].icon}</span>
+                  <span className="dsession__icon">
+                    {TRAINING_TYPE[s.type].icon}
+                  </span>
                   <span className="dsession__body">
                     <span className="dsession__title">
                       {s.title || TRAINING_TYPE[s.type].label}
@@ -316,14 +380,20 @@ function TodayView({ data, today, navigate }) {
                       </span>
                     )}
                   </span>
-                  {s.durationMin && <span className="dsession__dur">{formatDuration(s.durationMin)}</span>}
+                  {s.durationMin && (
+                    <span className="dsession__dur">
+                      {formatDuration(s.durationMin)}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
           ) : (
             <div className="dpanel__rest">
               <span className="dpanel__resticon">🌙</span>
-              <p className="dcard__empty">Jour de repos. Profites-en pour récupérer.</p>
+              <p className="dcard__empty">
+                Jour de repos. Profites-en pour récupérer.
+              </p>
             </div>
           )}
         </button>
@@ -352,7 +422,9 @@ function WeekView({ data, today, weekFrom, weekTo, navigate }) {
     [habits, checks, weekFrom, weekTo, today],
   );
   const weekSessions = [...events].sort((a, b) => a.date.localeCompare(b.date));
-  const totalDuration = formatDuration(weekSessions.reduce((s, e) => s + (e.durationMin || 0), 0));
+  const totalDuration = formatDuration(
+    weekSessions.reduce((s, e) => s + (e.durationMin || 0), 0),
+  );
 
   const summary = [
     completion != null ? `habitudes ${completion} %` : null,
@@ -362,15 +434,24 @@ function WeekView({ data, today, weekFrom, weekTo, navigate }) {
   return (
     <>
       <p className="dash__summary">
-        {frenchDayMonth(weekFrom)} – {frenchDayMonth(weekTo)} · {summary.join(' · ')}
+        {frenchDayMonth(weekFrom)} – {frenchDayMonth(weekTo)} ·{' '}
+        {summary.join(' · ')}
       </p>
 
       <section className="dgrid2">
         {/* Habitudes de la semaine — renseignées jour par jour */}
-        <button className="dpanel dpanel--habits" onClick={() => navigate('/habitudes')} aria-label="Habitudes">
+        <button
+          className="dpanel dpanel--habits"
+          onClick={() => navigate('/habitudes')}
+          aria-label="Habitudes"
+        >
           <div className="dpanel__head">
             <h2 className="dpanel__title">Habitudes de la semaine</h2>
-            <Ring ratio={(completion ?? 0) / 100} color={COLORS.habits} size={34}>
+            <Ring
+              ratio={(completion ?? 0) / 100}
+              color={COLORS.habits}
+              size={34}
+            >
               {completion != null ? `${completion}%` : '—'}
             </Ring>
           </div>
@@ -380,7 +461,9 @@ function WeekView({ data, today, weekFrom, weekTo, navigate }) {
                 <span className="dwk__name" />
                 <span className="dwk__dots">
                   {weekDates.map((d) => (
-                    <span key={d} className="dwk__dayhead">{weekdayInitial(...d.split('-').map(Number))}</span>
+                    <span key={d} className="dwk__dayhead">
+                      {weekdayInitial(...d.split('-').map(Number))}
+                    </span>
                   ))}
                 </span>
                 <span className="dwk__count">obj.</span>
@@ -391,7 +474,10 @@ function WeekView({ data, today, weekFrom, weekTo, navigate }) {
                   let count = 0;
                   return (
                     <li key={h.id} className="dwk">
-                      <span className="dwk__name">{h.icon ? `${h.icon} ` : ''}{h.name}</span>
+                      <span className="dwk__name">
+                        {h.icon ? `${h.icon} ` : ''}
+                        {h.name}
+                      </span>
                       <span className="dwk__dots">
                         {weekDates.map((d) => {
                           const done = checks.has(`${h.id}|${d}`);
@@ -407,7 +493,14 @@ function WeekView({ data, today, weekFrom, weekTo, navigate }) {
                             <span
                               key={d}
                               className={`dwk__dot${cls}`}
-                              style={done ? { background: h.color, borderColor: h.color } : undefined}
+                              style={
+                                done
+                                  ? {
+                                      background: h.color,
+                                      borderColor: h.color,
+                                    }
+                                  : undefined
+                              }
                               title={d}
                             >
                               {done ? '✓' : ''}
@@ -415,7 +508,9 @@ function WeekView({ data, today, weekFrom, weekTo, navigate }) {
                           );
                         })}
                       </span>
-                      <span className="dwk__count">{count}/{h.weeklyTarget}</span>
+                      <span className="dwk__count">
+                        {count}/{h.weeklyTarget}
+                      </span>
                     </li>
                   );
                 })}
@@ -427,21 +522,37 @@ function WeekView({ data, today, weekFrom, weekTo, navigate }) {
         </button>
 
         {/* Séances de la semaine */}
-        <button className="dpanel dpanel--session" onClick={() => navigate('/entrainement')} aria-label="Entraînement">
+        <button
+          className="dpanel dpanel--session"
+          onClick={() => navigate('/entrainement')}
+          aria-label="Entraînement"
+        >
           <div className="dpanel__head">
             <h2 className="dpanel__title">Séances de la semaine</h2>
-            <span className="dpanel__hint">{weekSessions.length} · {totalDuration ?? '—'}</span>
+            <span className="dpanel__hint">
+              {weekSessions.length} · {totalDuration ?? '—'}
+            </span>
           </div>
           {weekSessions.length > 0 ? (
             <ul className="dsessions">
               {weekSessions.map((s) => (
                 <li key={s.id} className="dsession">
-                  <span className="dsession__day">{weekdayInitial(...s.date.split('-').map(Number))}</span>
-                  <span className="dsession__icon">{TRAINING_TYPE[s.type].icon}</span>
-                  <span className="dsession__body">
-                    <span className="dsession__title">{s.title || TRAINING_TYPE[s.type].label}</span>
+                  <span className="dsession__day">
+                    {weekdayInitial(...s.date.split('-').map(Number))}
                   </span>
-                  {s.durationMin && <span className="dsession__dur">{formatDuration(s.durationMin)}</span>}
+                  <span className="dsession__icon">
+                    {TRAINING_TYPE[s.type].icon}
+                  </span>
+                  <span className="dsession__body">
+                    <span className="dsession__title">
+                      {s.title || TRAINING_TYPE[s.type].label}
+                    </span>
+                  </span>
+                  {s.durationMin && (
+                    <span className="dsession__dur">
+                      {formatDuration(s.durationMin)}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

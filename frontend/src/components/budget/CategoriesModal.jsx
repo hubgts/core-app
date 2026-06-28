@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { budgetApi } from '../../api/budget';
-import { BUDGET_COLORS, BUDGET_ICONS, DEFAULT_PLAN, monthLabel } from './constants';
+import {
+  BUDGET_COLORS,
+  BUDGET_ICONS,
+  DEFAULT_PLAN,
+  monthLabel,
+} from './constants';
 import { confirmDialog } from '../dialogs';
 import Combobox from '../Combobox';
 
@@ -33,7 +38,9 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
     setInherited(plan.inherited);
     setSource(plan.source);
     setArchived(all.filter((c) => c.status === 'archived'));
-    setRefIncome(settings.plannedIncome != null ? String(settings.plannedIncome) : '');
+    setRefIncome(
+      settings.plannedIncome != null ? String(settings.plannedIncome) : '',
+    );
   }, [month]);
 
   useEffect(() => {
@@ -58,28 +65,38 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
   const rounded = Math.round(totalPct);
 
   // --- Persistance du plan du mois ---
-  const savePlan = useCallback(async (nextRows) => {
-    setError('');
-    const items = nextRows
-      .filter((r) => r.inPlan)
-      .map((r) => ({ categoryId: r.id, targetPct: Number(r.targetPct) || 0 }));
-    try {
-      const res = await budgetApi.setPlan(month, items);
-      setRows(res.categories);
-      setInherited(res.inherited);
-      setSource(res.source);
-      onChanged?.();
-    } catch (e) {
-      setError(e.message);
-    }
-  }, [month, onChanged]);
+  const savePlan = useCallback(
+    async (nextRows) => {
+      setError('');
+      const items = nextRows
+        .filter((r) => r.inPlan)
+        .map((r) => ({
+          categoryId: r.id,
+          targetPct: Number(r.targetPct) || 0,
+        }));
+      try {
+        const res = await budgetApi.setPlan(month, items);
+        setRows(res.categories);
+        setInherited(res.inherited);
+        setSource(res.source);
+        onChanged?.();
+      } catch (e) {
+        setError(e.message);
+      }
+    },
+    [month, onChanged],
+  );
 
   function setLocalPct(id, value) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, targetPct: value } : r)));
+    setRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, targetPct: value } : r)),
+    );
   }
   function stepPct(id, delta) {
     const next = rows.map((r) =>
-      r.id === id ? { ...r, targetPct: clamp((Number(r.targetPct) || 0) + delta) } : r,
+      r.id === id
+        ? { ...r, targetPct: clamp((Number(r.targetPct) || 0) + delta) }
+        : r,
     );
     setRows(next);
     savePlan(next);
@@ -92,7 +109,12 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
   function normalize() {
     if (totalPct <= 0) return;
     const next = rows.map((r) =>
-      r.inPlan ? { ...r, targetPct: clamp(((Number(r.targetPct) || 0) / totalPct) * 100) } : r,
+      r.inPlan
+        ? {
+            ...r,
+            targetPct: clamp(((Number(r.targetPct) || 0) / totalPct) * 100),
+          }
+        : r,
     );
     setRows(next);
     savePlan(next);
@@ -110,7 +132,9 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
     }
   }
   function setLocalField(id, field, value) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
+    setRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)),
+    );
   }
 
   async function addCategory() {
@@ -123,7 +147,10 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
       const fresh = await budgetApi.plan(month);
       const items = fresh.categories
         .filter((c) => c.inPlan || c.id === cat.id)
-        .map((c) => ({ categoryId: c.id, targetPct: c.id === cat.id ? 0 : c.targetPct }));
+        .map((c) => ({
+          categoryId: c.id,
+          targetPct: c.id === cat.id ? 0 : c.targetPct,
+        }));
       const res = await budgetApi.setPlan(month, items);
       setRows(res.categories);
       setInherited(res.inherited);
@@ -138,10 +165,14 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
   async function seedDefault() {
     try {
       const created = [];
-      for (const c of DEFAULT_PLAN) created.push(await budgetApi.createCategory(c));
+      for (const c of DEFAULT_PLAN)
+        created.push(await budgetApi.createCategory(c));
       await budgetApi.setPlan(
         month,
-        created.map((cat, i) => ({ categoryId: cat.id, targetPct: DEFAULT_PLAN[i].targetPct })),
+        created.map((cat, i) => ({
+          categoryId: cat.id,
+          targetPct: DEFAULT_PLAN[i].targetPct,
+        })),
       );
       await reload();
       onChanged?.();
@@ -152,13 +183,27 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
 
   async function archive(id) {
     setEditingId(null);
-    await budgetApi.archiveCategory(id).then(reload).then(() => onChanged?.()).catch((e) => setError(e.message));
+    await budgetApi
+      .archiveCategory(id)
+      .then(reload)
+      .then(() => onChanged?.())
+      .catch((e) => setError(e.message));
   }
   async function unarchive(id) {
-    await budgetApi.unarchiveCategory(id).then(reload).then(() => onChanged?.()).catch((e) => setError(e.message));
+    await budgetApi
+      .unarchiveCategory(id)
+      .then(reload)
+      .then(() => onChanged?.())
+      .catch((e) => setError(e.message));
   }
   async function remove(c) {
-    if (!(await confirmDialog({ message: `Supprimer la catégorie « ${c.name} » ?`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer la catégorie « ${c.name} » ?`,
+        danger: true,
+      }))
+    )
+      return;
     setEditingId(null);
     try {
       await budgetApi.removeCategory(c.id);
@@ -178,13 +223,16 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
     next.splice(dropIndex, 0, moved);
     const newRows = [...next, ...excluded];
     setRows(newRows);
-    budgetApi.reorderCategories(newRows.map((r) => r.id)).catch((e) => setError(e.message));
+    budgetApi
+      .reorderCategories(newRows.map((r) => r.id))
+      .catch((e) => setError(e.message));
   }
 
   async function saveRefIncome() {
     try {
       await budgetApi.updateSettings({
-        plannedIncome: refIncome.trim() === '' ? null : Number(refIncome.replace(',', '.')),
+        plannedIncome:
+          refIncome.trim() === '' ? null : Number(refIncome.replace(',', '.')),
       });
     } catch (e) {
       setError(e.message);
@@ -195,7 +243,12 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
   let acc = 0;
   const segments = included.map((r) => {
     const pct = Math.max(Number(r.targetPct) || 0, 0);
-    const seg = { id: r.id, color: r.color, left: Math.min(acc, 100), width: Math.min(pct, Math.max(0, 100 - acc)) };
+    const seg = {
+      id: r.id,
+      color: r.color,
+      left: Math.min(acc, 100),
+      width: Math.min(pct, Math.max(0, 100 - acc)),
+    };
     acc += pct;
     return seg;
   });
@@ -257,8 +310,15 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
           </div>
         </div>
         <div className="bplan__editoractions">
-          <button className="btn btn--ghost btn--sm" onClick={() => archive(c.id)}>Archiver</button>
-          <button className="btn btn--danger btn--sm" onClick={() => remove(c)}>Supprimer</button>
+          <button
+            className="btn btn--ghost btn--sm"
+            onClick={() => archive(c.id)}
+          >
+            Archiver
+          </button>
+          <button className="btn btn--danger btn--sm" onClick={() => remove(c)}>
+            Supprimer
+          </button>
         </div>
       </div>
     );
@@ -266,47 +326,82 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
 
   return (
     <div className="modal-overlay" onMouseDown={close}>
-      <div className="modal modal--xl bplan" onMouseDown={(e) => e.stopPropagation()}>
+      <div
+        className="modal modal--xl bplan"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <header className="bplan__head">
           <h2 className="modal__title">Plan de {monthLabel(month)}</h2>
-          <button className="fdrawer__close" onClick={close} aria-label="Fermer">✕</button>
+          <button
+            className="fdrawer__close"
+            onClick={close}
+            aria-label="Fermer"
+          >
+            ✕
+          </button>
         </header>
         <p className="bplan__sub">
-          Répartissez 100 % de votre revenu entre vos catégories. Le plan est propre à ce
-          mois ; les catégories (noms, couleurs) sont partagées.
+          Répartissez 100 % de votre revenu entre vos catégories. Le plan est
+          propre à ce mois ; les catégories (noms, couleurs) sont partagées.
         </p>
         {inherited && source && (
-          <p className="bplan__inherit">↩ Plan repris de <strong>{monthLabel(source)}</strong> — ajustez-le ci-dessous.</p>
+          <p className="bplan__inherit">
+            ↩ Plan repris de <strong>{monthLabel(source)}</strong> — ajustez-le
+            ci-dessous.
+          </p>
         )}
 
         {rows.length === 0 ? (
           <div className="bplan__empty">
             <p>Aucune catégorie. Démarrez avec un modèle :</p>
-            <button className="btn btn--primary" onClick={seedDefault}>Utiliser le modèle 50/30/20</button>
-            <button className="btn btn--ghost" onClick={addCategory}>Créer une catégorie</button>
+            <button className="btn btn--primary" onClick={seedDefault}>
+              Utiliser le modèle 50/30/20
+            </button>
+            <button className="btn btn--ghost" onClick={addCategory}>
+              Créer une catégorie
+            </button>
           </div>
         ) : (
           <>
             {/* Jauge d'équilibrage */}
             <div className="bplan__balance">
-              <div className="bplan__gauge" role="img" aria-label={`Total ${rounded} %`}>
+              <div
+                className="bplan__gauge"
+                role="img"
+                aria-label={`Total ${rounded} %`}
+              >
                 {segments.map((s) => (
                   <span
                     key={s.id}
                     className="bplan__seg"
-                    style={{ left: `${s.left}%`, width: `${s.width}%`, background: s.color }}
+                    style={{
+                      left: `${s.left}%`,
+                      width: `${s.width}%`,
+                      background: s.color,
+                    }}
                   />
                 ))}
               </div>
               <div className="bplan__baltext">
-                <span className={`bplan__baltotal${rounded === 100 ? ' bplan__baltotal--ok' : rounded > 100 ? ' bplan__baltotal--over' : ''}`}>
+                <span
+                  className={`bplan__baltotal${rounded === 100 ? ' bplan__baltotal--ok' : rounded > 100 ? ' bplan__baltotal--over' : ''}`}
+                >
                   {rounded} %
                 </span>
                 <span className="bplan__balhint">
-                  {rounded === 100 ? 'équilibré ✓' : rounded < 100 ? `reste ${100 - rounded} % à répartir` : `${rounded - 100} % de trop`}
+                  {rounded === 100
+                    ? 'équilibré ✓'
+                    : rounded < 100
+                      ? `reste ${100 - rounded} % à répartir`
+                      : `${rounded - 100} % de trop`}
                 </span>
                 {rounded !== 100 && totalPct > 0 && (
-                  <button className="fsumlink fsumlink--btn" onClick={normalize}>Normaliser à 100 %</button>
+                  <button
+                    className="fsumlink fsumlink--btn"
+                    onClick={normalize}
+                  >
+                    Normaliser à 100 %
+                  </button>
                 )}
               </div>
             </div>
@@ -314,7 +409,10 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
             {/* Catégories du plan */}
             <ul className="bplan__list">
               {included.map((c, idx) => (
-                <li key={c.id} className={`bplan__row${editingId === c.id ? ' bplan__row--editing' : ''}`}>
+                <li
+                  key={c.id}
+                  className={`bplan__row${editingId === c.id ? ' bplan__row--editing' : ''}`}
+                >
                   <div
                     className="bplan__main"
                     draggable
@@ -322,16 +420,35 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => onDrop(idx)}
                   >
-                    <span className="bplan__grip" title="Glisser pour réordonner">⠿</span>
-                    <span className="bplan__emoji" style={{ '--c': c.color }}>{c.icon || '•'}</span>
+                    <span
+                      className="bplan__grip"
+                      title="Glisser pour réordonner"
+                    >
+                      ⠿
+                    </span>
+                    <span className="bplan__emoji" style={{ '--c': c.color }}>
+                      {c.icon || '•'}
+                    </span>
                     <div className="bplan__namewrap">
                       <span className="bplan__name">{c.name}</span>
                       <span className="bplan__bar">
-                        <span className="bplan__barfill" style={{ width: `${Math.min(Number(c.targetPct) || 0, 100)}%`, background: c.color }} />
+                        <span
+                          className="bplan__barfill"
+                          style={{
+                            width: `${Math.min(Number(c.targetPct) || 0, 100)}%`,
+                            background: c.color,
+                          }}
+                        />
                       </span>
                     </div>
                     <div className="bplan__stepper">
-                      <button className="bplan__step" onClick={() => stepPct(c.id, -5)} aria-label="−5 %">−</button>
+                      <button
+                        className="bplan__step"
+                        onClick={() => stepPct(c.id, -5)}
+                        aria-label="−5 %"
+                      >
+                        −
+                      </button>
                       <input
                         className="bplan__pctinput"
                         type="number"
@@ -342,16 +459,28 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
                         onBlur={() => savePlan(rows)}
                       />
                       <span className="bplan__pctsign">%</span>
-                      <button className="bplan__step" onClick={() => stepPct(c.id, 5)} aria-label="+5 %">+</button>
+                      <button
+                        className="bplan__step"
+                        onClick={() => stepPct(c.id, 5)}
+                        aria-label="+5 %"
+                      >
+                        +
+                      </button>
                     </div>
                     <button
                       className={`bplan__iconbtn${editingId === c.id ? ' bplan__iconbtn--active' : ''}`}
                       title="Modifier la catégorie"
-                      onClick={() => setEditingId(editingId === c.id ? null : c.id)}
+                      onClick={() =>
+                        setEditingId(editingId === c.id ? null : c.id)
+                      }
                     >
                       ✎
                     </button>
-                    <button className="bplan__iconbtn" title="Retirer du plan ce mois" onClick={() => setInPlan(c.id, false)}>
+                    <button
+                      className="bplan__iconbtn"
+                      title="Retirer du plan ce mois"
+                      onClick={() => setInPlan(c.id, false)}
+                    >
                       ×
                     </button>
                   </div>
@@ -360,7 +489,12 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
               ))}
             </ul>
 
-            <button className="btn btn--ghost btn--sm bplan__add" onClick={addCategory}>+ Ajouter une catégorie</button>
+            <button
+              className="btn btn--ghost btn--sm bplan__add"
+              onClick={addCategory}
+            >
+              + Ajouter une catégorie
+            </button>
 
             {/* Hors du plan ce mois */}
             {excluded.length > 0 && (
@@ -370,17 +504,29 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
                   {excluded.map((c) => (
                     <li key={c.id} className="bplan__row bplan__row--off">
                       <div className="bplan__main">
-                        <span className="bplan__emoji" style={{ '--c': c.color }}>{c.icon || '•'}</span>
+                        <span
+                          className="bplan__emoji"
+                          style={{ '--c': c.color }}
+                        >
+                          {c.icon || '•'}
+                        </span>
                         <span className="bplan__name">{c.name}</span>
                         <span className="bplan__spacer" />
                         <button
                           className="bplan__iconbtn"
                           title="Modifier la catégorie"
-                          onClick={() => setEditingId(editingId === c.id ? null : c.id)}
+                          onClick={() =>
+                            setEditingId(editingId === c.id ? null : c.id)
+                          }
                         >
                           ✎
                         </button>
-                        <button className="btn btn--ghost btn--sm" onClick={() => setInPlan(c.id, true)}>Inclure</button>
+                        <button
+                          className="btn btn--ghost btn--sm"
+                          onClick={() => setInPlan(c.id, true)}
+                        >
+                          Inclure
+                        </button>
                       </div>
                       {editingId === c.id && renderEditor(c)}
                     </li>
@@ -394,7 +540,10 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
         {/* Archivées */}
         {archived.length > 0 && (
           <div className="bplan__arch">
-            <button className="bplan__archtoggle" onClick={() => setShowArchived((v) => !v)}>
+            <button
+              className="bplan__archtoggle"
+              onClick={() => setShowArchived((v) => !v)}
+            >
               {showArchived ? '▾' : '▸'} Archivées ({archived.length})
             </button>
             {showArchived && (
@@ -402,10 +551,17 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
                 {archived.map((c) => (
                   <li key={c.id} className="bplan__row bplan__row--off">
                     <div className="bplan__main">
-                      <span className="bplan__emoji" style={{ '--c': c.color }}>{c.icon || '•'}</span>
+                      <span className="bplan__emoji" style={{ '--c': c.color }}>
+                        {c.icon || '•'}
+                      </span>
                       <span className="bplan__name">{c.name}</span>
                       <span className="bplan__spacer" />
-                      <button className="btn btn--ghost btn--sm" onClick={() => unarchive(c.id)}>Réactiver</button>
+                      <button
+                        className="btn btn--ghost btn--sm"
+                        onClick={() => unarchive(c.id)}
+                      >
+                        Réactiver
+                      </button>
                     </div>
                   </li>
                 ))}
@@ -432,7 +588,9 @@ export default function CategoriesModal({ month, onClose, onChanged }) {
 
         <div className="modal__actions">
           <div className="modal__actions-right">
-            <button type="button" className="btn btn--primary" onClick={close}>Terminé</button>
+            <button type="button" className="btn btn--primary" onClick={close}>
+              Terminé
+            </button>
           </div>
         </div>
       </div>

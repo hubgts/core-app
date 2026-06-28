@@ -46,7 +46,8 @@ export default function ExerciseCombobox({ value, onChange, placeholder }) {
   // Fermeture au clic extérieur.
   useEffect(() => {
     const onClick = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target))
+        setOpen(false);
     };
     window.addEventListener('mousedown', onClick);
     return () => window.removeEventListener('mousedown', onClick);
@@ -79,7 +80,9 @@ export default function ExerciseCombobox({ value, onChange, placeholder }) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setOpen(true);
-      setHighlight((h) => Math.min(h + 1, (canAdd ? rows.length : rows.length - 1)));
+      setHighlight((h) =>
+        Math.min(h + 1, canAdd ? rows.length : rows.length - 1),
+      );
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setHighlight((h) => Math.max(h - 1, 0));

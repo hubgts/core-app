@@ -56,7 +56,9 @@
   font-weight: 600;
   color: var(--text);
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
+  transition:
+    border-color 0.15s,
+    transform 0.1s;
 }
 
 .picker__target:hover {
@@ -78,7 +80,9 @@
   background: var(--surface);
   font-size: 18px;
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
+  transition:
+    border-color 0.15s,
+    transform 0.1s;
 }
 
 .picker__emoji:hover {
@@ -100,7 +104,9 @@
 
 .picker__color--active {
   border-color: var(--text);
-  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px currentColor;
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px currentColor;
 }
 
 /* .modal__error et .modal__actions* : voir index.css */

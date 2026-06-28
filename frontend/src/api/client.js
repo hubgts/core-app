@@ -9,7 +9,10 @@ export async function request(path, options = {}) {
     let message = `Erreur ${res.status}`;
     try {
       const body = await res.json();
-      if (body?.message) message = Array.isArray(body.message) ? body.message.join(', ') : body.message;
+      if (body?.message)
+        message = Array.isArray(body.message)
+          ? body.message.join(', ')
+          : body.message;
     } catch {
       /* corps non JSON, on garde le message par défaut */
     }

@@ -11,11 +11,7 @@ import './KnowHowPage.css';
 
 // Normalisation pour la recherche : minuscule, sans accents.
 const norm = (s) =>
-  (s ?? '')
-    .toString()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
+  (s ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export default function KnowHowPage() {
   const [recipes, setRecipes] = useState([]);
@@ -37,7 +33,10 @@ export default function KnowHowPage() {
   const load = useCallback(async () => {
     setError('');
     try {
-      const [recs, cats] = await Promise.all([knowhowApi.list(), knowhowApi.categories()]);
+      const [recs, cats] = await Promise.all([
+        knowhowApi.list(),
+        knowhowApi.categories(),
+      ]);
       setRecipes(recs);
       setCategories(cats);
     } catch (e) {
@@ -60,20 +59,34 @@ export default function KnowHowPage() {
 
   const allLabels = useMemo(() => {
     const seen = new Map();
-    for (const r of recipes) for (const l of r.labels) if (!seen.has(l.toLowerCase())) seen.set(l.toLowerCase(), l);
+    for (const r of recipes)
+      for (const l of r.labels)
+        if (!seen.has(l.toLowerCase())) seen.set(l.toLowerCase(), l);
     return [...seen.values()].sort((a, b) => a.localeCompare(b, 'fr'));
   }, [recipes]);
 
-  const isFiltering = query.trim() !== '' || activeCats.size > 0 || activeLabels.size > 0;
+  const isFiltering =
+    query.trim() !== '' || activeCats.size > 0 || activeLabels.size > 0;
 
   const filtered = useMemo(() => {
     const q = norm(query);
     return recipes.filter((r) => {
-      if (activeCats.size > 0 && !activeCats.has(r.categoryId ?? '∅')) return false;
-      if (activeLabels.size > 0 && !r.labels.some((l) => activeLabels.has(l.toLowerCase()))) return false;
+      if (activeCats.size > 0 && !activeCats.has(r.categoryId ?? '∅'))
+        return false;
+      if (
+        activeLabels.size > 0 &&
+        !r.labels.some((l) => activeLabels.has(l.toLowerCase()))
+      )
+        return false;
       if (q) {
         const hay = norm(
-          [r.title, r.goal, r.labels.join(' '), r.components.map((c) => c.label).join(' '), r.steps.map((s) => s.text).join(' ')].join(' '),
+          [
+            r.title,
+            r.goal,
+            r.labels.join(' '),
+            r.components.map((c) => c.label).join(' '),
+            r.steps.map((s) => s.text).join(' '),
+          ].join(' '),
         );
         if (!hay.includes(q)) return false;
       }
@@ -110,7 +123,9 @@ export default function KnowHowPage() {
 
   // --- Actions savoir-faire ---
   async function togglePin(recipe) {
-    await (recipe.pinned ? knowhowApi.unpin(recipe.id) : knowhowApi.pin(recipe.id));
+    await (recipe.pinned
+      ? knowhowApi.unpin(recipe.id)
+      : knowhowApi.pin(recipe.id));
     await load();
   }
   async function setColor(recipe, color) {
@@ -130,7 +145,13 @@ export default function KnowHowPage() {
     await load();
   }
   async function deleteRecipe(recipe) {
-    if (!(await confirmDialog({ message: `Supprimer « ${recipe.title} » ? Cette action est irréversible.\n\nAstuce : « Archiver » conserve le savoir-faire.`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer « ${recipe.title} » ? Cette action est irréversible.\n\nAstuce : « Archiver » conserve le savoir-faire.`,
+        danger: true,
+      }))
+    )
+      return;
     await knowhowApi.remove(recipe.id);
     setModal(null);
     setDrawer(null);
@@ -161,7 +182,10 @@ export default function KnowHowPage() {
     // Optimiste : réordonne localement puis persiste.
     const byId = new Map(recipes.map((r) => [r.id, r]));
     setRecipes(ids.map((id) => byId.get(id)));
-    knowhowApi.reorder(ids).then(load).catch((e) => flash(e.message));
+    knowhowApi
+      .reorder(ids)
+      .then(load)
+      .catch((e) => flash(e.message));
   }
 
   function renderCard(r) {
@@ -193,10 +217,16 @@ export default function KnowHowPage() {
       <header className="rpage__head">
         <h1 className="rpage__title">🛠️ Savoir-faire</h1>
         <div className="page__headactions">
-          <button className="btn btn--primary" onClick={() => setModal({})}>+ Savoir-faire</button>
+          <button className="btn btn--primary" onClick={() => setModal({})}>
+            + Savoir-faire
+          </button>
           <KebabMenu
             actions={[
-              { icon: '⚙', label: 'Gérer les catégories', to: '/referentiel?kind=knowhow_category' },
+              {
+                icon: '⚙',
+                label: 'Gérer les catégories',
+                to: '/referentiel?kind=knowhow_category',
+              },
             ]}
           />
         </div>
@@ -253,13 +283,20 @@ export default function KnowHowPage() {
       ) : recipes.length === 0 ? (
         <div className="rempty">
           <div className="rempty__icon">🛠️</div>
-          <p>Capture ton premier savoir-faire : un plat, un produit maison, ou n'importe quel procédé à reproduire.</p>
-          <button className="btn btn--primary" onClick={() => setModal({})}>+ Savoir-faire</button>
+          <p>
+            Capture ton premier savoir-faire : un plat, un produit maison, ou
+            n'importe quel procédé à reproduire.
+          </p>
+          <button className="btn btn--primary" onClick={() => setModal({})}>
+            + Savoir-faire
+          </button>
         </div>
       ) : filtered.length === 0 ? (
         <div className="rempty">
           <p>Aucun savoir-faire ne correspond à ta recherche.</p>
-          <button className="btn btn--ghost" onClick={resetFilters}>Réinitialiser les filtres</button>
+          <button className="btn btn--ghost" onClick={resetFilters}>
+            Réinitialiser les filtres
+          </button>
         </div>
       ) : (
         <>
@@ -271,7 +308,9 @@ export default function KnowHowPage() {
           )}
           {others.length > 0 && (
             <section className="rboard-section">
-              {pinned.length > 0 && <h2 className="rboard-section__title">Autres</h2>}
+              {pinned.length > 0 && (
+                <h2 className="rboard-section__title">Autres</h2>
+              )}
               <div className="rboard">{others.map(renderCard)}</div>
             </section>
           )}

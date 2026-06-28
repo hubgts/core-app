@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { BANKROLL_COLORS, BANKROLL_ICONS } from './constants';
 
 /** Création (nom + capital de départ) ou édition (nom/bookmaker/icône/couleur). */
-export default function BankrollFormModal({ bankroll, onSave, onArchive, onDelete, onClose }) {
+export default function BankrollFormModal({
+  bankroll,
+  onSave,
+  onArchive,
+  onDelete,
+  onClose,
+}) {
   const isEdit = Boolean(bankroll);
   const [name, setName] = useState(bankroll?.name ?? '');
   const [startingCapital, setStartingCapital] = useState(
@@ -35,7 +41,12 @@ export default function BankrollFormModal({ bankroll, onSave, onArchive, onDelet
     setError('');
     try {
       if (isEdit) {
-        await onSave({ name: name.trim(), bookmaker: bookmaker.trim(), icon, color });
+        await onSave({
+          name: name.trim(),
+          bookmaker: bookmaker.trim(),
+          icon,
+          color,
+        });
       } else {
         await onSave({
           name: name.trim(),
@@ -54,7 +65,9 @@ export default function BankrollFormModal({ bankroll, onSave, onArchive, onDelet
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
-        <h2 className="modal__title">{isEdit ? 'Modifier la bankroll' : 'Nouvelle bankroll'}</h2>
+        <h2 className="modal__title">
+          {isEdit ? 'Modifier la bankroll' : 'Nouvelle bankroll'}
+        </h2>
 
         <form onSubmit={submit}>
           <label className="ffield">
@@ -82,7 +95,8 @@ export default function BankrollFormModal({ bankroll, onSave, onArchive, onDelet
                 onChange={(e) => setStartingCapital(e.target.value)}
               />
               <span className="ffield__hint">
-                Base de la progression. Non modifiable ensuite : utilisez les dépôts / retraits.
+                Base de la progression. Non modifiable ensuite : utilisez les
+                dépôts / retraits.
               </span>
             </label>
           )}
@@ -136,19 +150,35 @@ export default function BankrollFormModal({ bankroll, onSave, onArchive, onDelet
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--ghost" onClick={() => onArchive(bankroll)}>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={() => onArchive(bankroll)}
+                >
                   Archiver
                 </button>
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(bankroll)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(bankroll)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

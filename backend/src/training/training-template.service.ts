@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { TrainingTemplateEntity } from './entities/training-template.entity';
@@ -130,24 +134,28 @@ export class TrainingTemplateService {
       throw new BadRequestException('Type de template invalide.');
     }
 
-    const rawName = (input.name !== undefined ? input.name : existing?.name ?? '') ?? '';
+    const rawName =
+      (input.name !== undefined ? input.name : (existing?.name ?? '')) ?? '';
     const name = rawName.trim();
-    if (!name) throw new BadRequestException('Le nom du template est obligatoire.');
+    if (!name)
+      throw new BadRequestException('Le nom du template est obligatoire.');
     if (name.length > 80) {
       throw new BadRequestException('Le nom ne peut dépasser 80 caractères.');
     }
 
     const tags = this.resolveTags(
-      input.tags !== undefined ? input.tags : existing?.tags ?? [],
+      input.tags !== undefined ? input.tags : (existing?.tags ?? []),
     );
 
     const durationMin = this.resolveInt(
-      input.durationMin !== undefined ? input.durationMin : existing?.durationMin ?? null,
+      input.durationMin !== undefined
+        ? input.durationMin
+        : (existing?.durationMin ?? null),
       'durationMin',
     );
 
     const feeling = this.resolveFeeling(
-      input.feeling !== undefined ? input.feeling : existing?.feeling ?? null,
+      input.feeling !== undefined ? input.feeling : (existing?.feeling ?? null),
     );
 
     let zone: CardioZone | null = null;
@@ -157,28 +165,46 @@ export class TrainingTemplateService {
 
     if (type === 'cardio') {
       const z =
-        input.zone !== undefined ? input.zone : (existing?.zone as CardioZone | null) ?? null;
+        input.zone !== undefined
+          ? input.zone
+          : ((existing?.zone as CardioZone | null) ?? null);
       if (z !== null && z !== undefined && !CARDIO_ZONES.includes(z)) {
         throw new BadRequestException('Zone cardio invalide (Z1 à Z5).');
       }
       zone = z ?? null;
       description = this.resolveDescription(input, existing);
     } else if (type === 'autre') {
-      const t = (input.title !== undefined ? input.title : existing?.title ?? '') ?? '';
+      const t =
+        (input.title !== undefined ? input.title : (existing?.title ?? '')) ??
+        '';
       const trimmed = t.trim();
       if (trimmed.length > 60) {
-        throw new BadRequestException('Le titre ne peut dépasser 60 caractères.');
+        throw new BadRequestException(
+          'Le titre ne peut dépasser 60 caractères.',
+        );
       }
       title = trimmed || null;
       description = this.resolveDescription(input, existing);
     } else {
       // musculation
       exercises = this.resolveExercises(
-        input.exercises !== undefined ? input.exercises : existing?.exercises ?? [],
+        input.exercises !== undefined
+          ? input.exercises
+          : (existing?.exercises ?? []),
       );
     }
 
-    return { name, type, tags, durationMin, feeling, zone, title, description, exercises };
+    return {
+      name,
+      type,
+      tags,
+      durationMin,
+      feeling,
+      zone,
+      title,
+      description,
+      exercises,
+    };
   }
 
   private resolveTags(value: unknown): string[] {
@@ -192,7 +218,9 @@ export class TrainingTemplateService {
       const tag = String(raw ?? '').trim();
       if (!tag) continue;
       if (tag.length > 40) {
-        throw new BadRequestException('Une étiquette ne peut dépasser 40 caractères.');
+        throw new BadRequestException(
+          'Une étiquette ne peut dépasser 40 caractères.',
+        );
       }
       const key = tag.toLowerCase();
       if (seen.has(key)) continue;
@@ -209,7 +237,10 @@ export class TrainingTemplateService {
     input: TemplateInput,
     existing: TrainingTemplateEntity | null,
   ): string | null {
-    const d = input.description !== undefined ? input.description : existing?.description ?? null;
+    const d =
+      input.description !== undefined
+        ? input.description
+        : (existing?.description ?? null);
     if (d === null || d === undefined) return null;
     const str = String(d).trim();
     return str || null;
@@ -225,8 +256,14 @@ export class TrainingTemplateService {
 
   private resolveFeeling(value: unknown): number | null {
     if (value === null || value === undefined) return null;
-    if (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 5) {
-      throw new BadRequestException('Le ressenti doit être un entier de 1 à 5.');
+    if (
+      !Number.isInteger(value) ||
+      (value as number) < 1 ||
+      (value as number) > 5
+    ) {
+      throw new BadRequestException(
+        'Le ressenti doit être un entier de 1 à 5.',
+      );
     }
     return value as number;
   }
@@ -239,13 +276,17 @@ export class TrainingTemplateService {
         const name = (ex?.name ?? '').trim();
         if (!name) return null;
         if (name.length > 60) {
-          throw new BadRequestException("Le nom d'exercice ne peut dépasser 60 caractères.");
+          throw new BadRequestException(
+            "Le nom d'exercice ne peut dépasser 60 caractères.",
+          );
         }
         const sets = (Array.isArray(ex.sets) ? ex.sets : []).map((s) => {
           const reps = Number(s?.reps);
           const weight = Number(s?.weight);
           if (!Number.isInteger(reps) || reps < 0) {
-            throw new BadRequestException(`Répétitions invalides pour "${name}".`);
+            throw new BadRequestException(
+              `Répétitions invalides pour "${name}".`,
+            );
           }
           if (!Number.isFinite(weight) || weight < 0) {
             throw new BadRequestException(`Charge invalide pour "${name}".`);

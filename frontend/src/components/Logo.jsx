@@ -56,7 +56,13 @@ export default function Logo({ size = 34, withTile = true }) {
 
       {/* Modules en orbite */}
       {nodes.map((n, i) => (
-        <circle key={`n${i}`} cx={n.x} cy={n.y} r="2.3" fill="url(#core-grad)" />
+        <circle
+          key={`n${i}`}
+          cx={n.x}
+          cy={n.y}
+          r="2.3"
+          fill="url(#core-grad)"
+        />
       ))}
 
       {/* Noyau central + halo */}

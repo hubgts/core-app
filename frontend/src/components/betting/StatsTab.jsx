@@ -12,11 +12,27 @@ export default function StatsTab({ stats: s }) {
     {
       title: 'Performance',
       rows: [
-        { label: 'Bénéfice', value: formatSignedEur(s.profit), tone: trendClass(s.profit) },
+        {
+          label: 'Bénéfice',
+          value: formatSignedEur(s.profit),
+          tone: trendClass(s.profit),
+        },
         { label: 'ROI', value: formatPct(s.roi) },
-        { label: 'Progression (ROC)', value: formatPct(s.progression, { signed: true }), tone: trendClass(s.progression) },
-        { label: 'TWR', value: formatPct(s.twr, { signed: true }), tone: trendClass(s.twr) },
-        { label: 'TRI (annualisé)', value: formatPct(s.tri, { signed: true }), tone: trendClass(s.tri) },
+        {
+          label: 'Progression (ROC)',
+          value: formatPct(s.progression, { signed: true }),
+          tone: trendClass(s.progression),
+        },
+        {
+          label: 'TWR',
+          value: formatPct(s.twr, { signed: true }),
+          tone: trendClass(s.twr),
+        },
+        {
+          label: 'TRI (annualisé)',
+          value: formatPct(s.tri, { signed: true }),
+          tone: trendClass(s.tri),
+        },
         { label: 'Réussite', value: formatPct(s.successRate) },
         { label: 'Capital de départ', value: formatEur(s.startingCapital) },
         { label: 'Capital actuel', value: formatEur(s.currentCapital) },
@@ -37,17 +53,37 @@ export default function StatsTab({ stats: s }) {
     {
       title: 'Risque & distribution',
       rows: [
-        { label: 'Drawdown max', value: formatEur(s.maxDrawdown), tone: s.maxDrawdown ? 'down' : 'flat' },
+        {
+          label: 'Drawdown max',
+          value: formatEur(s.maxDrawdown),
+          tone: s.maxDrawdown ? 'down' : 'flat',
+        },
         { label: 'Série victoires max', value: s.maxWinStreak, tone: 'up' },
-        { label: 'Série défaites max', value: s.maxLossStreak, tone: s.maxLossStreak ? 'down' : 'flat' },
+        {
+          label: 'Série défaites max',
+          value: s.maxLossStreak,
+          tone: s.maxLossStreak ? 'down' : 'flat',
+        },
         { label: 'Mise moyenne', value: formatEur(s.avgStake) },
         { label: 'Mise max', value: formatEur(s.maxStake) },
         { label: 'Cote moyenne', value: formatOdds(s.avgOdds) },
         { label: 'Plus grosse cote gagnée', value: formatOdds(s.bestWonOdds) },
-        { label: 'Plus gros bénéfice', value: formatSignedEur(s.biggestWin), tone: trendClass(s.biggestWin) },
-        { label: 'Plus grosse perte', value: formatSignedEur(s.biggestLoss), tone: trendClass(s.biggestLoss) },
+        {
+          label: 'Plus gros bénéfice',
+          value: formatSignedEur(s.biggestWin),
+          tone: trendClass(s.biggestWin),
+        },
+        {
+          label: 'Plus grosse perte',
+          value: formatSignedEur(s.biggestLoss),
+          tone: trendClass(s.biggestLoss),
+        },
         { label: 'Commissions', value: formatEur(s.commissions) },
-        { label: 'CLV', value: s.clv == null ? '—' : formatPct(s.clv, { signed: true }), tone: trendClass(s.clv) },
+        {
+          label: 'CLV',
+          value: s.clv == null ? '—' : formatPct(s.clv, { signed: true }),
+          tone: trendClass(s.clv),
+        },
       ],
     },
   ];
@@ -61,7 +97,9 @@ export default function StatsTab({ stats: s }) {
             {g.rows.map((r) => (
               <li key={r.label} className="bstat">
                 <span className="bstat__label">{r.label}</span>
-                <span className={`bstat__value${r.tone ? ` t-${r.tone}` : ''}`}>{r.value}</span>
+                <span className={`bstat__value${r.tone ? ` t-${r.tone}` : ''}`}>
+                  {r.value}
+                </span>
               </li>
             ))}
           </ul>

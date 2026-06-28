@@ -107,7 +107,9 @@ export default function TrainingPage() {
   };
 
   async function handleSave(payload, id) {
-    const res = id ? await trainingApi.update(id, payload) : await trainingApi.create(payload);
+    const res = id
+      ? await trainingApi.update(id, payload)
+      : await trainingApi.create(payload);
     setModal(null);
     setDrawer(null);
     await load();
@@ -119,7 +121,10 @@ export default function TrainingPage() {
   }
 
   async function handleDelete(ev) {
-    const ok = await confirmDialog({ message: 'Supprimer cette séance ? Cette action est irréversible.', danger: true });
+    const ok = await confirmDialog({
+      message: 'Supprimer cette séance ? Cette action est irréversible.',
+      danger: true,
+    });
     if (!ok) return;
     await trainingApi.remove(ev.id);
     setModal(null);
@@ -132,21 +137,46 @@ export default function TrainingPage() {
       <header className="page-head">
         <div>
           <h1 className="page-head__title">Entraînement</h1>
-          <p className="page-head__subtitle">Logge tes séances et suis ta progression.</p>
+          <p className="page-head__subtitle">
+            Logge tes séances et suis ta progression.
+          </p>
         </div>
-        <button className="btn btn--primary" onClick={() => openCreate(cursor)}>+ Séance</button>
+        <button className="btn btn--primary" onClick={() => openCreate(cursor)}>
+          + Séance
+        </button>
       </header>
 
       <div className="control-bar">
         <div className="control-bar__nav">
-          <button className="icon-btn" onClick={() => go(-1)} aria-label="Précédent">‹</button>
+          <button
+            className="icon-btn"
+            onClick={() => go(-1)}
+            aria-label="Précédent"
+          >
+            ‹
+          </button>
           <span className="control-bar__label">{periodLabel}</span>
-          <button className="icon-btn" onClick={() => go(1)} aria-label="Suivant">›</button>
-          <button className="btn btn--ghost btn--sm" onClick={() => setCursor(today)}>Aujourd’hui</button>
+          <button
+            className="icon-btn"
+            onClick={() => go(1)}
+            aria-label="Suivant"
+          >
+            ›
+          </button>
+          <button
+            className="btn btn--ghost btn--sm"
+            onClick={() => setCursor(today)}
+          >
+            Aujourd’hui
+          </button>
         </div>
 
         <div className="control-bar__switches">
-          <div className="segmented" role="radiogroup" aria-label="Vue calendrier">
+          <div
+            className="segmented"
+            role="radiogroup"
+            aria-label="Vue calendrier"
+          >
             {VIEWS.map((v) => (
               <button
                 key={v.id}

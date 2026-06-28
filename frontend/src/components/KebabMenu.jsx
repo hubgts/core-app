@@ -78,7 +78,7 @@ export default function KebabMenu({ actions, label = 'Actions secondaires' }) {
                 {a.icon && <span className="kebab__icon">{a.icon}</span>}
                 {a.label}
               </button>
-            )
+            ),
           )}
         </div>
       )}

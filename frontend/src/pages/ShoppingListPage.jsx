@@ -1,10 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { courseApi } from '../api/course';
-import { alertDialog, confirmDialog, promptDialog } from '../components/dialogs';
+import {
+  alertDialog,
+  confirmDialog,
+  promptDialog,
+} from '../components/dialogs';
 import ArticlePicker from '../components/course/ArticlePicker';
 import ImportRecipeModal from '../components/course/ImportRecipeModal';
-import { COMMON_UNITS, formatMeasure, groupByAisle } from '../components/course/constants';
+import {
+  COMMON_UNITS,
+  formatMeasure,
+  groupByAisle,
+} from '../components/course/constants';
 import { frenchFullDate } from '../utils/date';
 import './CoursePage.css';
 
@@ -18,7 +26,12 @@ export default function ShoppingListPage() {
   const [importing, setImporting] = useState(false);
 
   // Brouillon d'ajout d'item.
-  const [draft, setDraft] = useState({ articleId: null, articleName: '', name: '', unit: '' });
+  const [draft, setDraft] = useState({
+    articleId: null,
+    articleName: '',
+    name: '',
+    unit: '',
+  });
   const [qty, setQty] = useState('');
   const [unit, setUnit] = useState('');
   const pickerKey = useRef(0);
@@ -34,7 +47,9 @@ export default function ShoppingListPage() {
     }
   }, [id]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function run(fn) {
     setError('');
@@ -69,13 +84,19 @@ export default function ShoppingListPage() {
   }
 
   async function rename() {
-    const next = await promptDialog({ title: 'Renommer la liste', defaultValue: list.title });
+    const next = await promptDialog({
+      title: 'Renommer la liste',
+      defaultValue: list.title,
+    });
     if (next == null || !next.trim() || next.trim() === list.title) return;
     run(() => courseApi.updateList(id, { title: next.trim() }));
   }
 
   async function saveAsTemplate() {
-    const title = await promptDialog({ title: 'Nom du modèle', defaultValue: list.title });
+    const title = await promptDialog({
+      title: 'Nom du modèle',
+      defaultValue: list.title,
+    });
     if (title == null) return;
     run(() => courseApi.saveAsTemplate(id, { title: title.trim() }));
   }
@@ -92,7 +113,9 @@ export default function ShoppingListPage() {
       await alertDialog('Aucun modèle disponible. Crée-en un d’abord.');
       return;
     }
-    const choices = templates.map((t, i) => `${i + 1}. ${t.title} (${t.itemCount})`).join('\n');
+    const choices = templates
+      .map((t, i) => `${i + 1}. ${t.title} (${t.itemCount})`)
+      .join('\n');
     const pick = await promptDialog({
       title: 'Appliquer quel modèle ?',
       message: choices,
@@ -105,25 +128,59 @@ export default function ShoppingListPage() {
   }
 
   async function removeList() {
-    if (!(await confirmDialog({ message: `Supprimer « ${list.title} » ? Action irréversible.`, danger: true }))) return;
-    run(async () => { await courseApi.removeList(id); navigate('/course'); });
+    if (
+      !(await confirmDialog({
+        message: `Supprimer « ${list.title} » ? Action irréversible.`,
+        danger: true,
+      }))
+    )
+      return;
+    run(async () => {
+      await courseApi.removeList(id);
+      navigate('/course');
+    });
   }
 
-  if (loading) return <div className="course-page"><p className="course-empty">Chargement…</p></div>;
-  if (!list) return <div className="course-page"><p className="modal__error">{error || 'Liste introuvable.'}</p></div>;
+  if (loading)
+    return (
+      <div className="course-page">
+        <p className="course-empty">Chargement…</p>
+      </div>
+    );
+  if (!list)
+    return (
+      <div className="course-page">
+        <p className="modal__error">{error || 'Liste introuvable.'}</p>
+      </div>
+    );
 
-  const visibleItems = hidePicked ? list.items.filter((i) => !i.checked) : list.items;
+  const visibleItems = hidePicked
+    ? list.items.filter((i) => !i.checked)
+    : list.items;
   const groups = groupByAisle(visibleItems);
 
   return (
     <div className="course-page">
       <header className="page-head">
         <div className="course-detailhead">
-          <button className="btn btn--ghost btn--sm" onClick={() => navigate('/course')}>← Course</button>
-          <h1 className="page-head__title course-detailhead__title" onClick={rename} title="Renommer">
+          <button
+            className="btn btn--ghost btn--sm"
+            onClick={() => navigate('/course')}
+          >
+            ← Course
+          </button>
+          <h1
+            className="page-head__title course-detailhead__title"
+            onClick={rename}
+            title="Renommer"
+          >
             🛒 {list.title}
           </h1>
-          {list.date && <span className="course-detailhead__date">{frenchFullDate(list.date)}</span>}
+          {list.date && (
+            <span className="course-detailhead__date">
+              {frenchFullDate(list.date)}
+            </span>
+          )}
         </div>
         <div className="course-detail__counts">
           {list.checkedCount} / {list.itemCount} pris
@@ -131,22 +188,52 @@ export default function ShoppingListPage() {
       </header>
 
       <div className="course-detail__toolbar">
-        <button className="btn btn--sm btn--ghost" onClick={() => setImporting(true)}>+ Recette</button>
-        <button className="btn btn--sm btn--ghost" onClick={applyTemplate}>Appliquer un modèle</button>
-        <button className="btn btn--sm btn--ghost" onClick={saveAsTemplate}>Enregistrer comme modèle</button>
-        <button className="btn btn--sm btn--ghost" onClick={() => run(() => courseApi.uncheckAll(id))}>Tout décocher</button>
-        <button className="btn btn--sm btn--ghost" onClick={() => run(() => courseApi.clearChecked(id))}>Vider les pris</button>
+        <button
+          className="btn btn--sm btn--ghost"
+          onClick={() => setImporting(true)}
+        >
+          + Recette
+        </button>
+        <button className="btn btn--sm btn--ghost" onClick={applyTemplate}>
+          Appliquer un modèle
+        </button>
+        <button className="btn btn--sm btn--ghost" onClick={saveAsTemplate}>
+          Enregistrer comme modèle
+        </button>
+        <button
+          className="btn btn--sm btn--ghost"
+          onClick={() => run(() => courseApi.uncheckAll(id))}
+        >
+          Tout décocher
+        </button>
+        <button
+          className="btn btn--sm btn--ghost"
+          onClick={() => run(() => courseApi.clearChecked(id))}
+        >
+          Vider les pris
+        </button>
         <label className="course-detail__hide">
-          <input type="checkbox" checked={hidePicked} onChange={(e) => setHidePicked(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={hidePicked}
+            onChange={(e) => setHidePicked(e.target.checked)}
+          />
           Masquer les pris
         </label>
-        <button className="btn btn--sm btn--ghost course-detail__del" onClick={removeList}>Supprimer</button>
+        <button
+          className="btn btn--sm btn--ghost course-detail__del"
+          onClick={removeList}
+        >
+          Supprimer
+        </button>
       </div>
 
       {error && <p className="modal__error">{error}</p>}
 
       {list.items.length === 0 ? (
-        <p className="course-empty">Liste vide. Ajoute un article ci-dessous ou importe une recette.</p>
+        <p className="course-empty">
+          Liste vide. Ajoute un article ci-dessous ou importe une recette.
+        </p>
       ) : (
         <div className="course-sections">
           {groups.map((g) => (
@@ -156,16 +243,25 @@ export default function ShoppingListPage() {
               </h2>
               <ul className="course-items">
                 {g.items.map((it) => (
-                  <li key={it.id} className={`course-item${it.checked ? ' is-checked' : ''}`}>
+                  <li
+                    key={it.id}
+                    className={`course-item${it.checked ? ' is-checked' : ''}`}
+                  >
                     <label className="course-item__main">
                       <input
                         type="checkbox"
                         checked={it.checked}
-                        onChange={() => run(() => courseApi.toggleItem(id, it.id))}
+                        onChange={() =>
+                          run(() => courseApi.toggleItem(id, it.id))
+                        }
                       />
-                      <span className="course-item__qty">{formatMeasure(it.quantity, it.unit)}</span>
+                      <span className="course-item__qty">
+                        {formatMeasure(it.quantity, it.unit)}
+                      </span>
                       <span className="course-item__label">{it.label}</span>
-                      {it.note && <span className="course-item__note">{it.note}</span>}
+                      {it.note && (
+                        <span className="course-item__note">{it.note}</span>
+                      )}
                     </label>
                     <button
                       className="icon-btn"
@@ -208,7 +304,9 @@ export default function ShoppingListPage() {
           onKeyDown={(e) => e.key === 'Enter' && addItem()}
         />
         <datalist id="course-units">
-          {COMMON_UNITS.map((u) => <option key={u} value={u} />)}
+          {COMMON_UNITS.map((u) => (
+            <option key={u} value={u} />
+          ))}
         </datalist>
         <button
           className="btn btn--primary"
@@ -223,7 +321,10 @@ export default function ShoppingListPage() {
         <ImportRecipeModal
           listId={id}
           onClose={() => setImporting(false)}
-          onDone={(updated) => { setImporting(false); setList(updated); }}
+          onDone={(updated) => {
+            setImporting(false);
+            setList(updated);
+          }}
         />
       )}
     </div>

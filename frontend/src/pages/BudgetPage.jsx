@@ -66,7 +66,13 @@ export default function BudgetPage() {
   }
 
   async function deleteTransaction(id) {
-    if (!(await confirmDialog({ message: 'Supprimer cette transaction ?', danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: 'Supprimer cette transaction ?',
+        danger: true,
+      }))
+    )
+      return;
     await budgetApi.removeTransaction(id);
     flash('Transaction supprimée.');
     await load(month);
@@ -75,10 +81,14 @@ export default function BudgetPage() {
   async function seedDefaultPlan() {
     try {
       const created = [];
-      for (const c of DEFAULT_PLAN) created.push(await budgetApi.createCategory(c));
+      for (const c of DEFAULT_PLAN)
+        created.push(await budgetApi.createCategory(c));
       await budgetApi.setPlan(
         month,
-        created.map((cat, i) => ({ categoryId: cat.id, targetPct: DEFAULT_PLAN[i].targetPct })),
+        created.map((cat, i) => ({
+          categoryId: cat.id,
+          targetPct: DEFAULT_PLAN[i].targetPct,
+        })),
       );
       await load(month);
     } catch (e) {
@@ -120,10 +130,21 @@ export default function BudgetPage() {
           <MonthNav month={month} onChange={setMonth} />
           {data?.hasCategories && (
             <>
-              <button className="btn btn--primary" onClick={() => setTxModal({ kind: 'sortie' })}>
+              <button
+                className="btn btn--primary"
+                onClick={() => setTxModal({ kind: 'sortie' })}
+              >
                 + Dépense
               </button>
-              <KebabMenu actions={[{ icon: '🛠️', label: 'Gérer le plan', onClick: () => setShowCategories(true) }]} />
+              <KebabMenu
+                actions={[
+                  {
+                    icon: '🛠️',
+                    label: 'Gérer le plan',
+                    onClick: () => setShowCategories(true),
+                  },
+                ]}
+              />
             </>
           )}
         </div>
@@ -136,15 +157,19 @@ export default function BudgetPage() {
         <section className="fcard bonboard">
           <h2 className="fcard__title">Définissez votre plan budgétaire</h2>
           <p className="bonboard__text">
-            Répartissez votre revenu en catégories (ex. le classique <strong>50 / 30 / 20</strong> :
-            besoins de première nécessité, plaisirs, épargne). Vous saisirez ensuite vos dépenses et
-            verrez en temps réel si vous respectez votre plan.
+            Répartissez votre revenu en catégories (ex. le classique{' '}
+            <strong>50 / 30 / 20</strong> : besoins de première nécessité,
+            plaisirs, épargne). Vous saisirez ensuite vos dépenses et verrez en
+            temps réel si vous respectez votre plan.
           </p>
           <div className="bonboard__actions">
             <button className="btn btn--primary" onClick={seedDefaultPlan}>
               Utiliser le modèle 50/30/20
             </button>
-            <button className="btn btn--ghost" onClick={() => setShowCategories(true)}>
+            <button
+              className="btn btn--ghost"
+              onClick={() => setShowCategories(true)}
+            >
               Créer un plan personnalisé
             </button>
           </div>
@@ -158,17 +183,24 @@ export default function BudgetPage() {
             <div className="bbanner__cell">
               <span className="fhero__label">Revenu du mois</span>
               <span className="bbanner__value">{formatEur(data.income)}</span>
-              <button className="fsumlink fsumlink--btn" onClick={() => setTxModal({ kind: 'entree' })}>
+              <button
+                className="fsumlink fsumlink--btn"
+                onClick={() => setTxModal({ kind: 'entree' })}
+              >
                 + Revenu
               </button>
             </div>
             <div className="bbanner__cell">
               <span className="fhero__label">Dépensé / alloué</span>
-              <span className="bbanner__value">{formatEur(data.totalSpent)}</span>
+              <span className="bbanner__value">
+                {formatEur(data.totalSpent)}
+              </span>
             </div>
             <div className="bbanner__cell">
               <span className="fhero__label">Reste à allouer</span>
-              <span className={`bbanner__value t-${trendClass(data.remaining)}`}>
+              <span
+                className={`bbanner__value t-${trendClass(data.remaining)}`}
+              >
                 {formatEur(data.remaining)}
               </span>
             </div>
@@ -176,13 +208,20 @@ export default function BudgetPage() {
 
           {data.income === 0 && data.plannedIncome != null && (
             <button className="freminder" onClick={addReferenceIncome}>
-              💡 Ajouter votre revenu de référence ({formatEur(data.plannedIncome)}) comme revenu du mois →
+              💡 Ajouter votre revenu de référence (
+              {formatEur(data.plannedIncome)}) comme revenu du mois →
             </button>
           )}
           {Math.round(data.planTotalPct) !== 100 && (
             <p className="bwarn">
-              ⚠ La somme des cibles fait {Math.round(data.planTotalPct)} % (idéalement 100 %).{' '}
-              <button className="fsumlink fsumlink--btn" onClick={() => setShowCategories(true)}>Ajuster le plan</button>
+              ⚠ La somme des cibles fait {Math.round(data.planTotalPct)} %
+              (idéalement 100 %).{' '}
+              <button
+                className="fsumlink fsumlink--btn"
+                onClick={() => setShowCategories(true)}
+              >
+                Ajuster le plan
+              </button>
             </p>
           )}
 
@@ -190,47 +229,75 @@ export default function BudgetPage() {
           <section className="fgrid">
             <div className="fcard fcard--donut">
               <h2 className="fcard__title">Répartition du mois</h2>
-              <Donut slices={data.pie} gross={data.totalSpent} label="Répartition des dépenses" centerSub="dépensé" />
+              <Donut
+                slices={data.pie}
+                gross={data.totalSpent}
+                label="Répartition des dépenses"
+                centerSub="dépensé"
+              />
             </div>
 
             <div className="fcard">
               <div className="fcard__head">
                 <h2 className="fcard__title">Plan vs réel</h2>
-                <button className="fsumlink fsumlink--btn" onClick={() => setShowCategories(true)}>
+                <button
+                  className="fsumlink fsumlink--btn"
+                  onClick={() => setShowCategories(true)}
+                >
                   Gérer le plan
                 </button>
               </div>
               {data.planInherited && data.planSource && (
-                <p className="bwarn">↩ Plan repris de {monthLabel(data.planSource)}.</p>
+                <p className="bwarn">
+                  ↩ Plan repris de {monthLabel(data.planSource)}.
+                </p>
               )}
               {planCats.length === 0 ? (
                 <p className="fempty">
                   Aucune catégorie dans le plan de ce mois.{' '}
-                  <button className="fsumlink fsumlink--btn" onClick={() => setShowCategories(true)}>Définir le plan</button>
+                  <button
+                    className="fsumlink fsumlink--btn"
+                    onClick={() => setShowCategories(true)}
+                  >
+                    Définir le plan
+                  </button>
                 </p>
               ) : (
-              <ul className="bvs">
-                {planCats.map((c) => {
-                  const real = c.realPctOfIncome;
-                  const fill = clampPct(real);
-                  const marker = clampPct(c.targetPct);
-                  return (
-                    <li key={c.id} className="bvs__row">
-                      <span className="bvs__name">
-                        {c.icon ? `${c.icon} ` : ''}{c.name}
-                      </span>
-                      <span className="bvs__track">
-                        <span className="bvs__fill" style={{ width: `${fill}%`, background: c.color }} />
-                        <span className="bvs__marker" style={{ left: `${marker}%` }} title={`Cible ${c.targetPct} %`} />
-                      </span>
-                      <span className="bvs__nums">
-                        <strong>{real != null ? `${Math.round(real)} %` : '—'}</strong>
-                        <span className="bvs__target"> / {Math.round(c.targetPct ?? 0)} %</span>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
+                <ul className="bvs">
+                  {planCats.map((c) => {
+                    const real = c.realPctOfIncome;
+                    const fill = clampPct(real);
+                    const marker = clampPct(c.targetPct);
+                    return (
+                      <li key={c.id} className="bvs__row">
+                        <span className="bvs__name">
+                          {c.icon ? `${c.icon} ` : ''}
+                          {c.name}
+                        </span>
+                        <span className="bvs__track">
+                          <span
+                            className="bvs__fill"
+                            style={{ width: `${fill}%`, background: c.color }}
+                          />
+                          <span
+                            className="bvs__marker"
+                            style={{ left: `${marker}%` }}
+                            title={`Cible ${c.targetPct} %`}
+                          />
+                        </span>
+                        <span className="bvs__nums">
+                          <strong>
+                            {real != null ? `${Math.round(real)} %` : '—'}
+                          </strong>
+                          <span className="bvs__target">
+                            {' '}
+                            / {Math.round(c.targetPct ?? 0)} %
+                          </span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
               )}
             </div>
           </section>
@@ -241,9 +308,12 @@ export default function BudgetPage() {
             <div className="bcatcards">
               {categories.map((c) => {
                 const meta = statusMeta(c.state);
-                const pct = c.targetEur && c.targetEur > 0
-                  ? Math.min((c.real / c.targetEur) * 100, 100)
-                  : c.real > 0 ? 100 : 0;
+                const pct =
+                  c.targetEur && c.targetEur > 0
+                    ? Math.min((c.real / c.targetEur) * 100, 100)
+                    : c.real > 0
+                      ? 100
+                      : 0;
                 const over = c.state === 'over';
                 return (
                   <div className="bcat" key={c.id} style={{ '--c': c.color }}>
@@ -252,7 +322,9 @@ export default function BudgetPage() {
                       <span className="bcat__catname">{c.name}</span>
                       <button
                         className="btn btn--ghost btn--sm"
-                        onClick={() => setTxModal({ kind: 'sortie', categoryId: c.id })}
+                        onClick={() =>
+                          setTxModal({ kind: 'sortie', categoryId: c.id })
+                        }
                       >
                         + Dépense
                       </button>
@@ -271,14 +343,19 @@ export default function BudgetPage() {
                       <div className="fprog__track">
                         <div
                           className="fprog__fill"
-                          style={{ width: `${pct}%`, background: over ? '#f87171' : c.color }}
+                          style={{
+                            width: `${pct}%`,
+                            background: over ? '#f87171' : c.color,
+                          }}
                         />
                       </div>
                     </div>
                     {meta && (
                       <div className={`bcat__state t-${meta.tone}`}>
                         {meta.label}
-                        {c.ecartEur != null && c.ecartEur !== 0 && ` · ${formatSignedEur(c.ecartEur)}`}
+                        {c.ecartEur != null &&
+                          c.ecartEur !== 0 &&
+                          ` · ${formatSignedEur(c.ecartEur)}`}
                       </div>
                     )}
                   </div>
@@ -291,18 +368,28 @@ export default function BudgetPage() {
           <section className="fcard">
             <div className="fcard__head">
               <h2 className="fcard__title">Transactions</h2>
-              <button className="fsumlink fsumlink--btn" onClick={() => setTxModal({ kind: 'sortie' })}>
+              <button
+                className="fsumlink fsumlink--btn"
+                onClick={() => setTxModal({ kind: 'sortie' })}
+              >
                 + Ajouter
               </button>
             </div>
             {data.transactions.length === 0 ? (
-              <p className="fempty">Aucune transaction ce mois-ci. Ajoutez une dépense ou un revenu.</p>
+              <p className="fempty">
+                Aucune transaction ce mois-ci. Ajoutez une dépense ou un revenu.
+              </p>
             ) : (
               <ul className="btx">
                 {data.transactions.map((t) => (
                   <li key={t.id} className="btx__row">
-                    <span className="btx__date">{t.date.slice(8)}/{t.date.slice(5, 7)}</span>
-                    <span className="btx__tag" style={{ '--c': t.categoryColor || '#94a3b8' }}>
+                    <span className="btx__date">
+                      {t.date.slice(8)}/{t.date.slice(5, 7)}
+                    </span>
+                    <span
+                      className="btx__tag"
+                      style={{ '--c': t.categoryColor || '#94a3b8' }}
+                    >
                       {t.kind === 'entree' ? 'Revenu' : t.categoryName || '—'}
                     </span>
                     <span className="btx__label">{t.label || ''}</span>
@@ -313,10 +400,19 @@ export default function BudgetPage() {
                     >
                       ✎
                     </button>
-                    <span className={`btx__amount${t.kind === 'sortie' ? ' btx__amount--out' : ' btx__amount--in'}`}>
-                      {t.kind === 'sortie' ? '−' : '+'}{formatEur(t.amount)}
+                    <span
+                      className={`btx__amount${t.kind === 'sortie' ? ' btx__amount--out' : ' btx__amount--in'}`}
+                    >
+                      {t.kind === 'sortie' ? '−' : '+'}
+                      {formatEur(t.amount)}
                     </span>
-                    <button className="fhist__del" onClick={() => deleteTransaction(t.id)} title="Supprimer">✕</button>
+                    <button
+                      className="fhist__del"
+                      onClick={() => deleteTransaction(t.id)}
+                      title="Supprimer"
+                    >
+                      ✕
+                    </button>
                   </li>
                 ))}
               </ul>

@@ -14,7 +14,9 @@
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 .kebab__btn:hover,
 .kebab__btn[aria-expanded='true'] {

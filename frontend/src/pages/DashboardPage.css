@@ -46,9 +46,17 @@
   animation: dash-wave 1.6s ease 0.3s 2;
 }
 @keyframes dash-wave {
-  0%, 60%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(16deg); }
-  40% { transform: rotate(-8deg); }
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(16deg);
+  }
+  40% {
+    transform: rotate(-8deg);
+  }
 }
 .dash__date {
   color: var(--text-faint);
@@ -80,9 +88,13 @@
   font-weight: 700;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
-.dtabs__btn:hover { color: var(--text); }
+.dtabs__btn:hover {
+  color: var(--text);
+}
 .dtabs__btn--active {
   background: var(--surface);
   color: var(--text);
@@ -90,9 +102,15 @@
 }
 
 /* Tendances */
-.t-up { color: #34d399; }
-.t-down { color: var(--danger); }
-.t-flat { color: var(--text-muted); }
+.t-up {
+  color: #34d399;
+}
+.t-down {
+  color: var(--danger);
+}
+.t-flat {
+  color: var(--text-muted);
+}
 
 /* --- Rangée 1 : cartes stat (curated par onglet) --- */
 .dash__stats {
@@ -102,7 +120,9 @@
   margin-bottom: 18px;
 }
 @media (max-width: 1100px) {
-  .dash__stats { grid-template-columns: repeat(2, 1fr); }
+  .dash__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .dcard {
@@ -119,20 +139,37 @@
   cursor: pointer;
   font: inherit;
   color: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.1s;
 }
 .dcard:hover {
   border-color: color-mix(in srgb, var(--c) 50%, var(--border));
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   transform: translateY(-2px);
 }
-.dcard--training { --c: var(--dash-training); }
-.dcard--habits { --c: var(--dash-habits); }
-.dcard--finances { --c: var(--dash-finances); }
-.dcard--betting { --c: var(--dash-betting); }
-.dcard--knowhow { --c: var(--dash-knowhow); }
-.dcard--referentiel { --c: var(--dash-referentiel); }
-.dcard--health { --c: var(--dash-health); }
+.dcard--training {
+  --c: var(--dash-training);
+}
+.dcard--habits {
+  --c: var(--dash-habits);
+}
+.dcard--finances {
+  --c: var(--dash-finances);
+}
+.dcard--betting {
+  --c: var(--dash-betting);
+}
+.dcard--knowhow {
+  --c: var(--dash-knowhow);
+}
+.dcard--referentiel {
+  --c: var(--dash-referentiel);
+}
+.dcard--health {
+  --c: var(--dash-health);
+}
 
 .dcard__top {
   display: flex;
@@ -156,7 +193,9 @@
 .dcard__go {
   color: var(--text-faint);
   font-size: 16px;
-  transition: transform 0.15s, color 0.15s;
+  transition:
+    transform 0.15s,
+    color 0.15s;
 }
 .dcard:hover .dcard__go {
   color: var(--c);
@@ -179,8 +218,12 @@
   line-height: 1.05;
   display: block;
 }
-.dcard__value--money { font-size: 27px; }
-.dcard__value--sm { font-size: 22px; }
+.dcard__value--money {
+  font-size: 27px;
+}
+.dcard__value--sm {
+  font-size: 22px;
+}
 .dcard__unit {
   font-size: 14px;
   font-weight: 600;
@@ -208,8 +251,12 @@
   font-weight: 600;
   color: var(--text-muted);
 }
-.dchip.t-up { background: color-mix(in srgb, #34d399 18%, transparent); }
-.dchip.t-down { background: color-mix(in srgb, var(--danger) 18%, transparent); }
+.dchip.t-up {
+  background: color-mix(in srgb, #34d399 18%, transparent);
+}
+.dchip.t-down {
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+}
 
 .dcard__foot {
   font-size: 12.5px;
@@ -223,10 +270,26 @@
 }
 
 /* Anneau */
-.dring-wrap { position: relative; display: grid; place-items: center; flex: none; }
-.dring { display: block; }
-.dring__bg { fill: none; stroke: var(--surface-3); stroke-width: 6; }
-.dring__fg { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray 0.4s ease; }
+.dring-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.dring {
+  display: block;
+}
+.dring__bg {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 6;
+}
+.dring__fg {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease;
+}
 .dring__label {
   position: absolute;
   inset: 0;
@@ -259,7 +322,9 @@
 .dpanel--session,
 .dpanel--finances {
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 .dpanel--habits:hover {
   border-color: color-mix(in srgb, var(--m-habits) 45%, var(--border));
@@ -299,7 +364,9 @@
   font-weight: 600;
   color: var(--text-muted);
 }
-.dpanel--chart .dcard__meta { margin-bottom: 12px; }
+.dpanel--chart .dcard__meta {
+  margin-bottom: 12px;
+}
 
 /* --- Bloc enveloppes --- */
 .denvs {
@@ -350,7 +417,9 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.denv__arrow { font-size: 14px; }
+.denv__arrow {
+  font-size: 14px;
+}
 
 /* Liste de séances (jour / semaine) */
 .dsessions {
@@ -383,8 +452,17 @@
   font-weight: 700;
   color: var(--text-muted);
 }
-.dsession__icon { font-size: 17px; flex: none; }
-.dsession__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.dsession__icon {
+  font-size: 17px;
+  flex: none;
+}
+.dsession__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
 .dsession__title {
   font-size: 14px;
   font-weight: 600;
@@ -416,7 +494,10 @@
   padding: 24px 0;
   text-align: center;
 }
-.dpanel__resticon { font-size: 30px; opacity: 0.8; }
+.dpanel__resticon {
+  font-size: 30px;
+  opacity: 0.8;
+}
 .dpanel__head {
   display: flex;
   align-items: baseline;
@@ -525,8 +606,12 @@
   color: #fff;
   flex: none;
 }
-.dwk__dot--off { opacity: 0.3; }
-.dwk__dot--miss { border-style: dashed; }
+.dwk__dot--off {
+  opacity: 0.3;
+}
+.dwk__dot--miss {
+  border-style: dashed;
+}
 .dwk__count {
   width: 40px;
   text-align: right;
@@ -539,10 +624,22 @@
 
 /* --- Responsive --- */
 @media (max-width: 860px) {
-  .dgrid2 { grid-template-columns: 1fr; }
-  .dfin { grid-template-columns: 1fr; }
-  .dash__head { align-items: stretch; }
-  .dtabs { width: 100%; }
-  .dtabs__btn { flex: 1; }
-  .denv__trend { min-width: 0; }
+  .dgrid2 {
+    grid-template-columns: 1fr;
+  }
+  .dfin {
+    grid-template-columns: 1fr;
+  }
+  .dash__head {
+    align-items: stretch;
+  }
+  .dtabs {
+    width: 100%;
+  }
+  .dtabs__btn {
+    flex: 1;
+  }
+  .denv__trend {
+    min-width: 0;
+  }
 }

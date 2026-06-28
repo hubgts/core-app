@@ -28,7 +28,15 @@ const LABEL_MAX = 120;
 const SETTINGS_ID = 'me';
 const MONTH_RE = /^\d{4}-\d{2}$/;
 /** Palette par défaut (couleurs hex concrètes pour les SVG). */
-const DEFAULT_COLORS = ['#38bdf8', '#a78bfa', '#34d399', '#fbbf24', '#f472b6', '#f87171', '#22d3ee'];
+const DEFAULT_COLORS = [
+  '#38bdf8',
+  '#a78bfa',
+  '#34d399',
+  '#fbbf24',
+  '#f472b6',
+  '#f87171',
+  '#22d3ee',
+];
 
 @Injectable()
 export class BudgetService {
@@ -57,7 +65,8 @@ export class BudgetService {
     await this.assertNameUnique(name, null);
     const kind = this.validateKind(input.kind);
     const maxPos = await this.maxPosition();
-    const color = input.color || DEFAULT_COLORS[(maxPos + 1) % DEFAULT_COLORS.length];
+    const color =
+      input.color || DEFAULT_COLORS[(maxPos + 1) % DEFAULT_COLORS.length];
     return this.categories.save(
       this.categories.create({
         name,
@@ -110,7 +119,9 @@ export class BudgetService {
     if (!Array.isArray(ids)) {
       throw new BadRequestException('Le corps doit contenir un tableau "ids".');
     }
-    await Promise.all(ids.map((id, index) => this.categories.update(id, { position: index })));
+    await Promise.all(
+      ids.map((id, index) => this.categories.update(id, { position: index })),
+    );
     return this.listCategories();
   }
 
@@ -131,12 +142,16 @@ export class BudgetService {
   async createTransaction(input: TransactionInput) {
     const kind = input.kind === 'entree' ? 'entree' : 'sortie';
     const amount = this.validateAmount(input.amount);
-    const date = isValidDateStr(input.date) ? (input.date as string) : todayStr();
+    const date = isValidDateStr(input.date)
+      ? (input.date as string)
+      : todayStr();
 
     let categoryId: string | null = null;
     if (kind === 'sortie') {
       if (!input.categoryId) {
-        throw new BadRequestException('Une dépense doit être rattachée à une catégorie.');
+        throw new BadRequestException(
+          'Une dépense doit être rattachée à une catégorie.',
+        );
       }
       const cat = await this.getCategoryOrThrow(input.categoryId);
       if (cat.status !== 'active') {
@@ -159,8 +174,10 @@ export class BudgetService {
 
   async updateTransaction(id: string, input: TransactionInput) {
     const tx = await this.getTransactionOrThrow(id);
-    if (input.kind !== undefined) tx.kind = input.kind === 'entree' ? 'entree' : 'sortie';
-    if (input.amount !== undefined) tx.amount = this.validateAmount(input.amount);
+    if (input.kind !== undefined)
+      tx.kind = input.kind === 'entree' ? 'entree' : 'sortie';
+    if (input.amount !== undefined)
+      tx.amount = this.validateAmount(input.amount);
     if (input.date !== undefined) {
       if (!isValidDateStr(input.date)) {
         throw new BadRequestException('Date invalide (YYYY-MM-DD attendu).');
@@ -172,7 +189,10 @@ export class BudgetService {
       tx.categoryId = null;
     } else if (input.categoryId !== undefined || tx.categoryId == null) {
       const id2 = input.categoryId ?? tx.categoryId;
-      if (!id2) throw new BadRequestException('Une dépense doit être rattachée à une catégorie.');
+      if (!id2)
+        throw new BadRequestException(
+          'Une dépense doit être rattachée à une catégorie.',
+        );
       const cat = await this.getCategoryOrThrow(id2);
       tx.categoryId = cat.id;
     }
@@ -241,7 +261,10 @@ export class BudgetService {
     const spentByCat = new Map<string, number>();
     for (const t of txs) {
       if (t.kind !== 'sortie' || !t.categoryId) continue;
-      spentByCat.set(t.categoryId, (spentByCat.get(t.categoryId) ?? 0) + t.amount);
+      spentByCat.set(
+        t.categoryId,
+        (spentByCat.get(t.categoryId) ?? 0) + t.amount,
+      );
     }
 
     // Cibles du mois : % de chaque catégorie (plan effectif, hérité si besoin).
@@ -261,14 +284,20 @@ export class BudgetService {
 
     const categories = visible.map((c) => {
       const real = round2(spentByCat.get(c.id) ?? 0);
-      const targetPct = planMap.has(c.id) ? round2(planMap.get(c.id) as number) : null;
-      const targetEur = targetPct != null && income > 0 ? round2((targetPct / 100) * income) : null;
+      const targetPct = planMap.has(c.id)
+        ? round2(planMap.get(c.id) as number)
+        : null;
+      const targetEur =
+        targetPct != null && income > 0
+          ? round2((targetPct / 100) * income)
+          : null;
       const realPctOfIncome = income > 0 ? round2((real / income) * 100) : null;
       const sharePct = totalSpent > 0 ? round2((real / totalSpent) * 100) : 0;
       const ecartEur = targetEur != null ? round2(real - targetEur) : null;
       let status: CategoryStatus = null;
       if (targetEur != null) {
-        if (c.kind === 'epargne') status = real >= targetEur ? 'reached' : 'insufficient';
+        if (c.kind === 'epargne')
+          status = real >= targetEur ? 'reached' : 'insufficient';
         else status = real > targetEur ? 'over' : 'within';
       }
       return {
@@ -289,12 +318,20 @@ export class BudgetService {
       };
     });
 
-    const planTotalPct = round2([...planMap.values()].reduce((s, p) => s + p, 0));
+    const planTotalPct = round2(
+      [...planMap.values()].reduce((s, p) => s + p, 0),
+    );
 
     // Camembert du réel : catégories ayant des sorties.
     const pie = categories
       .filter((c) => c.real > 0)
-      .map((c) => ({ key: c.id, label: c.name, color: c.color, total: c.real, pct: c.sharePct }))
+      .map((c) => ({
+        key: c.id,
+        label: c.name,
+        color: c.color,
+        total: c.real,
+        pct: c.sharePct,
+      }))
       .sort((a, b) => b.total - a.total);
 
     return {
@@ -311,7 +348,13 @@ export class BudgetService {
       categories,
       allCategories: cats
         .filter((c) => c.status === 'active')
-        .map((c) => ({ id: c.id, name: c.name, color: c.color, icon: c.icon, kind: c.kind })),
+        .map((c) => ({
+          id: c.id,
+          name: c.name,
+          color: c.color,
+          icon: c.icon,
+          kind: c.kind,
+        })),
       pie,
       transactions: txs.map((t) => this.decorateTransaction(t, visible)),
     };
@@ -361,9 +404,13 @@ export class BudgetService {
         agg.income += t.amount;
       } else {
         agg.expenses += t.amount;
-        if (t.categoryId && savingsCatIds.has(t.categoryId)) agg.savings += t.amount;
+        if (t.categoryId && savingsCatIds.has(t.categoryId))
+          agg.savings += t.amount;
         if (m === month && t.categoryId) {
-          spentByCat.set(t.categoryId, (spentByCat.get(t.categoryId) ?? 0) + t.amount);
+          spentByCat.set(
+            t.categoryId,
+            (spentByCat.get(t.categoryId) ?? 0) + t.amount,
+          );
         }
       }
     }
@@ -385,14 +432,23 @@ export class BudgetService {
 
     // Mois précédent (immédiat) : son solde, qu'il ait ou non des transactions.
     const prev = shiftMonth(month, -1);
-    const prevAgg = perMonth.get(prev) ?? { income: 0, expenses: 0, savings: 0 };
+    const prevAgg = perMonth.get(prev) ?? {
+      income: 0,
+      expenses: 0,
+      savings: 0,
+    };
     const previousMonth = {
       month: prev,
       net: round2(prevAgg.income - prevAgg.expenses),
     };
 
     // Historique : 6 mois (du plus ancien au plus récent), mois courant inclus.
-    const history: { month: string; income: number; expenses: number; net: number }[] = [];
+    const history: {
+      month: string;
+      income: number;
+      expenses: number;
+      net: number;
+    }[] = [];
     for (let i = 5; i >= 0; i--) {
       const m = shiftMonth(month, -i);
       const a = perMonth.get(m) ?? { income: 0, expenses: 0, savings: 0 };
@@ -442,9 +498,11 @@ export class BudgetService {
    * Plan effectif d'un mois : ses propres lignes si elles existent, sinon **héritage**
    * du dernier plan défini (mois le plus récent < `month`, à défaut le plus récent).
    */
-  private async effectivePlan(
-    month: string,
-  ): Promise<{ rows: BudgetMonthPlanEntity[]; inherited: boolean; source: string | null }> {
+  private async effectivePlan(month: string): Promise<{
+    rows: BudgetMonthPlanEntity[];
+    inherited: boolean;
+    source: string | null;
+  }> {
     const own = await this.plans.find({ where: { month } });
     if (own.length > 0) return { rows: own, inherited: false, source: month };
     const months = (
@@ -456,14 +514,21 @@ export class BudgetService {
     ).map((r) => r.month);
     const src = months.find((m) => m < month) ?? months[0] ?? null;
     if (!src) return { rows: [], inherited: false, source: null };
-    return { rows: await this.plans.find({ where: { month: src } }), inherited: true, source: src };
+    return {
+      rows: await this.plans.find({ where: { month: src } }),
+      inherited: true,
+      source: src,
+    };
   }
 
   /** Plan d'un mois pour l'éditeur : toutes les catégories actives + leur % (hérité). */
   async getPlanEditor(monthParam?: string) {
     const month = this.resolveMonth(monthParam);
     const [cats, plan] = await Promise.all([
-      this.categories.find({ where: { status: 'active' }, order: { position: 'ASC' } }),
+      this.categories.find({
+        where: { status: 'active' },
+        order: { position: 'ASC' },
+      }),
       this.effectivePlan(month),
     ]);
     const map = new Map(plan.rows.map((r) => [r.categoryId, r.targetPct]));
@@ -496,7 +561,11 @@ export class BudgetService {
       if (cat.status !== 'active') continue;
       seen.add(cat.id);
       rows.push(
-        this.plans.create({ month, categoryId: cat.id, targetPct: this.validatePct(it.targetPct ?? 0) }),
+        this.plans.create({
+          month,
+          categoryId: cat.id,
+          targetPct: this.validatePct(it.targetPct ?? 0),
+        }),
       );
     }
     await this.plans.delete({ month });
@@ -508,8 +577,12 @@ export class BudgetService {
   // Helpers
   // ---------------------------------------------------------------------------
 
-  private decorateTransaction(t: BudgetTransactionEntity, cats?: BudgetCategoryEntity[]) {
-    const cat = t.categoryId && cats ? cats.find((c) => c.id === t.categoryId) : null;
+  private decorateTransaction(
+    t: BudgetTransactionEntity,
+    cats?: BudgetCategoryEntity[],
+  ) {
+    const cat =
+      t.categoryId && cats ? cats.find((c) => c.id === t.categoryId) : null;
     return {
       id: t.id,
       kind: t.kind,
@@ -541,13 +614,18 @@ export class BudgetService {
     return cat;
   }
 
-  private async getTransactionOrThrow(id: string): Promise<BudgetTransactionEntity> {
+  private async getTransactionOrThrow(
+    id: string,
+  ): Promise<BudgetTransactionEntity> {
     const tx = await this.transactions.findOne({ where: { id } });
     if (!tx) throw new NotFoundException('Transaction introuvable.');
     return tx;
   }
 
-  private async assertNameUnique(name: string, exceptId: string | null): Promise<void> {
+  private async assertNameUnique(
+    name: string,
+    exceptId: string | null,
+  ): Promise<void> {
     const qb = this.categories
       .createQueryBuilder('c')
       .where('c.status = :status', { status: 'active' })
@@ -562,7 +640,9 @@ export class BudgetService {
     const trimmed = (name ?? '').trim();
     if (!trimmed) throw new BadRequestException('Le nom est obligatoire.');
     if (trimmed.length > NAME_MAX) {
-      throw new BadRequestException(`Le nom ne peut dépasser ${NAME_MAX} caractères.`);
+      throw new BadRequestException(
+        `Le nom ne peut dépasser ${NAME_MAX} caractères.`,
+      );
     }
     return trimmed;
   }
@@ -570,7 +650,9 @@ export class BudgetService {
   private validatePct(value?: number): number {
     const pct = Number(value);
     if (!Number.isFinite(pct) || pct < 0 || pct > 100) {
-      throw new BadRequestException('Le % cible doit être un nombre entre 0 et 100.');
+      throw new BadRequestException(
+        'Le % cible doit être un nombre entre 0 et 100.',
+      );
     }
     return round2(pct);
   }
@@ -586,7 +668,11 @@ export class BudgetService {
   /** Montant > 0 (ou ≥ 0 si `allowZero`). */
   private validateAmount(value?: number | null, allowZero = false): number {
     const amount = Number(value);
-    if (!Number.isFinite(amount) || amount < 0 || (!allowZero && amount === 0)) {
+    if (
+      !Number.isFinite(amount) ||
+      amount < 0 ||
+      (!allowZero && amount === 0)
+    ) {
       throw new BadRequestException(
         `Le montant doit être un nombre ${allowZero ? '≥ 0' : '> 0'}.`,
       );
@@ -605,7 +691,10 @@ export class BudgetService {
 function monthBounds(month: string): { start: string; end: string } {
   const [y, m] = month.split('-').map(Number);
   const last = new Date(y, m, 0).getDate();
-  return { start: `${month}-01`, end: `${month}-${String(last).padStart(2, '0')}` };
+  return {
+    start: `${month}-01`,
+    end: `${month}-${String(last).padStart(2, '0')}`,
+  };
 }
 
 /** Décale un mois `YYYY-MM` de `delta` mois. */

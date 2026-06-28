@@ -11,7 +11,10 @@ function initExercises(session) {
   if (session?.type === 'musculation' && session.exercises?.length) {
     return session.exercises.map((ex) => ({
       name: ex.name,
-      sets: ex.sets.map((s) => ({ reps: String(s.reps), weight: String(s.weight) })),
+      sets: ex.sets.map((s) => ({
+        reps: String(s.reps),
+        weight: String(s.weight),
+      })),
     }));
   }
   return [emptyExercise()];
@@ -22,11 +25,19 @@ function initExercises(session) {
  * `onSave(session)` renvoie l'objet séance ; la persistance est gérée par
  * l'éditeur de programme (le programme est enregistré d'un bloc).
  */
-export default function ProgramSessionModal({ session, presetDay, onSave, onDelete, onClose }) {
+export default function ProgramSessionModal({
+  session,
+  presetDay,
+  onSave,
+  onDelete,
+  onClose,
+}) {
   const isEdit = Boolean(session);
   const [type, setType] = useState(session?.type ?? null);
 
-  const [dayOfWeek, setDayOfWeek] = useState(session?.dayOfWeek ?? presetDay ?? 1);
+  const [dayOfWeek, setDayOfWeek] = useState(
+    session?.dayOfWeek ?? presetDay ?? 1,
+  );
   const [label, setLabel] = useState(session?.label ?? '');
   const [hasTime, setHasTime] = useState(Boolean(session?.startTime));
   const [time, setTime] = useState(session?.startTime ?? '18:00');
@@ -38,7 +49,9 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
   const [zone, setZone] = useState(session?.zone ?? null);
   const [title, setTitle] = useState(session?.title ?? '');
   const [description, setDescription] = useState(session?.description ?? '');
-  const [sourceTemplateId, setSourceTemplateId] = useState(session?.sourceTemplateId ?? null);
+  const [sourceTemplateId, setSourceTemplateId] = useState(
+    session?.sourceTemplateId ?? null,
+  );
   const [error, setError] = useState('');
 
   const [templates, setTemplates] = useState([]);
@@ -79,7 +92,10 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
           ? tpl.exercises.map((ex) => ({
               name: ex.name,
               sets: ex.sets.length
-                ? ex.sets.map((s) => ({ reps: String(s.reps), weight: String(s.weight) }))
+                ? ex.sets.map((s) => ({
+                    reps: String(s.reps),
+                    weight: String(s.weight),
+                  }))
                 : [emptySet()],
             }))
           : [emptyExercise()],
@@ -94,12 +110,17 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
   }
 
   const updateExercise = (i, patch) =>
-    setExercises((prev) => prev.map((ex, idx) => (idx === i ? { ...ex, ...patch } : ex)));
+    setExercises((prev) =>
+      prev.map((ex, idx) => (idx === i ? { ...ex, ...patch } : ex)),
+    );
   const updateSet = (ei, si, patch) =>
     setExercises((prev) =>
       prev.map((ex, idx) =>
         idx === ei
-          ? { ...ex, sets: ex.sets.map((s, j) => (j === si ? { ...s, ...patch } : s)) }
+          ? {
+              ...ex,
+              sets: ex.sets.map((s, j) => (j === si ? { ...s, ...patch } : s)),
+            }
           : ex,
       ),
     );
@@ -118,7 +139,8 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
       ),
     );
   const addExercise = () => setExercises((prev) => [...prev, emptyExercise()]);
-  const removeExercise = (ei) => setExercises((prev) => prev.filter((_, idx) => idx !== ei));
+  const removeExercise = (ei) =>
+    setExercises((prev) => prev.filter((_, idx) => idx !== ei));
 
   function submit(e) {
     e.preventDefault();
@@ -144,7 +166,10 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
           name: ex.name.trim(),
           sets: ex.sets
             .filter((s) => s.reps !== '' || s.weight !== '')
-            .map((s) => ({ reps: Number(s.reps || 0), weight: Number(s.weight || 0) })),
+            .map((s) => ({
+              reps: Number(s.reps || 0),
+              weight: Number(s.weight || 0),
+            })),
         }))
         .filter((ex) => ex.name && ex.sets.length);
       if (cleaned.length === 0) {
@@ -166,9 +191,16 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
   if (!type) {
     return (
       <div className="modal-overlay" onMouseDown={onClose}>
-        <div className="modal modal--pick" onMouseDown={(e) => e.stopPropagation()}>
+        <div
+          className="modal modal--pick"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           <h2 className="modal__title">Nouvelle séance du programme</h2>
-          <div className="segmented pick-toggle" role="radiogroup" aria-label="Mode de création">
+          <div
+            className="segmented pick-toggle"
+            role="radiogroup"
+            aria-label="Mode de création"
+          >
             <button
               role="radio"
               aria-checked={pickMode === 'template'}
@@ -218,7 +250,9 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
                   <div className="tpl-pick__empty-state">
                     <span className="tpl-pick__empty-icon">📋</span>
                     <p className="muted">
-                      {tplSearch ? 'Aucun template ne correspond.' : 'Aucun template enregistré.'}
+                      {tplSearch
+                        ? 'Aucun template ne correspond.'
+                        : 'Aucun template enregistré.'}
                     </p>
                     <button
                       type="button"
@@ -243,7 +277,9 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
                         <span className="tpl-pick__body">
                           <span className="tpl-pick__name">{tpl.name}</span>
                         </span>
-                        <span className="tpl-pick__go" aria-hidden="true">›</span>
+                        <span className="tpl-pick__go" aria-hidden="true">
+                          ›
+                        </span>
                       </button>
                     );
                   })
@@ -254,7 +290,13 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
 
           <div className="modal__actions">
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
             </div>
           </div>
         </div>
@@ -341,7 +383,10 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
               {exercises.map((ex, ei) => (
                 <div key={ei} className="exo-card">
                   <div className="exo-card__head">
-                    <ExerciseCombobox value={ex.name} onChange={(name) => updateExercise(ei, { name })} />
+                    <ExerciseCombobox
+                      value={ex.name}
+                      onChange={(name) => updateExercise(ei, { name })}
+                    />
                     <button
                       type="button"
                       className="icon-btn"
@@ -353,7 +398,10 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
                   </div>
                   <div className="set-list">
                     <div className="set-row set-row--head">
-                      <span>Série</span><span>Reps</span><span>Charge (kg)</span><span />
+                      <span>Série</span>
+                      <span>Reps</span>
+                      <span>Charge (kg)</span>
+                      <span />
                     </div>
                     {ex.sets.map((s, si) => (
                       <div key={si} className="set-row">
@@ -363,7 +411,9 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
                           min="1"
                           className="field__input field__input--xs"
                           value={s.reps}
-                          onChange={(e) => updateSet(ei, si, { reps: e.target.value })}
+                          onChange={(e) =>
+                            updateSet(ei, si, { reps: e.target.value })
+                          }
                         />
                         <input
                           type="number"
@@ -371,7 +421,9 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
                           step="0.5"
                           className="field__input field__input--xs"
                           value={s.weight}
-                          onChange={(e) => updateSet(ei, si, { weight: e.target.value })}
+                          onChange={(e) =>
+                            updateSet(ei, si, { weight: e.target.value })
+                          }
                         />
                         <button
                           type="button"
@@ -384,13 +436,21 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
                         </button>
                       </div>
                     ))}
-                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => addSet(ei)}>
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--sm"
+                      onClick={() => addSet(ei)}
+                    >
                       + série
                     </button>
                   </div>
                 </div>
               ))}
-              <button type="button" className="btn btn--ghost btn--sm" onClick={addExercise}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={addExercise}
+              >
                 + exercice
               </button>
             </div>
@@ -399,7 +459,9 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
           {type === 'cardio' && (
             <>
               <div className="field">
-                <span className="field__label">Zone de fréquence cardiaque</span>
+                <span className="field__label">
+                  Zone de fréquence cardiaque
+                </span>
                 <div className="zone-picker">
                   {CARDIO_ZONES.map((z) => (
                     <button
@@ -458,14 +520,26 @@ export default function ProgramSessionModal({ session, presetDay, onSave, onDele
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(session)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(session)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
-              <button type="submit" className="btn btn--primary">Valider</button>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
+              <button type="submit" className="btn btn--primary">
+                Valider
+              </button>
             </div>
           </div>
         </form>

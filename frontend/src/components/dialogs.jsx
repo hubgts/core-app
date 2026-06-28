@@ -23,7 +23,8 @@ function normalize(type, arg, maybeDefault) {
   if (arg == null) return { type };
   if (typeof arg === 'string') {
     const o = { type, title: arg };
-    if (type === 'prompt' && maybeDefault !== undefined) o.defaultValue = maybeDefault;
+    if (type === 'prompt' && maybeDefault !== undefined)
+      o.defaultValue = maybeDefault;
     return o;
   }
   return { type, ...arg };
@@ -60,7 +61,8 @@ function DialogModal({ dialog, onFinish }) {
   const [value, setValue] = useState(defaultValue);
   const inputRef = useRef(null);
 
-  const cancelResult = type === 'confirm' ? false : type === 'prompt' ? null : undefined;
+  const cancelResult =
+    type === 'confirm' ? false : type === 'prompt' ? null : undefined;
   const submit = () => onFinish(type === 'prompt' ? value : true);
 
   useEffect(() => {
@@ -83,11 +85,20 @@ function DialogModal({ dialog, onFinish }) {
     }
   }, [type]);
 
-  const okLabel = confirmLabel || (type === 'alert' ? 'OK' : type === 'prompt' ? 'Valider' : 'Confirmer');
+  const okLabel =
+    confirmLabel ||
+    (type === 'alert' ? 'OK' : type === 'prompt' ? 'Valider' : 'Confirmer');
 
   return (
-    <div className="modal-overlay modal-overlay--top" onMouseDown={() => onFinish(cancelResult)}>
-      <div className="modal modal--dialog" onMouseDown={(e) => e.stopPropagation()} role="dialog">
+    <div
+      className="modal-overlay modal-overlay--top"
+      onMouseDown={() => onFinish(cancelResult)}
+    >
+      <div
+        className="modal modal--dialog"
+        onMouseDown={(e) => e.stopPropagation()}
+        role="dialog"
+      >
         {title && <h2 className="modal__title">{title}</h2>}
         {message && <p className="dialog__message">{message}</p>}
 
@@ -119,7 +130,11 @@ function DialogModal({ dialog, onFinish }) {
         <div className="modal__actions">
           <div className="modal__actions-right">
             {type !== 'alert' && (
-              <button type="button" className="btn btn--ghost" onClick={() => onFinish(cancelResult)}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => onFinish(cancelResult)}
+              >
                 {cancelLabel}
               </button>
             )}

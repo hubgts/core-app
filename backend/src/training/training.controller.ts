@@ -11,7 +11,12 @@ import {
 import { TrainingService } from './training.service';
 import { TrainingTemplateService } from './training-template.service';
 import { TrainingProgramService } from './training-program.service';
-import { EventInput, ProgramInput, StartProgramInput, TemplateInput } from './types';
+import {
+  EventInput,
+  ProgramInput,
+  StartProgramInput,
+  TemplateInput,
+} from './types';
 
 @Controller('training')
 export class TrainingController {
@@ -85,7 +90,10 @@ export class TrainingController {
 
   /** Aperçu du placement des séances pour une date de début. */
   @Get('programs/:id/preview')
-  previewProgram(@Param('id') id: string, @Query('startDate') startDate?: string) {
+  previewProgram(
+    @Param('id') id: string,
+    @Query('startDate') startDate?: string,
+  ) {
     return this.programs.previewStart(id, startDate);
   }
 

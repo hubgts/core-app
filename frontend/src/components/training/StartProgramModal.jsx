@@ -3,7 +3,8 @@ import { trainingApi } from '../../api/training';
 import { frenchFullDate, frenchDayMonth, todayStr } from '../../utils/date';
 import { PROGRAM_DAYS, TYPE_META } from './constants';
 
-const dayLabel = (dow) => PROGRAM_DAYS.find((d) => d.value === dow)?.label ?? `J${dow}`;
+const dayLabel = (dow) =>
+  PROGRAM_DAYS.find((d) => d.value === dow)?.label ?? `J${dow}`;
 
 /**
  * Choisit une date de début, prévisualise le placement des séances
@@ -70,7 +71,9 @@ export default function StartProgramModal({ program, onStarted, onClose }) {
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
-          <span className="muted prog-start__hint">{frenchFullDate(startDate)}</span>
+          <span className="muted prog-start__hint">
+            {frenchFullDate(startDate)}
+          </span>
         </label>
 
         {error && <p className="modal__error">{error}</p>}
@@ -92,12 +95,22 @@ export default function StartProgramModal({ program, onStarted, onClose }) {
                         key={i}
                         className={`prog-start__row${s.skipped ? ' is-skipped' : ''}`}
                       >
-                        <span className="prog-start__status">{s.skipped ? '⚠' : '✓'}</span>
-                        <span className="prog-start__day">J{s.dayOfWeek} ({dayLabel(s.dayOfWeek)})</span>
-                        <span className="prog-start__icon">{TYPE_META[s.type]?.icon}</span>
-                        <span className="prog-start__name">{s.label || TYPE_META[s.type]?.label}</span>
+                        <span className="prog-start__status">
+                          {s.skipped ? '⚠' : '✓'}
+                        </span>
+                        <span className="prog-start__day">
+                          J{s.dayOfWeek} ({dayLabel(s.dayOfWeek)})
+                        </span>
+                        <span className="prog-start__icon">
+                          {TYPE_META[s.type]?.icon}
+                        </span>
+                        <span className="prog-start__name">
+                          {s.label || TYPE_META[s.type]?.label}
+                        </span>
                         <span className="prog-start__date">
-                          {s.skipped ? 'ignorée (avant le début)' : frenchDayMonth(s.date)}
+                          {s.skipped
+                            ? 'ignorée (avant le début)'
+                            : frenchDayMonth(s.date)}
                         </span>
                       </li>
                     ))}
@@ -105,7 +118,8 @@ export default function StartProgramModal({ program, onStarted, onClose }) {
                 </div>
               ))}
               <p className="prog-start__summary">
-                <strong>{preview.placed}</strong> séance{preview.placed > 1 ? 's' : ''} ajoutée
+                <strong>{preview.placed}</strong> séance
+                {preview.placed > 1 ? 's' : ''} ajoutée
                 {preview.placed > 1 ? 's' : ''} · {preview.skipped} ignorée
                 {preview.skipped > 1 ? 's' : ''}.
               </p>
@@ -115,7 +129,9 @@ export default function StartProgramModal({ program, onStarted, onClose }) {
 
         <div className="modal__actions">
           <div className="modal__actions-right">
-            <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
+            <button type="button" className="btn btn--ghost" onClick={onClose}>
+              Annuler
+            </button>
             <button
               type="button"
               className="btn btn--primary"

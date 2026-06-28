@@ -17,7 +17,8 @@ function packLanes(events) {
   const items = events
     .map((ev) => {
       const start = startMinutes(ev);
-      const end = start + (ev.durationMin && ev.durationMin > 0 ? ev.durationMin : 60);
+      const end =
+        start + (ev.durationMin && ev.durationMin > 0 ? ev.durationMin : 60);
       return { ev, start, end };
     })
     .sort((a, b) => a.start - b.start || a.end - b.end);
@@ -36,7 +37,13 @@ function packLanes(events) {
   return { items, lanes: Math.max(1, laneEnds.length) };
 }
 
-export default function WeekView({ dates, today, eventsByDate, onSlotCreate, onEventClick }) {
+export default function WeekView({
+  dates,
+  today,
+  eventsByDate,
+  onSlotCreate,
+  onEventClick,
+}) {
   const hours = [];
   for (let h = DAY_START_HOUR; h <= DAY_END_HOUR; h += 1) hours.push(h);
   const bodyHeight = (DAY_END_HOUR - DAY_START_HOUR + 1) * HOUR_H;
@@ -48,7 +55,10 @@ export default function WeekView({ dates, today, eventsByDate, onSlotCreate, onE
       <div className="cal-time__head">
         <div className="cal-time__gutter" />
         {dates.map((date) => (
-          <div key={date} className={`cal-time__dayhead${date === today ? ' is-today' : ''}`}>
+          <div
+            key={date}
+            className={`cal-time__dayhead${date === today ? ' is-today' : ''}`}
+          >
             <span className="cal-time__wd">{WEEKDAYS[isoWeekday(date)]}</span>
             <span className="cal-time__dnum">{dayNum(date)}</span>
           </div>
@@ -59,7 +69,9 @@ export default function WeekView({ dates, today, eventsByDate, onSlotCreate, onE
       <div className="cal-time__allday">
         <div className="cal-time__gutter cal-time__gutter--allday">Journée</div>
         {dates.map((date) => {
-          const allDay = (eventsByDate.get(date) ?? []).filter((e) => !e.startTime);
+          const allDay = (eventsByDate.get(date) ?? []).filter(
+            (e) => !e.startTime,
+          );
           return (
             <div key={date} className="cal-time__alldaycol">
               {allDay.map((ev) => (
@@ -75,9 +87,13 @@ export default function WeekView({ dates, today, eventsByDate, onSlotCreate, onE
                   onClick={() => onEventClick(ev)}
                 >
                   {ev.programLabel && (
-                    <span className="ev-chip__prog" aria-label="Programme">{PROGRAM_BADGE}</span>
+                    <span className="ev-chip__prog" aria-label="Programme">
+                      {PROGRAM_BADGE}
+                    </span>
                   )}
-                  <span className="ev-chip__icon">{TYPE_META[ev.type].icon}</span>
+                  <span className="ev-chip__icon">
+                    {TYPE_META[ev.type].icon}
+                  </span>
                   <span className="ev-chip__txt">{eventChipLabel(ev)}</span>
                 </button>
               ))}
@@ -97,7 +113,9 @@ export default function WeekView({ dates, today, eventsByDate, onSlotCreate, onE
         </div>
 
         {dates.map((date) => {
-          const timed = (eventsByDate.get(date) ?? []).filter((e) => e.startTime);
+          const timed = (eventsByDate.get(date) ?? []).filter(
+            (e) => e.startTime,
+          );
           const { items, lanes } = packLanes(timed);
           return (
             <div key={date} className="cal-time__col">
@@ -107,7 +125,9 @@ export default function WeekView({ dates, today, eventsByDate, onSlotCreate, onE
                   key={h}
                   className="cal-time__slot"
                   style={{ height: HOUR_H }}
-                  onClick={() => onSlotCreate(date, `${String(h).padStart(2, '0')}:00`)}
+                  onClick={() =>
+                    onSlotCreate(date, `${String(h).padStart(2, '0')}:00`)
+                  }
                   title="Cliquer pour ajouter une séance"
                 />
               ))}
@@ -121,12 +141,20 @@ export default function WeekView({ dates, today, eventsByDate, onSlotCreate, onE
                   <button
                     key={ev.id}
                     className="ev-block"
-                    style={{ top, height, width, left, '--c': TYPE_META[ev.type].color }}
+                    style={{
+                      top,
+                      height,
+                      width,
+                      left,
+                      '--c': TYPE_META[ev.type].color,
+                    }}
                     onClick={() => onEventClick(ev)}
                   >
                     <span className="ev-block__time">{ev.startTime}</span>
                     <span className="ev-block__txt">
-                      {ev.programLabel && <span className="ev-block__prog">{PROGRAM_BADGE} </span>}
+                      {ev.programLabel && (
+                        <span className="ev-block__prog">{PROGRAM_BADGE} </span>
+                      )}
                       {TYPE_META[ev.type].icon} {eventChipLabel(ev)}
                     </span>
                   </button>

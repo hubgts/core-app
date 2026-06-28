@@ -5,7 +5,20 @@ const W = 760;
 const H = 300;
 const PAD = { top: 20, right: 16, bottom: 32, left: 56 };
 
-const MONTHS_SHORT = ['jan', 'fév', 'mar', 'avr', 'mai', 'jun', 'jui', 'aoû', 'sep', 'oct', 'nov', 'déc'];
+const MONTHS_SHORT = [
+  'jan',
+  'fév',
+  'mar',
+  'avr',
+  'mai',
+  'jun',
+  'jui',
+  'aoû',
+  'sep',
+  'oct',
+  'nov',
+  'déc',
+];
 
 function monthLabel(dateStr) {
   const [, m] = dateStr.split('-').map(Number);
@@ -40,11 +53,19 @@ export default function NetWorthChart({
   projection = null,
 }) {
   const points = useMemo(
-    () => (data ?? []).map((d) => ({ date: d.date, value: Number(d[valueKey] ?? 0) })),
+    () =>
+      (data ?? []).map((d) => ({
+        date: d.date,
+        value: Number(d[valueKey] ?? 0),
+      })),
     [data, valueKey],
   );
   const projPoints = useMemo(
-    () => (projection ?? []).map((d) => ({ date: d.date, value: Number(d[valueKey] ?? 0) })),
+    () =>
+      (projection ?? []).map((d) => ({
+        date: d.date,
+        value: Number(d[valueKey] ?? 0),
+      })),
     [projection, valueKey],
   );
 
@@ -56,8 +77,15 @@ export default function NetWorthChart({
   if (h === 0) {
     return (
       <div className="fchart">
-        <svg className="fchart__svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
-          <text className="fchart__empty" x={W / 2} y={H / 2}>Aucune donnée sur la période.</text>
+        <svg
+          className="fchart__svg"
+          viewBox={`0 0 ${W} ${H}`}
+          role="img"
+          aria-label={label}
+        >
+          <text className="fchart__empty" x={W / 2} y={H / 2}>
+            Aucune donnée sur la période.
+          </text>
         </svg>
       </div>
     );
@@ -78,21 +106,33 @@ export default function NetWorthChart({
   const areaPath = `${linePath} L ${linePts[h - 1].x} ${yAt(0)} L ${linePts[0].x} ${yAt(0)} Z`;
 
   // Projection : connectée au dernier point réel, tracée en pointillé.
-  const projLinePts = projPoints.map((p, i) => ({ x: xAt(h + i), y: yAt(p.value) }));
-  const projPathPts = projLinePts.length ? [linePts[h - 1], ...projLinePts] : [];
+  const projLinePts = projPoints.map((p, i) => ({
+    x: xAt(h + i),
+    y: yAt(p.value),
+  }));
+  const projPathPts = projLinePts.length
+    ? [linePts[h - 1], ...projLinePts]
+    : [];
   const projPath = smoothPath(projPathPts);
 
   // Graduations Y (~4).
   const ticks = [];
   const stepCount = 4;
-  for (let i = 0; i <= stepCount; i += 1) ticks.push(min + (span * i) / stepCount);
+  for (let i = 0; i <= stepCount; i += 1)
+    ticks.push(min + (span * i) / stepCount);
 
   const labelEvery = Math.ceil(n / 12);
   const gid = `fchart-grad-${valueKey}`;
 
   return (
     <div className="fchart">
-      <svg className="fchart__svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label={label}>
+      <svg
+        className="fchart__svg"
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMidYMid meet"
+        role="img"
+        aria-label={label}
+      >
         <defs>
           <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={color} stopOpacity="0.28" />
@@ -102,7 +142,13 @@ export default function NetWorthChart({
 
         {ticks.map((v, i) => (
           <g key={i}>
-            <line className="fchart__gridline" x1={PAD.left} x2={W - PAD.right} y1={yAt(v)} y2={yAt(v)} />
+            <line
+              className="fchart__gridline"
+              x1={PAD.left}
+              x2={W - PAD.right}
+              y1={yAt(v)}
+              y2={yAt(v)}
+            />
             <text className="fchart__ylabel" x={PAD.left - 8} y={yAt(v) + 4}>
               {formatEur(Math.round(v))}
             </text>
@@ -110,7 +156,13 @@ export default function NetWorthChart({
         ))}
 
         {min < 0 && (
-          <line className="fchart__zero" x1={PAD.left} x2={W - PAD.right} y1={yAt(0)} y2={yAt(0)} />
+          <line
+            className="fchart__zero"
+            x1={PAD.left}
+            x2={W - PAD.right}
+            y1={yAt(0)}
+            y2={yAt(0)}
+          />
         )}
 
         <path className="fchart__area" d={areaPath} fill={`url(#${gid})`} />
@@ -126,7 +178,11 @@ export default function NetWorthChart({
               y1={PAD.top}
               y2={PAD.top + plotH}
             />
-            <text className="fchart__nowlabel" x={linePts[h - 1].x + 4} y={PAD.top + 10}>
+            <text
+              className="fchart__nowlabel"
+              x={linePts[h - 1].x + 4}
+              y={PAD.top + 10}
+            >
               auj.
             </text>
             <path
@@ -149,14 +205,26 @@ export default function NetWorthChart({
         )}
 
         {linePts.map((p, i) => (
-          <circle key={i} className="fchart__dot" cx={p.x} cy={p.y} r={3} fill={color}>
+          <circle
+            key={i}
+            className="fchart__dot"
+            cx={p.x}
+            cy={p.y}
+            r={3}
+            fill={color}
+          >
             <title>{`${points[i].date} · ${formatEur(points[i].value)}`}</title>
           </circle>
         ))}
 
         {[...points, ...projPoints].map((p, i) =>
           i % labelEvery === 0 ? (
-            <text key={i} className="fchart__xlabel" x={xAt(i)} y={H - PAD.bottom + 18}>
+            <text
+              key={i}
+              className="fchart__xlabel"
+              x={xAt(i)}
+              y={H - PAD.bottom + 18}
+            >
               {monthLabel(p.date)}
             </text>
           ) : null,

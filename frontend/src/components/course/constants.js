@@ -16,8 +16,26 @@ export const COMMON_UNITS = [
 
 // Émojis proposés pour personnaliser un rayon.
 export const AISLE_ICONS = [
-  '🥦', '🧀', '🥖', '🥫', '🍫', '🧊', '🥤', '🧼', '🧽', '🐾',
-  '📦', '🍎', '🥩', '🐟', '🧴', '🍼', '🧹', '🌿', '🍷', '🛒',
+  '🥦',
+  '🧀',
+  '🥖',
+  '🥫',
+  '🍫',
+  '🧊',
+  '🥤',
+  '🧼',
+  '🧽',
+  '🐾',
+  '📦',
+  '🍎',
+  '🥩',
+  '🐟',
+  '🧴',
+  '🍼',
+  '🧹',
+  '🌿',
+  '🍷',
+  '🛒',
 ];
 
 // Rayon de repli pour les articles sans rayon.

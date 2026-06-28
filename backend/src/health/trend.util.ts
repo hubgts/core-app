@@ -35,7 +35,8 @@ export function computeTrend(pointsAsc: DatedValue[]): TrendPoint[] {
 export function trendAt(trend: TrendPoint[], date: string): number | null {
   if (trend.length === 0) return null;
   if (date <= trend[0].date) return trend[0].trend;
-  if (date >= trend[trend.length - 1].date) return trend[trend.length - 1].trend;
+  if (date >= trend[trend.length - 1].date)
+    return trend[trend.length - 1].trend;
   for (let i = 1; i < trend.length; i += 1) {
     const a = trend[i - 1];
     const b = trend[i];

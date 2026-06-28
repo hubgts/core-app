@@ -132,10 +132,16 @@ export default function FinancesPage() {
               <span className="fhero__label">Patrimoine net</span>
               <span className="fhero__value">{formatEur(o.netWorth)}</span>
               {variation && (
-                <span className={`fhero__delta t-${trendClass(variation.amount)}`}>
+                <span
+                  className={`fhero__delta t-${trendClass(variation.amount)}`}
+                >
                   {formatSignedEur(variation.amount)}
-                  {variation.pct != null && ` (${formatSignedPct(variation.pct)})`}
-                  <span className="fhero__deltahint"> depuis le {variation.fromDate}</span>
+                  {variation.pct != null &&
+                    ` (${formatSignedPct(variation.pct)})`}
+                  <span className="fhero__deltahint">
+                    {' '}
+                    depuis le {variation.fromDate}
+                  </span>
                 </span>
               )}
             </div>
@@ -143,7 +149,9 @@ export default function FinancesPage() {
             {o.plusValueTotal !== 0 && (
               <div className="fhero__pv">
                 <span className="fhero__label">Plus-values latentes</span>
-                <span className={`fhero__pvvalue t-${trendClass(o.plusValueTotal)}`}>
+                <span
+                  className={`fhero__pvvalue t-${trendClass(o.plusValueTotal)}`}
+                >
                   {formatSignedEur(o.plusValueTotal)}
                 </span>
                 {o.performancePct != null && (
@@ -162,7 +170,9 @@ export default function FinancesPage() {
               <div>
                 <span className="fhero__label">Passifs</span>
                 <span className="fhero__small t-down">
-                  {o.totalLiabilities ? `−${formatEur(o.totalLiabilities)}` : formatEur(0)}
+                  {o.totalLiabilities
+                    ? `−${formatEur(o.totalLiabilities)}`
+                    : formatEur(0)}
                 </span>
               </div>
             </div>
@@ -171,7 +181,8 @@ export default function FinancesPage() {
           {/* Rappel de fraîcheur (#2) */}
           {staleCount > 0 && (
             <Link className="freminder" to="/finances/bilan">
-              ⚠ {staleCount} enveloppe{staleCount > 1 ? 's' : ''} à actualiser — faire le bilan →
+              ⚠ {staleCount} enveloppe{staleCount > 1 ? 's' : ''} à actualiser —
+              faire le bilan →
             </Link>
           )}
 
@@ -181,21 +192,31 @@ export default function FinancesPage() {
               <div className="fkpis">
                 <div className="fkpicell">
                   <span className="fkpicell__label">Depuis le 1ᵉʳ janvier</span>
-                  <span className={`fkpicell__value t-${trendClass(kpis.ytd.amount)}`}>
+                  <span
+                    className={`fkpicell__value t-${trendClass(kpis.ytd.amount)}`}
+                  >
                     {formatSignedEur(kpis.ytd.amount)}
                   </span>
                 </div>
                 <div className="fkpicell">
                   <span className="fkpicell__label">Sur 12 mois</span>
-                  <span className={`fkpicell__value t-${trendClass(kpis.oneYear.amount)}`}>
+                  <span
+                    className={`fkpicell__value t-${trendClass(kpis.oneYear.amount)}`}
+                  >
                     {formatSignedEur(kpis.oneYear.amount)}
                   </span>
                 </div>
                 {kpis.allTimeHigh && (
                   <div className="fkpicell">
-                    <span className="fkpicell__label">Plus haut historique</span>
-                    <span className="fkpicell__value">{formatEur(kpis.allTimeHigh.amount)}</span>
-                    <span className="fkpicell__hint">au {kpis.allTimeHigh.date}</span>
+                    <span className="fkpicell__label">
+                      Plus haut historique
+                    </span>
+                    <span className="fkpicell__value">
+                      {formatEur(kpis.allTimeHigh.amount)}
+                    </span>
+                    <span className="fkpicell__hint">
+                      au {kpis.allTimeHigh.date}
+                    </span>
                   </div>
                 )}
               </div>
@@ -204,7 +225,10 @@ export default function FinancesPage() {
             <div className="fcard fnetobj">
               <div className="fcard__head">
                 <h2 className="fcard__title">Objectif de patrimoine net</h2>
-                <button className="fsumlink fsumlink--btn" onClick={() => setObjModal(true)}>
+                <button
+                  className="fsumlink fsumlink--btn"
+                  onClick={() => setObjModal(true)}
+                >
                   {netObj ? 'Modifier' : 'Définir'}
                 </button>
               </div>
@@ -213,7 +237,10 @@ export default function FinancesPage() {
                   <div className="fprog__track">
                     <div
                       className="fprog__fill"
-                      style={{ width: `${netObjPct}%`, background: netObj.reached ? '#34d399' : '#818cf8' }}
+                      style={{
+                        width: `${netObjPct}%`,
+                        background: netObj.reached ? '#34d399' : '#818cf8',
+                      }}
                     />
                   </div>
                   <div className="fprog__meta">
@@ -223,15 +250,21 @@ export default function FinancesPage() {
                         : `${formatEur(o.netWorth)} / ${formatEur(netObj.target)} · reste ${formatEur(netObj.remaining)}`}
                     </span>
                     {netObj.targetDate && (
-                      <span className="fprog__date">🎯 {frenchMonthYear(netObj.targetDate)}</span>
+                      <span className="fprog__date">
+                        🎯 {frenchMonthYear(netObj.targetDate)}
+                      </span>
                     )}
                   </div>
-                  {netPace && <div className={`fprog__pace t-${netPace.tone}`}>{netPace.text}</div>}
+                  {netPace && (
+                    <div className={`fprog__pace t-${netPace.tone}`}>
+                      {netPace.text}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="fempty fnetobj__empty">
-                  Aucun objectif. Fixez un montant cible (et une échéance) pour suivre votre
-                  progression globale.
+                  Aucun objectif. Fixez un montant cible (et une échéance) pour
+                  suivre votre progression globale.
                 </p>
               )}
             </div>
@@ -312,7 +345,11 @@ export default function FinancesPage() {
                   </button>
                 </div>
               </div>
-              <Link className="fdonutlink" to="/finances/enveloppes" title="Gérer mes enveloppes">
+              <Link
+                className="fdonutlink"
+                to="/finances/enveloppes"
+                title="Gérer mes enveloppes"
+              >
                 <Donut
                   slices={repartSlices}
                   gross={o.grossAssets}
@@ -320,7 +357,10 @@ export default function FinancesPage() {
                   centerSub="actifs"
                 />
               </Link>
-              <Link className="fsumlink fdonut__manage" to="/finances/enveloppes">
+              <Link
+                className="fsumlink fdonut__manage"
+                to="/finances/enveloppes"
+              >
                 Gérer mes enveloppes →
               </Link>
             </div>
@@ -330,7 +370,14 @@ export default function FinancesPage() {
 
       {objModal && (
         <NetObjectiveModal
-          settings={netObj ? { netWorthTarget: netObj.target, netWorthTargetDate: netObj.targetDate } : null}
+          settings={
+            netObj
+              ? {
+                  netWorthTarget: netObj.target,
+                  netWorthTargetDate: netObj.targetDate,
+                }
+              : null
+          }
           onSave={saveObjective}
           onClose={() => setObjModal(false)}
         />

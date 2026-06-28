@@ -30,7 +30,12 @@ export class HabitsController {
   @Post()
   create(
     @Body()
-    body: { name?: string; weeklyTarget?: number; color?: string; icon?: string },
+    body: {
+      name?: string;
+      weeklyTarget?: number;
+      color?: string;
+      icon?: string;
+    },
   ) {
     return this.habits.create(body ?? {});
   }
@@ -45,7 +50,12 @@ export class HabitsController {
   update(
     @Param('id') id: string,
     @Body()
-    body: { name?: string; weeklyTarget?: number; color?: string; icon?: string },
+    body: {
+      name?: string;
+      weeklyTarget?: number;
+      color?: string;
+      icon?: string;
+    },
   ) {
     return this.habits.update(id, body ?? {});
   }
@@ -74,7 +84,12 @@ export class HabitsController {
     @Body() body: { checked?: boolean },
     @Query('today') today?: string,
   ) {
-    const stats = await this.habits.setCheck(id, date, body?.checked ?? true, today);
+    const stats = await this.habits.setCheck(
+      id,
+      date,
+      body?.checked ?? true,
+      today,
+    );
     return {
       stats,
       milestones: this.habits.milestonesForStreak(

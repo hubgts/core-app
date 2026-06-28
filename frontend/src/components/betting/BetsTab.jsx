@@ -31,7 +31,9 @@ export default function BetsTab({
   onSettleSelection,
   onDeleteBet,
 }) {
-  const bets = bankroll.bets.filter((b) => filter === 'all' || b.status === filter);
+  const bets = bankroll.bets.filter(
+    (b) => filter === 'all' || b.status === filter,
+  );
 
   return (
     <div className="btab">
@@ -47,12 +49,16 @@ export default function BetsTab({
             </button>
           ))}
         </div>
-        <button className="btn btn--primary btn--sm" onClick={onAddBet}>+ Pari</button>
+        <button className="btn btn--primary btn--sm" onClick={onAddBet}>
+          + Pari
+        </button>
       </div>
 
       {bets.length === 0 ? (
         <p className="btab__empty">
-          {bankroll.bets.length === 0 ? "Aucun pari pour l'instant." : 'Aucun pari pour ce filtre.'}
+          {bankroll.bets.length === 0
+            ? "Aucun pari pour l'instant."
+            : 'Aucun pari pour ce filtre.'}
         </p>
       ) : (
         <ul className="bbetlist">
@@ -79,7 +85,10 @@ function BetCard({ bet, onSettleBet, onSettleSelection, onDeleteBet }) {
 
   async function settle(status) {
     if (status === 'cashout') {
-      const raw = await promptDialog({ title: 'Montant récupéré au cash out (€)', defaultValue: String(bet.stake) });
+      const raw = await promptDialog({
+        title: 'Montant récupéré au cash out (€)',
+        defaultValue: String(bet.stake),
+      });
       if (raw == null) return;
       const amount = Number(String(raw).replace(',', '.'));
       if (!Number.isFinite(amount) || amount < 0) return;
@@ -93,8 +102,12 @@ function BetCard({ bet, onSettleBet, onSettleSelection, onDeleteBet }) {
   return (
     <li className={`bbet bbet--${meta.tone}`}>
       <div className="bbet__head">
-        <span className={`bpill bpill--${bet.status}`}>{meta.icon} {meta.label}</span>
-        <span className="bbet__type">{BET_TYPE_META[bet.type].icon} {BET_TYPE_META[bet.type].label}</span>
+        <span className={`bpill bpill--${bet.status}`}>
+          {meta.icon} {meta.label}
+        </span>
+        <span className="bbet__type">
+          {BET_TYPE_META[bet.type].icon} {BET_TYPE_META[bet.type].label}
+        </span>
         <span className="bbet__date">{frenchDayMonth(bet.placedAt)}</span>
       </div>
 
@@ -104,10 +117,14 @@ function BetCard({ bet, onSettleBet, onSettleSelection, onDeleteBet }) {
           <li key={sel.id} className="bsel">
             <span className="bsel__sport">{sportIcon(sel.sport)}</span>
             <span className="bsel__main">
-              <span className="bsel__pick">{sel.pick || sel.market || sel.sport}</span>
+              <span className="bsel__pick">
+                {sel.pick || sel.market || sel.sport}
+              </span>
               {(sel.event || sel.market) && (
                 <span className="bsel__meta">
-                  {[sel.event, sel.pick ? sel.market : null].filter(Boolean).join(' · ')}
+                  {[sel.event, sel.pick ? sel.market : null]
+                    .filter(Boolean)
+                    .join(' · ')}
                 </span>
               )}
             </span>
@@ -119,10 +136,12 @@ function BetCard({ bet, onSettleBet, onSettleSelection, onDeleteBet }) {
                 value={sel.status}
                 onChange={(v) => onSettleSelection(sel.id, v)}
                 title="Statut de la sélection"
-                options={Object.entries(SELECTION_STATUS_META).map(([v, m]) => ({
-                  value: v,
-                  label: `${m.icon} ${m.label}`,
-                }))}
+                options={Object.entries(SELECTION_STATUS_META).map(
+                  ([v, m]) => ({
+                    value: v,
+                    label: `${m.icon} ${m.label}`,
+                  }),
+                )}
               />
             )}
           </li>
@@ -134,13 +153,22 @@ function BetCard({ bet, onSettleBet, onSettleSelection, onDeleteBet }) {
         <Metric label="Mise" value={formatEur(bet.stake)} />
         <Metric label="Cote" value={formatOdds(bet.odds)} />
         {isPending ? (
-          <Metric label="Gain potentiel" value={formatSignedEur(round2(bet.stake * (bet.odds - 1)))} tone="up" />
+          <Metric
+            label="Gain potentiel"
+            value={formatSignedEur(round2(bet.stake * (bet.odds - 1)))}
+            tone="up"
+          />
         ) : bet.status === 'cancelled' ? (
           <Metric label="" value="Exclu des statistiques" muted />
         ) : (
           <>
             <Metric label="Retour" value={formatEur(bet.payout)} />
-            <Metric label="Bénéfice" value={formatSignedEur(bet.profit)} tone={trendClass(bet.profit)} strong />
+            <Metric
+              label="Bénéfice"
+              value={formatSignedEur(bet.profit)}
+              tone={trendClass(bet.profit)}
+              strong
+            />
           </>
         )}
         <button
@@ -166,16 +194,29 @@ function BetCard({ bet, onSettleBet, onSettleSelection, onDeleteBet }) {
             </button>
           ))}
           {!isPending && (
-            <button className="bchip" onClick={() => { onSettleBet(bet.id, { status: 'pending' }); setEditing(false); }}>
+            <button
+              className="bchip"
+              onClick={() => {
+                onSettleBet(bet.id, { status: 'pending' });
+                setEditing(false);
+              }}
+            >
               ⏳ Rouvrir
             </button>
           )}
           {editing && (
-            <button className="bchip bchip--ghost" onClick={() => setEditing(false)}>Annuler</button>
+            <button
+              className="bchip bchip--ghost"
+              onClick={() => setEditing(false)}
+            >
+              Annuler
+            </button>
           )}
         </div>
       ) : (
-        <button className="bbet__edit" onClick={() => setEditing(true)}>Modifier le résultat</button>
+        <button className="bbet__edit" onClick={() => setEditing(true)}>
+          Modifier le résultat
+        </button>
       )}
     </li>
   );
@@ -185,7 +226,9 @@ function Metric({ label, value, tone, strong, muted }) {
   return (
     <div className={`bmetric${muted ? ' bmetric--muted' : ''}`}>
       {label && <span className="bmetric__label">{label}</span>}
-      <span className={`bmetric__value${strong ? ' bmetric__value--strong' : ''}${tone ? ` t-${tone}` : ''}`}>
+      <span
+        className={`bmetric__value${strong ? ' bmetric__value--strong' : ''}${tone ? ` t-${tone}` : ''}`}
+      >
         {value}
       </span>
     </div>

@@ -46,7 +46,13 @@ function MonthBlock({ habit, checks, year, month, today, onPick }) {
   );
 }
 
-export default function YearHeatmap({ habits, checks, year, today, onPickMonth }) {
+export default function YearHeatmap({
+  habits,
+  checks,
+  year,
+  today,
+  onPickMonth,
+}) {
   const yearPctById = useMemo(() => {
     const pct = new Map();
     for (const habit of habits) {
@@ -61,7 +67,10 @@ export default function YearHeatmap({ habits, checks, year, today, onPickMonth }
         }
       }
       const expected = (habit.weeklyTarget * eligibleDays) / 7;
-      pct.set(habit.id, expected ? Math.min(100, Math.round((done / expected) * 100)) : 0);
+      pct.set(
+        habit.id,
+        expected ? Math.min(100, Math.round((done / expected) * 100)) : 0,
+      );
     }
     return pct;
   }, [habits, checks, year]);
@@ -81,7 +90,10 @@ export default function YearHeatmap({ habits, checks, year, today, onPickMonth }
 
         {habits.map((h) => (
           <div key={h.id} className="heatmap__row">
-            <div className="heatmap__namecol heatmap__name" style={{ '--accent': h.color }}>
+            <div
+              className="heatmap__namecol heatmap__name"
+              style={{ '--accent': h.color }}
+            >
               <span className="heatmap__icon">{h.icon}</span>
               <span className="heatmap__hname">{h.name}</span>
             </div>
@@ -96,16 +108,21 @@ export default function YearHeatmap({ habits, checks, year, today, onPickMonth }
                 onPick={onPickMonth}
               />
             ))}
-            <div className="heatmap__pccol heatmap__pct">{yearPctById.get(h.id)}%</div>
+            <div className="heatmap__pccol heatmap__pct">
+              {yearPctById.get(h.id)}%
+            </div>
           </div>
         ))}
       </div>
       <p className="heatmap__legend">
         <span className="hm-cell hm-cell--on hm-cell--demo" /> coché
-        <span className="hm-cell hm-cell--off hm-cell--demo" /> attendu non coché
+        <span className="hm-cell hm-cell--off hm-cell--demo" /> attendu non
+        coché
         <span className="hm-cell hm-cell--pre hm-cell--demo" /> avant création
         <span className="hm-cell hm-cell--void hm-cell--demo" /> futur
-        <span className="heatmap__legend-hint">· clique un mois pour l’ouvrir</span>
+        <span className="heatmap__legend-hint">
+          · clique un mois pour l’ouvrir
+        </span>
       </p>
     </div>
   );

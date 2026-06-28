@@ -30,12 +30,18 @@ export default function EnvelopeCard({ envelope: e, onOpen }) {
 
   const pct = obj ? Math.min(Math.max(obj.progressPct, 0), 100) : 0;
   const late = Boolean(
-    obj && !obj.reached && ((obj.targetDate && obj.targetDate < todayStr()) || obj.paceStatus === 'behind'),
+    obj &&
+    !obj.reached &&
+    ((obj.targetDate && obj.targetDate < todayStr()) ||
+      obj.paceStatus === 'behind'),
   );
   const pace = objectivePace(obj);
 
   return (
-    <div className={`fecard${e.stale ? ' fecard--stale' : ''}`} style={{ '--c': color }}>
+    <div
+      className={`fecard${e.stale ? ' fecard--stale' : ''}`}
+      style={{ '--c': color }}
+    >
       <button className="fecard__main" onClick={() => onOpen(e.id, false)}>
         <span className="fecard__icon">{e.icon || meta.icon}</span>
         <span className="fecard__head">
@@ -43,7 +49,9 @@ export default function EnvelopeCard({ envelope: e, onOpen }) {
           <span className="fecard__type">
             {meta.label}
             {e.lastSnapshotDate && (
-              <span className={`fecard__fresh${e.stale ? ' fecard__fresh--stale' : ''}`}>
+              <span
+                className={`fecard__fresh${e.stale ? ' fecard__fresh--stale' : ''}`}
+              >
                 {' · '}
                 {e.stale ? '⚠ ' : ''}
                 {formatDaysAgo(e.daysSinceUpdate)}
@@ -52,7 +60,9 @@ export default function EnvelopeCard({ envelope: e, onOpen }) {
           </span>
         </span>
         <span className="fecard__right">
-          <span className={`fecard__amount${isPassif ? ' fecard__amount--neg' : ''}`}>
+          <span
+            className={`fecard__amount${isPassif ? ' fecard__amount--neg' : ''}`}
+          >
             {amountStr}
           </span>
           {isInvest && e.performancePct != null && (
@@ -73,7 +83,10 @@ export default function EnvelopeCard({ envelope: e, onOpen }) {
           <div className="fprog__track">
             <div
               className="fprog__fill"
-              style={{ width: `${pct}%`, background: obj.reached ? '#34d399' : color }}
+              style={{
+                width: `${pct}%`,
+                background: obj.reached ? '#34d399' : color,
+              }}
             />
           </div>
           <div className="fprog__meta">
@@ -83,17 +96,24 @@ export default function EnvelopeCard({ envelope: e, onOpen }) {
                 : `${formatEur(e.balance ?? 0)} / ${formatEur(obj.targetAmount)} · reste ${formatEur(obj.remaining)}`}
             </span>
             {obj.targetDate && (
-              <span className={`fprog__date${late ? ' fprog__date--late' : ''}`}>
+              <span
+                className={`fprog__date${late ? ' fprog__date--late' : ''}`}
+              >
                 🎯 {frenchMonthYear(obj.targetDate)}
               </span>
             )}
           </div>
-          {pace && <div className={`fprog__pace t-${pace.tone}`}>{pace.text}</div>}
+          {pace && (
+            <div className={`fprog__pace t-${pace.tone}`}>{pace.text}</div>
+          )}
         </div>
       )}
 
       <div className="fecard__actions">
-        <button className="btn btn--ghost btn--sm" onClick={() => onOpen(e.id, true)}>
+        <button
+          className="btn btn--ghost btn--sm"
+          onClick={() => onOpen(e.id, true)}
+        >
           + Solde
         </button>
       </div>

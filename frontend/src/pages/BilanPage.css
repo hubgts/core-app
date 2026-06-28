@@ -22,10 +22,20 @@
   top: 0;
   z-index: 2;
 }
-.fbilan__date { margin-bottom: 0; flex: none; min-width: 180px; }
-.fbilan__bar .btn { margin-left: auto; }
+.fbilan__date {
+  margin-bottom: 0;
+  flex: none;
+  min-width: 180px;
+}
+.fbilan__bar .btn {
+  margin-left: auto;
+}
 
-.fbilan__list { list-style: none; margin: 0; padding: 0; }
+.fbilan__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 .fbilan__row {
   display: grid;
   grid-template-columns: 36px 1.6fr 1fr 1.4fr;
@@ -37,7 +47,9 @@
   background: var(--surface);
   margin-bottom: 7px;
 }
-.fbilan__row--stale { border-color: color-mix(in srgb, var(--warning, #f59e0b) 55%, var(--border)); }
+.fbilan__row--stale {
+  border-color: color-mix(in srgb, var(--warning, #f59e0b) 55%, var(--border));
+}
 
 .fbilan__icon {
   width: 32px;
@@ -71,13 +83,28 @@
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
 }
-.fbilan__ago { font-size: 11px; font-weight: 400; color: var(--text-faint); }
-.fbilan__inputs { display: flex; gap: 8px; }
-.fbilan__input { padding: 7px 10px; }
+.fbilan__ago {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.fbilan__inputs {
+  display: flex;
+  gap: 8px;
+}
+.fbilan__input {
+  padding: 7px 10px;
+}
 
 @media (max-width: 720px) {
-  .fbilan__row { grid-template-columns: 32px 1fr; }
+  .fbilan__row {
+    grid-template-columns: 32px 1fr;
+  }
   .fbilan__current,
-  .fbilan__inputs { grid-column: 1 / -1; }
-  .fbilan__inputs { flex-wrap: wrap; }
+  .fbilan__inputs {
+    grid-column: 1 / -1;
+  }
+  .fbilan__inputs {
+    flex-wrap: wrap;
+  }
 }

@@ -4,7 +4,13 @@ import { todayStr } from '../../utils/date';
 import { BET_TYPE_META, formatOdds, parseOdds } from './constants';
 import { parseAmount } from './BankrollFormModal';
 
-const EMPTY_SELECTION = { sport: '', event: '', market: '', pick: '', odds: '' };
+const EMPTY_SELECTION = {
+  sport: '',
+  event: '',
+  market: '',
+  pick: '',
+  odds: '',
+};
 
 /** Création d'un pari : simple (1 sélection) ou combiné (≥ 2 sélections). */
 export default function BetFormModal({ onSave, onClose }) {
@@ -21,7 +27,10 @@ export default function BetFormModal({ onSave, onClose }) {
   const stakeRef = useRef(null);
 
   useEffect(() => {
-    referentialApi.list('sport').then(setSports).catch(() => setSports([]));
+    referentialApi
+      .list('sport')
+      .then(setSports)
+      .catch(() => setSports([]));
   }, []);
 
   useEffect(() => {
@@ -34,14 +43,17 @@ export default function BetFormModal({ onSave, onClose }) {
   function pickType(t) {
     setType(t);
     setSelections((prev) => {
-      if (t === 'combine' && prev.length < 2) return [...prev, { ...EMPTY_SELECTION }];
+      if (t === 'combine' && prev.length < 2)
+        return [...prev, { ...EMPTY_SELECTION }];
       if (t === 'simple') return [prev[0] ?? { ...EMPTY_SELECTION }];
       return prev;
     });
   }
 
   function setSel(i, patch) {
-    setSelections((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+    setSelections((prev) =>
+      prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)),
+    );
   }
   function addSel() {
     setSelections((prev) => [...prev, { ...EMPTY_SELECTION }]);
@@ -78,8 +90,10 @@ export default function BetFormModal({ onSave, onClose }) {
         })),
       };
       if (type === 'simple') payload.odds = payload.selections[0].odds;
-      if (commission.trim() !== '') payload.commission = parseAmount(commission);
-      if (closingOdds.trim() !== '') payload.closingOdds = parseOdds(closingOdds);
+      if (commission.trim() !== '')
+        payload.commission = parseAmount(commission);
+      if (closingOdds.trim() !== '')
+        payload.closingOdds = parseOdds(closingOdds);
       await onSave(payload);
     } catch (err) {
       setError(err.message);
@@ -120,7 +134,9 @@ export default function BetFormModal({ onSave, onClose }) {
           {/* Sélections */}
           <div className="ffield">
             <span className="ffield__label">
-              {type === 'combine' ? `Sélections (${selections.length})` : 'Sélection'}
+              {type === 'combine'
+                ? `Sélections (${selections.length})`
+                : 'Sélection'}
             </span>
             {selections.map((s, i) => (
               <div key={i} className="bseledit">
@@ -175,13 +191,20 @@ export default function BetFormModal({ onSave, onClose }) {
               </div>
             ))}
             {type === 'combine' && (
-              <button type="button" className="btn btn--ghost btn--sm" onClick={addSel}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={addSel}
+              >
                 + Ajouter une sélection
               </button>
             )}
             {type === 'combine' && (
               <div className="btotalodds">
-                Cote totale : <strong>{totalOdds != null ? formatOdds(totalOdds) : '—'}</strong>
+                Cote totale :{' '}
+                <strong>
+                  {totalOdds != null ? formatOdds(totalOdds) : '—'}
+                </strong>
               </div>
             )}
           </div>
@@ -242,16 +265,26 @@ export default function BetFormModal({ onSave, onClose }) {
             </div>
           )}
 
-          <p className="ffield__hint">Le pari est créé « en cours ». Réglez-le depuis la liste des paris.</p>
+          <p className="ffield__hint">
+            Le pari est créé « en cours ». Réglez-le depuis la liste des paris.
+          </p>
 
           {error && <p className="modal__error">{error}</p>}
 
           <div className="modal__actions">
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Créer le pari'}
               </button>
             </div>

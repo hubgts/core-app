@@ -1,4 +1,9 @@
-import { PROGRAM_BADGE, TYPE_META, eventChipLabel, sortEvents } from './constants';
+import {
+  PROGRAM_BADGE,
+  TYPE_META,
+  eventChipLabel,
+  sortEvents,
+} from './constants';
 
 const WEEKDAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const dayNum = (date) => Number(date.split('-')[2]);
@@ -17,7 +22,9 @@ export default function MonthView({
     <div className="cal-month">
       <div className="cal-month__head">
         {WEEKDAYS.map((w) => (
-          <div key={w} className="cal-month__wd">{w}</div>
+          <div key={w} className="cal-month__wd">
+            {w}
+          </div>
         ))}
       </div>
       <div className="cal-month__grid">
@@ -51,10 +58,16 @@ export default function MonthView({
                     }}
                   >
                     {ev.programLabel && (
-                      <span className="ev-chip__prog" aria-label="Programme">{PROGRAM_BADGE}</span>
+                      <span className="ev-chip__prog" aria-label="Programme">
+                        {PROGRAM_BADGE}
+                      </span>
                     )}
-                    <span className="ev-chip__icon">{TYPE_META[ev.type].icon}</span>
-                    {ev.startTime && <span className="ev-chip__time">{ev.startTime}</span>}
+                    <span className="ev-chip__icon">
+                      {TYPE_META[ev.type].icon}
+                    </span>
+                    {ev.startTime && (
+                      <span className="ev-chip__time">{ev.startTime}</span>
+                    )}
                     <span className="ev-chip__txt">{eventChipLabel(ev)}</span>
                   </button>
                 ))}

@@ -42,7 +42,9 @@ export default function CoursePage() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   function flash(msg) {
     setToast(msg);
@@ -60,7 +62,9 @@ export default function CoursePage() {
   }
 
   const isFiltering = query.trim() !== '';
-  const filtered = lists.filter((l) => !isFiltering || norm(l.title).includes(norm(query)));
+  const filtered = lists.filter(
+    (l) => !isFiltering || norm(l.title).includes(norm(query)),
+  );
 
   // --- Création / édition via modale ---
   async function saveList(payload, id) {
@@ -77,12 +81,24 @@ export default function CoursePage() {
   }
 
   function duplicate(list) {
-    run(async () => { await courseApi.duplicateList(list.id); flash('Liste dupliquée.'); });
+    run(async () => {
+      await courseApi.duplicateList(list.id);
+      flash('Liste dupliquée.');
+    });
   }
 
   async function removeList(list) {
-    if (!(await confirmDialog({ message: `Supprimer « ${list.title} » ? Action irréversible.`, danger: true }))) return;
-    run(async () => { await courseApi.removeList(list.id); flash('Liste supprimée.'); });
+    if (
+      !(await confirmDialog({
+        message: `Supprimer « ${list.title} » ? Action irréversible.`,
+        danger: true,
+      }))
+    )
+      return;
+    run(async () => {
+      await courseApi.removeList(list.id);
+      flash('Liste supprimée.');
+    });
   }
 
   function instantiate(t) {
@@ -93,13 +109,22 @@ export default function CoursePage() {
   }
 
   async function newTemplate() {
-    const title = await promptDialog({ title: 'Nom du modèle', defaultValue: 'Essentiels' });
+    const title = await promptDialog({
+      title: 'Nom du modèle',
+      defaultValue: 'Essentiels',
+    });
     if (title == null || !title.trim()) return;
     run(() => courseApi.createTemplate({ title: title.trim() }));
   }
 
   async function removeTemplate(t) {
-    if (!(await confirmDialog({ message: `Supprimer le modèle « ${t.title} » ?`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer le modèle « ${t.title} » ?`,
+        danger: true,
+      }))
+    )
+      return;
     run(() => courseApi.removeTemplate(t.id));
   }
 
@@ -114,7 +139,10 @@ export default function CoursePage() {
     ids.splice(to, 0, ids.splice(from, 1)[0]);
     const byId = new Map(lists.map((l) => [l.id, l]));
     setLists(ids.map((id) => byId.get(id)));
-    courseApi.reorderLists(ids).then(load).catch((e) => flash(e.message));
+    courseApi
+      .reorderLists(ids)
+      .then(load)
+      .catch((e) => flash(e.message));
   }
 
   return (
@@ -123,11 +151,31 @@ export default function CoursePage() {
         <h1 className="alpage__title">🛒 Course</h1>
         <div className="page__headactions">
           <div className="course-create">
-            <button className="btn btn--primary" onClick={() => setMenuOpen((v) => !v)}>+ Liste ▾</button>
+            <button
+              className="btn btn--primary"
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              + Liste ▾
+            </button>
             {menuOpen && (
-              <div className="course-create__menu" onMouseLeave={() => setMenuOpen(false)}>
-                <button onClick={() => { setMenuOpen(false); setModal({}); }}>Liste vide</button>
-                <button onClick={() => { setMenuOpen(false); setImporting(true); }}>
+              <div
+                className="course-create__menu"
+                onMouseLeave={() => setMenuOpen(false)}
+              >
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setModal({});
+                  }}
+                >
+                  Liste vide
+                </button>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setImporting(true);
+                  }}
+                >
                   À partir d'une recette…
                 </button>
               </div>
@@ -135,8 +183,16 @@ export default function CoursePage() {
           </div>
           <KebabMenu
             actions={[
-              { icon: '⚙', label: 'Gérer les articles', to: '/referentiel?kind=course_article' },
-              { icon: '⚙', label: 'Gérer les rayons', to: '/referentiel?kind=course_aisle' },
+              {
+                icon: '⚙',
+                label: 'Gérer les articles',
+                to: '/referentiel?kind=course_article',
+              },
+              {
+                icon: '⚙',
+                label: 'Gérer les rayons',
+                to: '/referentiel?kind=course_aisle',
+              },
             ]}
           />
         </div>
@@ -160,7 +216,9 @@ export default function CoursePage() {
         <div className="alempty">
           <div className="alempty__icon">🛒</div>
           <p>Crée ta première liste : vide, ou à partir d'une recette.</p>
-          <button className="btn btn--primary" onClick={() => setModal({})}>+ Liste</button>
+          <button className="btn btn--primary" onClick={() => setModal({})}>
+            + Liste
+          </button>
         </div>
       ) : (
         <>
@@ -186,7 +244,9 @@ export default function CoursePage() {
               ))}
             </div>
             {filtered.length === 0 && (
-              <p className="course-empty">Aucune liste ne correspond à ta recherche.</p>
+              <p className="course-empty">
+                Aucune liste ne correspond à ta recherche.
+              </p>
             )}
           </section>
 
@@ -199,14 +259,31 @@ export default function CoursePage() {
                     <span className="course-card__icon">📋</span>
                     <span className="course-card__title">{t.title}</span>
                   </div>
-                  <p className="course-card__meta">{t.itemCount} article{t.itemCount > 1 ? 's' : ''}</p>
+                  <p className="course-card__meta">
+                    {t.itemCount} article{t.itemCount > 1 ? 's' : ''}
+                  </p>
                   <div className="course-card__actions">
-                    <button className="btn btn--sm btn--primary" onClick={() => instantiate(t)}>Instancier</button>
-                    <button className="btn btn--sm btn--ghost" onClick={() => removeTemplate(t)}>Supprimer</button>
+                    <button
+                      className="btn btn--sm btn--primary"
+                      onClick={() => instantiate(t)}
+                    >
+                      Instancier
+                    </button>
+                    <button
+                      className="btn btn--sm btn--ghost"
+                      onClick={() => removeTemplate(t)}
+                    >
+                      Supprimer
+                    </button>
                   </div>
                 </div>
               ))}
-              <button className="course-card course-card--add" onClick={newTemplate}>+ Nouveau modèle</button>
+              <button
+                className="course-card course-card--add"
+                onClick={newTemplate}
+              >
+                + Nouveau modèle
+              </button>
             </div>
           </section>
         </>
@@ -224,7 +301,10 @@ export default function CoursePage() {
       {importing && (
         <ImportRecipeModal
           onClose={() => setImporting(false)}
-          onDone={(list) => { setImporting(false); navigate(`/course/${list.id}`); }}
+          onDone={(list) => {
+            setImporting(false);
+            navigate(`/course/${list.id}`);
+          }}
         />
       )}
 

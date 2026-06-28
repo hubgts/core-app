@@ -39,7 +39,10 @@ export default function RealizationMode({ recipe, scale = 1, onClose }) {
 
   // Items cochables = composants (hors sections) + étapes.
   const checkableIds = useMemo(
-    () => [...components.filter((c) => !isSection(c)).map((c) => c.id), ...steps.map((s) => s.id)],
+    () => [
+      ...components.filter((c) => !isSection(c)).map((c) => c.id),
+      ...steps.map((s) => s.id),
+    ],
     [components, steps],
   );
   const total = checkableIds.length;
@@ -55,7 +58,14 @@ export default function RealizationMode({ recipe, scale = 1, onClose }) {
   }
 
   async function close() {
-    if (checked.size > 0 && !(await confirmDialog({ message: 'Quitter le mode Réalisation ? Les cases cochées seront perdues.', danger: true }))) {
+    if (
+      checked.size > 0 &&
+      !(await confirmDialog({
+        message:
+          'Quitter le mode Réalisation ? Les cases cochées seront perdues.',
+        danger: true,
+      }))
+    ) {
       return;
     }
     onClose();
@@ -64,10 +74,17 @@ export default function RealizationMode({ recipe, scale = 1, onClose }) {
   return (
     <div className="rmode">
       <header className="rmode__head">
-        <button className="rmode__close" onClick={close} aria-label="Fermer">✕</button>
+        <button className="rmode__close" onClick={close} aria-label="Fermer">
+          ✕
+        </button>
         <span className="rmode__title">Réalisation · {recipe.title}</span>
         <span className="rmode__progress" aria-label={`${done} sur ${total}`}>
-          <span className="rmode__bar"><span className="rmode__barfill" style={{ width: total ? `${(done / total) * 100}%` : '0%' }} /></span>
+          <span className="rmode__bar">
+            <span
+              className="rmode__barfill"
+              style={{ width: total ? `${(done / total) * 100}%` : '0%' }}
+            />
+          </span>
           {done}/{total}
         </span>
       </header>
@@ -79,15 +96,24 @@ export default function RealizationMode({ recipe, scale = 1, onClose }) {
             <ul className="rmode__list">
               {components.map((c) =>
                 isSection(c) ? (
-                  <li key={c.id} className="rmode__sectionlabel">{c.label.replace(/^[—-]\s*|\s*[—-]$/g, '')}</li>
+                  <li key={c.id} className="rmode__sectionlabel">
+                    {c.label.replace(/^[—-]\s*|\s*[—-]$/g, '')}
+                  </li>
                 ) : (
                   <li key={c.id}>
-                    <label className={`rmode__item${checked.has(c.id) ? ' rmode__item--done' : ''}`}>
-                      <input type="checkbox" checked={checked.has(c.id)} onChange={() => toggle(c.id)} />
+                    <label
+                      className={`rmode__item${checked.has(c.id) ? ' rmode__item--done' : ''}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked.has(c.id)}
+                        onChange={() => toggle(c.id)}
+                      />
                       <span>
                         {c.quantity != null && (
                           <strong className="rmode__qty">
-                            {formatQuantity(scaleQuantity(c.quantity, scale))}{c.unit ? ` ${c.unit}` : ''}
+                            {formatQuantity(scaleQuantity(c.quantity, scale))}
+                            {c.unit ? ` ${c.unit}` : ''}
                           </strong>
                         )}{' '}
                         {c.label}
@@ -110,8 +136,15 @@ export default function RealizationMode({ recipe, scale = 1, onClose }) {
                   <label
                     className={`rmode__item rmode__item--step${checked.has(s.id) ? ' rmode__item--done' : ''}${s.id === currentStepId ? ' rmode__item--current' : ''}`}
                   >
-                    <input type="checkbox" checked={checked.has(s.id)} onChange={() => toggle(s.id)} />
-                    <span><strong className="rmode__stepnum">{i + 1}.</strong> {s.text}</span>
+                    <input
+                      type="checkbox"
+                      checked={checked.has(s.id)}
+                      onChange={() => toggle(s.id)}
+                    />
+                    <span>
+                      <strong className="rmode__stepnum">{i + 1}.</strong>{' '}
+                      {s.text}
+                    </span>
                   </label>
                 </li>
               ))}
@@ -121,7 +154,9 @@ export default function RealizationMode({ recipe, scale = 1, onClose }) {
       </div>
 
       <footer className="rmode__foot">
-        <button className="btn btn--primary" onClick={onClose}>✓ Terminer</button>
+        <button className="btn btn--primary" onClick={onClose}>
+          ✓ Terminer
+        </button>
       </footer>
     </div>
   );

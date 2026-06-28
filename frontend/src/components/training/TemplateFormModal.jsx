@@ -10,7 +10,10 @@ function initExercises(tpl) {
   if (tpl?.type === 'musculation' && tpl.exercises?.length) {
     return tpl.exercises.map((ex) => ({
       name: ex.name,
-      sets: ex.sets.map((s) => ({ reps: String(s.reps), weight: String(s.weight) })),
+      sets: ex.sets.map((s) => ({
+        reps: String(s.reps),
+        weight: String(s.weight),
+      })),
     }));
   }
   return [emptyExercise()];
@@ -21,7 +24,13 @@ function initExercises(tpl) {
  * (type + champs spécifiques) mais sans date/horaire, plus un nom et des
  * étiquettes pour le retrouver dans la liste.
  */
-export default function TemplateFormModal({ template, presetType, onSave, onDelete, onClose }) {
+export default function TemplateFormModal({
+  template,
+  presetType,
+  onSave,
+  onDelete,
+  onClose,
+}) {
   const isEdit = Boolean(template);
   const [type, setType] = useState(template?.type ?? presetType ?? null);
 
@@ -48,12 +57,17 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
 
   // --- musculation : édition des exercices/séries ---
   const updateExercise = (i, patch) =>
-    setExercises((prev) => prev.map((ex, idx) => (idx === i ? { ...ex, ...patch } : ex)));
+    setExercises((prev) =>
+      prev.map((ex, idx) => (idx === i ? { ...ex, ...patch } : ex)),
+    );
   const updateSet = (ei, si, patch) =>
     setExercises((prev) =>
       prev.map((ex, idx) =>
         idx === ei
-          ? { ...ex, sets: ex.sets.map((s, j) => (j === si ? { ...s, ...patch } : s)) }
+          ? {
+              ...ex,
+              sets: ex.sets.map((s, j) => (j === si ? { ...s, ...patch } : s)),
+            }
           : ex,
       ),
     );
@@ -72,7 +86,8 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
       ),
     );
   const addExercise = () => setExercises((prev) => [...prev, emptyExercise()]);
-  const removeExercise = (ei) => setExercises((prev) => prev.filter((_, idx) => idx !== ei));
+  const removeExercise = (ei) =>
+    setExercises((prev) => prev.filter((_, idx) => idx !== ei));
 
   async function submit(e) {
     e.preventDefault();
@@ -98,7 +113,10 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
           name: ex.name.trim(),
           sets: ex.sets
             .filter((s) => s.reps !== '')
-            .map((s) => ({ reps: Number(s.reps), weight: Number(s.weight || 0) })),
+            .map((s) => ({
+              reps: Number(s.reps),
+              weight: Number(s.weight || 0),
+            })),
         }));
     } else if (type === 'cardio') {
       payload.zone = zone;
@@ -140,7 +158,13 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
           </div>
           <div className="modal__actions">
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
             </div>
           </div>
         </div>
@@ -155,7 +179,9 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
       <div className="modal modal--lg" onMouseDown={(e) => e.stopPropagation()}>
         <h2 className="modal__title">
           <span style={{ marginRight: 8 }}>{meta.icon}</span>
-          {isEdit ? `Modifier le template — ${meta.label}` : `Nouveau template — ${meta.label}`}
+          {isEdit
+            ? `Modifier le template — ${meta.label}`
+            : `Nouveau template — ${meta.label}`}
         </h2>
 
         <form onSubmit={submit}>
@@ -172,7 +198,11 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
 
           <label className="field">
             <span className="field__label">Étiquettes</span>
-            <TagInput value={tags} onChange={setTags} placeholder="ex : haut du corps, salle…" />
+            <TagInput
+              value={tags}
+              onChange={setTags}
+              placeholder="ex : haut du corps, salle…"
+            />
           </label>
 
           <div className="form-row">
@@ -240,7 +270,9 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
                           min="1"
                           className="field__input field__input--xs"
                           value={s.reps}
-                          onChange={(e) => updateSet(ei, si, { reps: e.target.value })}
+                          onChange={(e) =>
+                            updateSet(ei, si, { reps: e.target.value })
+                          }
                         />
                         <input
                           type="number"
@@ -248,7 +280,9 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
                           step="0.5"
                           className="field__input field__input--xs"
                           value={s.weight}
-                          onChange={(e) => updateSet(ei, si, { weight: e.target.value })}
+                          onChange={(e) =>
+                            updateSet(ei, si, { weight: e.target.value })
+                          }
                         />
                         <button
                           type="button"
@@ -261,13 +295,21 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
                         </button>
                       </div>
                     ))}
-                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => addSet(ei)}>
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--sm"
+                      onClick={() => addSet(ei)}
+                    >
                       + série
                     </button>
                   </div>
                 </div>
               ))}
-              <button type="button" className="btn btn--ghost btn--sm" onClick={addExercise}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={addExercise}
+              >
                 + exercice
               </button>
             </div>
@@ -276,7 +318,9 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
           {type === 'cardio' && (
             <>
               <div className="field">
-                <span className="field__label">Zone de fréquence cardiaque</span>
+                <span className="field__label">
+                  Zone de fréquence cardiaque
+                </span>
                 <div className="zone-picker">
                   {CARDIO_ZONES.map((z) => (
                     <button
@@ -309,7 +353,9 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
           {type === 'autre' && (
             <>
               <label className="field">
-                <span className="field__label">Titre de séance (par défaut)</span>
+                <span className="field__label">
+                  Titre de séance (par défaut)
+                </span>
                 <input
                   className="field__input"
                   maxLength={60}
@@ -335,14 +381,28 @@ export default function TemplateFormModal({ template, presetType, onSave, onDele
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(template)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(template)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

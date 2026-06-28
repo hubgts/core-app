@@ -18,7 +18,18 @@ export const TYPE_ORDER = [
   'dette',
 ];
 
-export const ICONS = ['💵', '💳', '🐷', '📈', '🏠', '🏦', '🚗', '🎯', '🛟', '💎'];
+export const ICONS = [
+  '💵',
+  '💳',
+  '🐷',
+  '📈',
+  '🏠',
+  '🏦',
+  '🚗',
+  '🎯',
+  '🛟',
+  '💎',
+];
 
 export function natureOf(type) {
   return type === 'dette' ? 'passif' : 'actif';
@@ -78,7 +89,9 @@ export function objectivePace(o) {
   if (o.paceStatus === 'behind') {
     const eta = o.eta ? ` (proj. ${frenchMonthYear(o.eta)})` : '';
     const req =
-      o.requiredMonthly != null ? ` · +${formatEur(o.requiredMonthly)}/mois` : '';
+      o.requiredMonthly != null
+        ? ` · +${formatEur(o.requiredMonthly)}/mois`
+        : '';
     return { text: `en retard${eta}${req}`, tone: 'down' };
   }
   return null;

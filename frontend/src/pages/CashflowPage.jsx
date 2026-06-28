@@ -52,7 +52,9 @@ export default function CashflowPage() {
         <h1 className="fpage__title">📊 Vue d'ensemble</h1>
         <div className="fpage__headactions">
           <MonthNav month={month} onChange={setMonth} />
-          <Link className="btn btn--primary" to="/budget/plan">Plan &amp; dépenses</Link>
+          <Link className="btn btn--primary" to="/budget/plan">
+            Plan &amp; dépenses
+          </Link>
         </div>
       </header>
 
@@ -62,12 +64,15 @@ export default function CashflowPage() {
         <section className="fcard bonboard">
           <h2 className="fcard__title">Aucun flux ce mois-ci</h2>
           <p className="bonboard__text">
-            Saisissez vos revenus et vos dépenses depuis l'onglet <strong>Plan &amp; dépenses</strong>.
-            Cette vue résume alors vos entrées, vos sorties, votre taux d'épargne et le report
-            de trésorerie d'un mois sur l'autre.
+            Saisissez vos revenus et vos dépenses depuis l'onglet{' '}
+            <strong>Plan &amp; dépenses</strong>. Cette vue résume alors vos
+            entrées, vos sorties, votre taux d'épargne et le report de
+            trésorerie d'un mois sur l'autre.
           </p>
           <div className="bonboard__actions">
-            <Link className="btn btn--primary" to="/budget/plan">Aller au plan</Link>
+            <Link className="btn btn--primary" to="/budget/plan">
+              Aller au plan
+            </Link>
           </div>
         </section>
       )}
@@ -78,11 +83,15 @@ export default function CashflowPage() {
           <section className="bbanner">
             <div className="bbanner__cell">
               <span className="fhero__label">Entrées</span>
-              <span className="bbanner__value t-up">{formatEur(data.income)}</span>
+              <span className="bbanner__value t-up">
+                {formatEur(data.income)}
+              </span>
             </div>
             <div className="bbanner__cell">
               <span className="fhero__label">Sorties</span>
-              <span className="bbanner__value t-down">{formatEur(data.expenses)}</span>
+              <span className="bbanner__value t-down">
+                {formatEur(data.expenses)}
+              </span>
             </div>
             <div className="bbanner__cell">
               <span className="fhero__label">Solde du mois</span>
@@ -97,16 +106,22 @@ export default function CashflowPage() {
             <div className="fcard bcfstat">
               <span className="fhero__label">Taux d'épargne</span>
               <span className="bcfstat__big">
-                {data.savingsRate != null ? `${Math.round(data.savingsRate)} %` : '—'}
+                {data.savingsRate != null
+                  ? `${Math.round(data.savingsRate)} %`
+                  : '—'}
               </span>
               <span className="bcfstat__sub">
-                {formatEur(data.savings)} épargnés sur {formatEur(data.income)} de revenus
+                {formatEur(data.savings)} épargnés sur {formatEur(data.income)}{' '}
+                de revenus
               </span>
               {data.savingsRate != null && (
                 <div className="bcfstat__bar">
                   <div
                     className="bcfstat__barfill"
-                    style={{ width: `${clampPct(data.savingsRate)}%`, background: '#34d399' }}
+                    style={{
+                      width: `${clampPct(data.savingsRate)}%`,
+                      background: '#34d399',
+                    }}
                   />
                 </div>
               )}
@@ -119,16 +134,25 @@ export default function CashflowPage() {
               </span>
               <ul className="bcarry">
                 <li>
-                  <span>Report mois précédent ({monthLabel(data.previousMonth.month)})</span>
-                  <strong className={`t-${trendClass(data.carryIn)}`}>{formatSignedEur(data.carryIn)}</strong>
+                  <span>
+                    Report mois précédent (
+                    {monthLabel(data.previousMonth.month)})
+                  </span>
+                  <strong className={`t-${trendClass(data.carryIn)}`}>
+                    {formatSignedEur(data.carryIn)}
+                  </strong>
                 </li>
                 <li>
                   <span>+ Solde du mois</span>
-                  <strong className={`t-${trendClass(data.net)}`}>{formatSignedEur(data.net)}</strong>
+                  <strong className={`t-${trendClass(data.net)}`}>
+                    {formatSignedEur(data.net)}
+                  </strong>
                 </li>
                 <li className="bcarry__total">
                   <span>= Solde de fin de mois</span>
-                  <strong className={`t-${trendClass(data.endBalance)}`}>{formatSignedEur(data.endBalance)}</strong>
+                  <strong className={`t-${trendClass(data.endBalance)}`}>
+                    {formatSignedEur(data.endBalance)}
+                  </strong>
                 </li>
               </ul>
             </div>
@@ -142,7 +166,12 @@ export default function CashflowPage() {
             </div>
             <div className="fcard fcard--donut">
               <h2 className="fcard__title">Répartition des sorties</h2>
-              <Donut slices={data.pie} gross={data.expenses} label="Répartition des sorties" centerSub="dépensé" />
+              <Donut
+                slices={data.pie}
+                gross={data.expenses}
+                label="Répartition des sorties"
+                centerSub="dépensé"
+              />
             </div>
           </section>
         </>

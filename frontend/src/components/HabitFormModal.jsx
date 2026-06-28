@@ -3,13 +3,38 @@ import './HabitFormModal.css';
 
 // Tons « 400 » : lisibles comme accents sur fond sombre.
 const COLORS = [
-  '#818cf8', '#38bdf8', '#34d399', '#fbbf24',
-  '#f87171', '#f472b6', '#a78bfa', '#2dd4bf',
+  '#818cf8',
+  '#38bdf8',
+  '#34d399',
+  '#fbbf24',
+  '#f87171',
+  '#f472b6',
+  '#a78bfa',
+  '#2dd4bf',
 ];
 
-const ICONS = ['✅', '🧘', '📖', '💧', '🏃', '🚫', '🌙', '💪', '🥗', '🧠', '✍️', '☀️'];
+const ICONS = [
+  '✅',
+  '🧘',
+  '📖',
+  '💧',
+  '🏃',
+  '🚫',
+  '🌙',
+  '💪',
+  '🥗',
+  '🧠',
+  '✍️',
+  '☀️',
+];
 
-export default function HabitFormModal({ habit, onSave, onArchive, onDelete, onClose }) {
+export default function HabitFormModal({
+  habit,
+  onSave,
+  onArchive,
+  onDelete,
+  onClose,
+}) {
   const isEdit = Boolean(habit);
   const [name, setName] = useState(habit?.name ?? '');
   const [weeklyTarget, setWeeklyTarget] = useState(habit?.weeklyTarget ?? 7);
@@ -68,7 +93,11 @@ export default function HabitFormModal({ habit, onSave, onArchive, onDelete, onC
 
           <div className="field">
             <span className="field__label">Objectif hebdomadaire</span>
-            <div className="picker picker--target" role="radiogroup" aria-label="Fois par semaine">
+            <div
+              className="picker picker--target"
+              role="radiogroup"
+              aria-label="Fois par semaine"
+            >
               {[1, 2, 3, 4, 5, 6, 7].map((n) => (
                 <button
                   type="button"
@@ -126,19 +155,35 @@ export default function HabitFormModal({ habit, onSave, onArchive, onDelete, onC
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--ghost" onClick={() => onArchive(habit)}>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={() => onArchive(habit)}
+                >
                   Archiver
                 </button>
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(habit)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(habit)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

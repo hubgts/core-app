@@ -17,8 +17,12 @@ export default function TransactionModal({
 }) {
   const isEdit = Boolean(transaction);
   const [kind, setKind] = useState(transaction?.kind ?? defaultKind);
-  const [amount, setAmount] = useState(transaction ? String(transaction.amount) : '');
-  const [date, setDate] = useState(transaction?.date ?? defaultDate ?? todayStr());
+  const [amount, setAmount] = useState(
+    transaction ? String(transaction.amount) : '',
+  );
+  const [date, setDate] = useState(
+    transaction?.date ?? defaultDate ?? todayStr(),
+  );
   const [categoryId, setCategoryId] = useState(
     transaction?.categoryId ?? defaultCategoryId ?? categories[0]?.id ?? '',
   );
@@ -71,7 +75,11 @@ export default function TransactionModal({
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
         <h2 className="modal__title">
-          {isEdit ? 'Modifier la transaction' : kind === 'entree' ? 'Nouveau revenu' : 'Nouvelle dépense'}
+          {isEdit
+            ? 'Modifier la transaction'
+            : kind === 'entree'
+              ? 'Nouveau revenu'
+              : 'Nouvelle dépense'}
         </h2>
 
         <form onSubmit={submit}>
@@ -151,10 +159,18 @@ export default function TransactionModal({
 
           <div className="modal__actions">
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

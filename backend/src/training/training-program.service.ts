@@ -1,7 +1,16 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { addDaysStr, isValidDateStr, isValidTimeStr, mondayOf } from './date.util';
+import {
+  addDaysStr,
+  isValidDateStr,
+  isValidTimeStr,
+  mondayOf,
+} from './date.util';
 import { TrainingProgramEntity } from './entities/training-program.entity';
 import { TrainingProgramPhaseEntity } from './entities/training-program-phase.entity';
 import { TrainingProgramWeekEntity } from './entities/training-program-week.entity';
@@ -130,7 +139,9 @@ export class TrainingProgramService {
   /** Démarre le programme : crée les séances réelles dans le planning. */
   async start(id: string, startDate?: string) {
     const program = await this.getOrThrow(id);
-    const placed = this.computePlacements(program, startDate).filter((p) => !p.skipped);
+    const placed = this.computePlacements(program, startDate).filter(
+      (p) => !p.skipped,
+    );
     if (placed.length === 0) {
       throw new BadRequestException(
         'Aucune séance à placer pour cette date de début (programme vide ou semaine entièrement passée).',
@@ -150,16 +161,25 @@ export class TrainingProgramService {
         programObjective: p.objective,
       });
     }
-    return { ok: true, created: placed.length, skipped: this.skippedCount(program, startDate) };
+    return {
+      ok: true,
+      created: placed.length,
+      skipped: this.skippedCount(program, startDate),
+    };
   }
 
   // ---------------------------------------------------------------------------
   // Calcul du placement (RG-04 / RG-05)
   // ---------------------------------------------------------------------------
 
-  private computePlacements(program: TrainingProgramEntity, startDate?: string): PlacedSession[] {
+  private computePlacements(
+    program: TrainingProgramEntity,
+    startDate?: string,
+  ): PlacedSession[] {
     if (!isValidDateStr(startDate)) {
-      throw new BadRequestException('Date de début invalide (YYYY-MM-DD attendu).');
+      throw new BadRequestException(
+        'Date de début invalide (YYYY-MM-DD attendu).',
+      );
     }
     const monday = mondayOf(startDate);
     const phaseObjectiveById = new Map<string, string | null>(
@@ -174,7 +194,8 @@ export class TrainingProgramService {
       // n-ième semaine du programme (1-based) → lundi de référence.
       const weekMonday = addDaysStr(monday, ordinal * 7);
       const objective =
-        week.objective ?? (week.phaseId ? phaseObjectiveById.get(week.phaseId) ?? null : null);
+        week.objective ??
+        (week.phaseId ? (phaseObjectiveById.get(week.phaseId) ?? null) : null);
       const orderedSessions = [...(week.sessions ?? [])].sort(
         (a, b) => a.dayOfWeek - b.dayOfWeek || a.position - b.position,
       );
@@ -197,12 +218,19 @@ export class TrainingProgramService {
     return out;
   }
 
-  private skippedCount(program: TrainingProgramEntity, startDate?: string): number {
-    return this.computePlacements(program, startDate).filter((p) => p.skipped).length;
+  private skippedCount(
+    program: TrainingProgramEntity,
+    startDate?: string,
+  ): number {
+    return this.computePlacements(program, startDate).filter((p) => p.skipped)
+      .length;
   }
 
   /** Construit le payload d'évènement à partir d'une séance de programme. */
-  private sessionToEventInput(s: TrainingProgramSessionEntity, date: string): EventInput {
+  private sessionToEventInput(
+    s: TrainingProgramSessionEntity,
+    date: string,
+  ): EventInput {
     const base: EventInput = {
       date,
       type: s.type as TrainingType,
@@ -234,9 +262,12 @@ export class TrainingProgramService {
     for (let i = 0; i < phaseInputs.length; i += 1) {
       const ph = phaseInputs[i];
       const name = (ph?.name ?? '').trim();
-      if (!name) throw new BadRequestException('Chaque phase doit avoir un nom.');
+      if (!name)
+        throw new BadRequestException('Chaque phase doit avoir un nom.');
       if (name.length > 60) {
-        throw new BadRequestException('Le nom de phase ne peut dépasser 60 caractères.');
+        throw new BadRequestException(
+          'Le nom de phase ne peut dépasser 60 caractères.',
+        );
       }
       const saved = await this.phases.save(
         this.phases.create({
@@ -254,16 +285,27 @@ export class TrainingProgramService {
     const seenIndex = new Set<number>();
     for (let i = 0; i < weekInputs.length; i += 1) {
       const w = weekInputs[i];
-      const index = Number.isInteger(w.index) && (w.index as number) >= 1 ? (w.index as number) : i + 1;
+      const index =
+        Number.isInteger(w.index) && (w.index as number) >= 1
+          ? (w.index as number)
+          : i + 1;
       if (seenIndex.has(index)) {
-        throw new BadRequestException(`Index de semaine en double : S${index}.`);
+        throw new BadRequestException(
+          `Index de semaine en double : S${index}.`,
+        );
       }
       seenIndex.add(index);
 
       let phaseId: string | null = null;
       if (w.phaseIndex !== null && w.phaseIndex !== undefined) {
-        if (!Number.isInteger(w.phaseIndex) || w.phaseIndex < 0 || w.phaseIndex >= phaseIds.length) {
-          throw new BadRequestException('Référence de phase invalide pour une semaine.');
+        if (
+          !Number.isInteger(w.phaseIndex) ||
+          w.phaseIndex < 0 ||
+          w.phaseIndex >= phaseIds.length
+        ) {
+          throw new BadRequestException(
+            'Référence de phase invalide pour une semaine.',
+          );
         }
         phaseId = phaseIds[w.phaseIndex];
       }
@@ -281,21 +323,33 @@ export class TrainingProgramService {
 
       const sessionInputs = Array.isArray(w.sessions) ? w.sessions : [];
       for (let j = 0; j < sessionInputs.length; j += 1) {
-        await this.sessions.save(this.buildSession(savedWeek.id, sessionInputs[j], j));
+        await this.sessions.save(
+          this.buildSession(savedWeek.id, sessionInputs[j], j),
+        );
       }
     }
   }
 
-  private buildSession(weekId: string, s: ProgramSessionInput, position: number) {
+  private buildSession(
+    weekId: string,
+    s: ProgramSessionInput,
+    position: number,
+  ) {
     const type = s.type as TrainingType;
     if (!TRAINING_TYPES.includes(type)) {
       throw new BadRequestException('Type de séance de programme invalide.');
     }
     const dow = Number(s.dayOfWeek);
     if (!Number.isInteger(dow) || dow < 1 || dow > 7) {
-      throw new BadRequestException('Jour de séance invalide (1 = lundi … 7 = dimanche).');
+      throw new BadRequestException(
+        'Jour de séance invalide (1 = lundi … 7 = dimanche).',
+      );
     }
-    if (s.startTime !== null && s.startTime !== undefined && !isValidTimeStr(s.startTime)) {
+    if (
+      s.startTime !== null &&
+      s.startTime !== undefined &&
+      !isValidTimeStr(s.startTime)
+    ) {
       throw new BadRequestException('Horaire invalide (HH:MM attendu).');
     }
 
@@ -318,7 +372,9 @@ export class TrainingProgramService {
 
     const label = (s.label ?? '').trim() || null;
     if (label && label.length > 60) {
-      throw new BadRequestException('Le nom de séance ne peut dépasser 60 caractères.');
+      throw new BadRequestException(
+        'Le nom de séance ne peut dépasser 60 caractères.',
+      );
     }
 
     return this.sessions.create({
@@ -345,7 +401,12 @@ export class TrainingProgramService {
   private toResponse(p: TrainingProgramEntity) {
     const phases = [...(p.phases ?? [])]
       .sort((a, b) => a.position - b.position)
-      .map((ph) => ({ id: ph.id, name: ph.name, objective: ph.objective, position: ph.position }));
+      .map((ph) => ({
+        id: ph.id,
+        name: ph.name,
+        objective: ph.objective,
+        position: ph.position,
+      }));
     const phaseIndexById = new Map(phases.map((ph, i) => [ph.id, i]));
 
     const weeks = [...(p.weeks ?? [])]
@@ -353,7 +414,8 @@ export class TrainingProgramService {
       .map((w) => ({
         id: w.id,
         index: w.index,
-        phaseIndex: w.phaseId != null ? phaseIndexById.get(w.phaseId) ?? null : null,
+        phaseIndex:
+          w.phaseId != null ? (phaseIndexById.get(w.phaseId) ?? null) : null,
         objective: w.objective,
         isDeload: w.isDeload,
         sessions: [...(w.sessions ?? [])]
@@ -418,7 +480,8 @@ export class TrainingProgramService {
 
   private resolveName(value?: string): string {
     const name = (value ?? '').trim();
-    if (!name) throw new BadRequestException('Le nom du programme est obligatoire.');
+    if (!name)
+      throw new BadRequestException('Le nom du programme est obligatoire.');
     if (name.length > 80) {
       throw new BadRequestException('Le nom ne peut dépasser 80 caractères.');
     }
@@ -435,7 +498,9 @@ export class TrainingProgramService {
     if (value === null || value === undefined) return null;
     const str = String(value).trim();
     if (str.length > 120) {
-      throw new BadRequestException("L'objectif ne peut dépasser 120 caractères.");
+      throw new BadRequestException(
+        "L'objectif ne peut dépasser 120 caractères.",
+      );
     }
     return str || null;
   }
@@ -450,8 +515,14 @@ export class TrainingProgramService {
 
   private resolveFeeling(value: unknown): number | null {
     if (value === null || value === undefined) return null;
-    if (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 5) {
-      throw new BadRequestException('Le ressenti doit être un entier de 1 à 5.');
+    if (
+      !Number.isInteger(value) ||
+      (value as number) < 1 ||
+      (value as number) > 5
+    ) {
+      throw new BadRequestException(
+        'Le ressenti doit être un entier de 1 à 5.',
+      );
     }
     return value as number;
   }
@@ -464,13 +535,17 @@ export class TrainingProgramService {
         const name = (ex?.name ?? '').trim();
         if (!name) return null;
         if (name.length > 60) {
-          throw new BadRequestException("Le nom d'exercice ne peut dépasser 60 caractères.");
+          throw new BadRequestException(
+            "Le nom d'exercice ne peut dépasser 60 caractères.",
+          );
         }
         const sets = (Array.isArray(ex.sets) ? ex.sets : []).map((s) => {
           const reps = Number(s?.reps);
           const weight = Number(s?.weight);
           if (!Number.isInteger(reps) || reps < 0) {
-            throw new BadRequestException(`Répétitions invalides pour "${name}".`);
+            throw new BadRequestException(
+              `Répétitions invalides pour "${name}".`,
+            );
           }
           if (!Number.isFinite(weight) || weight < 0) {
             throw new BadRequestException(`Charge invalide pour "${name}".`);

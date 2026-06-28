@@ -48,7 +48,9 @@ export class TrainingService {
 
   async eventsInRange(from: string, to: string) {
     if (!isValidDateStr(from) || !isValidDateStr(to)) {
-      throw new BadRequestException('Paramètres "from" / "to" invalides (YYYY-MM-DD attendu).');
+      throw new BadRequestException(
+        'Paramètres "from" / "to" invalides (YYYY-MM-DD attendu).',
+      );
     }
     const rows = await this.events.find({
       where: { date: Between(from, to) },
@@ -136,7 +138,9 @@ export class TrainingService {
 
   async stats(from: string, to: string) {
     if (!isValidDateStr(from) || !isValidDateStr(to)) {
-      throw new BadRequestException('Paramètres "from" / "to" invalides (YYYY-MM-DD attendu).');
+      throw new BadRequestException(
+        'Paramètres "from" / "to" invalides (YYYY-MM-DD attendu).',
+      );
     }
     const rows = await this.events.find({
       where: { date: Between(from, to) },
@@ -160,7 +164,10 @@ export class TrainingService {
 
     // Musculation
     const tonnageByDate = new Map<string, number>();
-    const maxByExercise = new Map<string, { name: string; maxWeight: number }>();
+    const maxByExercise = new Map<
+      string,
+      { name: string; maxWeight: number }
+    >();
     let totalTonnage = 0;
     for (const e of events.filter((x) => x.type === 'musculation')) {
       totalTonnage += e.tonnage;
@@ -176,7 +183,13 @@ export class TrainingService {
     }
 
     // Cardio
-    const timeByZone: Record<string, number> = { Z1: 0, Z2: 0, Z3: 0, Z4: 0, Z5: 0 };
+    const timeByZone: Record<string, number> = {
+      Z1: 0,
+      Z2: 0,
+      Z3: 0,
+      Z4: 0,
+      Z5: 0,
+    };
     let cardioSessions = 0;
     let cardioDuration = 0;
     for (const e of events.filter((x) => x.type === 'cardio')) {
@@ -193,7 +206,9 @@ export class TrainingService {
       overview: {
         sessions: events.length,
         durationMin,
-        avgFeeling: feelingCount ? Math.round((feelingSum / feelingCount) * 10) / 10 : null,
+        avgFeeling: feelingCount
+          ? Math.round((feelingSum / feelingCount) * 10) / 10
+          : null,
         byType,
       },
       musculation: {
@@ -201,7 +216,9 @@ export class TrainingService {
         tonnageByDate: [...tonnageByDate.entries()]
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([date, tonnage]) => ({ date, tonnage })),
-        maxByExercise: [...maxByExercise.values()].sort((a, b) => b.maxWeight - a.maxWeight),
+        maxByExercise: [...maxByExercise.values()].sort(
+          (a, b) => b.maxWeight - a.maxWeight,
+        ),
       },
       cardio: {
         sessions: cardioSessions,
@@ -226,7 +243,12 @@ export class TrainingService {
         sets: (ex.sets ?? [])
           .slice()
           .sort((a, b) => a.position - b.position)
-          .map((s) => ({ id: s.id, reps: s.reps, weight: s.weight, position: s.position })),
+          .map((s) => ({
+            id: s.id,
+            reps: s.reps,
+            weight: s.weight,
+            position: s.position,
+          })),
       }));
     const tonnage = exercises.reduce(
       (t, ex) => t + ex.sets.reduce((st, s) => st + s.reps * s.weight, 0),
@@ -313,13 +335,17 @@ export class TrainingService {
   }
 
   /** Détecte les nouveaux records de charge (PR) par exercice (RG-13). */
-  private async computePrs(eventId: string, exercises: ExerciseInput[]): Promise<PrReached[]> {
+  private async computePrs(
+    eventId: string,
+    exercises: ExerciseInput[],
+  ): Promise<PrReached[]> {
     const inputMax = new Map<string, { name: string; weight: number }>();
     for (const ex of exercises) {
       const max = ex.sets.reduce((m, s) => Math.max(m, s.weight), 0);
       const key = this.normalizeKey(ex.name);
       const prev = inputMax.get(key);
-      if (!prev || max > prev.weight) inputMax.set(key, { name: ex.name, weight: max });
+      if (!prev || max > prev.weight)
+        inputMax.set(key, { name: ex.name, weight: max });
     }
 
     const prs: PrReached[] = [];
@@ -333,7 +359,10 @@ export class TrainingService {
     return prs;
   }
 
-  private async prevMaxForExercise(name: string, excludeEventId: string): Promise<number | null> {
+  private async prevMaxForExercise(
+    name: string,
+    excludeEventId: string,
+  ): Promise<number | null> {
     const row = await this.sets
       .createQueryBuilder('s')
       .innerJoin('s.exercise', 'e')
@@ -354,7 +383,10 @@ export class TrainingService {
   }
 
   /** Valide et normalise l'entrée. `existing` non-null = édition (type immuable). */
-  private resolve(input: EventInput, existing: TrainingEventEntity | null): ResolvedEvent {
+  private resolve(
+    input: EventInput,
+    existing: TrainingEventEntity | null,
+  ): ResolvedEvent {
     const type = (existing ? existing.type : input.type) as TrainingType;
     if (!TRAINING_TYPES.includes(type)) {
       throw new BadRequestException('Type de séance invalide.');
@@ -365,8 +397,10 @@ export class TrainingService {
       throw new BadRequestException('Date invalide (YYYY-MM-DD attendu).');
     }
 
-    let startTime: string | null =
-      input.startTime !== undefined ? input.startTime : (existing?.startTime ?? null);
+    const startTime: string | null =
+      input.startTime !== undefined
+        ? input.startTime
+        : (existing?.startTime ?? null);
     if (startTime !== null) {
       if (!isValidTimeStr(startTime)) {
         throw new BadRequestException('Horaire invalide (HH:MM attendu).');
@@ -374,13 +408,15 @@ export class TrainingService {
     }
 
     const durationMin = this.resolveInt(
-      input.durationMin !== undefined ? input.durationMin : existing?.durationMin ?? null,
+      input.durationMin !== undefined
+        ? input.durationMin
+        : (existing?.durationMin ?? null),
       'durationMin',
       0,
     );
 
     const feeling = this.resolveFeeling(
-      input.feeling !== undefined ? input.feeling : existing?.feeling ?? null,
+      input.feeling !== undefined ? input.feeling : (existing?.feeling ?? null),
     );
 
     // Champs spécifiques au type (les autres sont neutralisés).
@@ -390,18 +426,25 @@ export class TrainingService {
     let exercises: ExerciseInput[] = [];
 
     if (type === 'cardio') {
-      const z = input.zone !== undefined ? input.zone : (existing?.zone as CardioZone | null) ?? null;
+      const z =
+        input.zone !== undefined
+          ? input.zone
+          : ((existing?.zone as CardioZone | null) ?? null);
       if (z !== null && z !== undefined && !CARDIO_ZONES.includes(z)) {
         throw new BadRequestException('Zone cardio invalide (Z1 à Z5).');
       }
       zone = z ?? null;
       description = this.resolveDescription(input, existing);
     } else if (type === 'autre') {
-      const t = (input.title !== undefined ? input.title : existing?.title ?? '') ?? '';
+      const t =
+        (input.title !== undefined ? input.title : (existing?.title ?? '')) ??
+        '';
       const trimmed = t.trim();
       if (!trimmed) throw new BadRequestException('Le titre est obligatoire.');
       if (trimmed.length > 60) {
-        throw new BadRequestException('Le titre ne peut dépasser 60 caractères.');
+        throw new BadRequestException(
+          'Le titre ne peut dépasser 60 caractères.',
+        );
       }
       title = trimmed;
       description = this.resolveDescription(input, existing);
@@ -410,16 +453,36 @@ export class TrainingService {
       exercises = this.resolveExercises(input.exercises);
     }
 
-    return { date, type, startTime, durationMin, feeling, zone, title, description, exercises };
+    return {
+      date,
+      type,
+      startTime,
+      durationMin,
+      feeling,
+      zone,
+      title,
+      description,
+      exercises,
+    };
   }
 
-  private resolveDescription(input: EventInput, existing: TrainingEventEntity | null): string | null {
-    const d = input.description !== undefined ? input.description : existing?.description ?? null;
+  private resolveDescription(
+    input: EventInput,
+    existing: TrainingEventEntity | null,
+  ): string | null {
+    const d =
+      input.description !== undefined
+        ? input.description
+        : (existing?.description ?? null);
     if (d === null || d === undefined) return null;
     return String(d);
   }
 
-  private resolveInt(value: unknown, field: string, min: number): number | null {
+  private resolveInt(
+    value: unknown,
+    field: string,
+    min: number,
+  ): number | null {
     if (value === null || value === undefined) return null;
     if (!Number.isInteger(value) || (value as number) < min) {
       throw new BadRequestException(`Champ "${field}" invalide.`);
@@ -429,32 +492,49 @@ export class TrainingService {
 
   private resolveFeeling(value: unknown): number | null {
     if (value === null || value === undefined) return null;
-    if (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 5) {
-      throw new BadRequestException('Le ressenti doit être un entier de 1 à 5.');
+    if (
+      !Number.isInteger(value) ||
+      (value as number) < 1 ||
+      (value as number) > 5
+    ) {
+      throw new BadRequestException(
+        'Le ressenti doit être un entier de 1 à 5.',
+      );
     }
     return value as number;
   }
 
   private resolveExercises(exercises?: ExerciseInput[]): ExerciseInput[] {
     if (!Array.isArray(exercises) || exercises.length === 0) {
-      throw new BadRequestException('Une séance de musculation doit contenir au moins un exercice.');
+      throw new BadRequestException(
+        'Une séance de musculation doit contenir au moins un exercice.',
+      );
     }
     return exercises.map((ex) => {
       const name = (ex?.name ?? '').trim();
-      if (!name) throw new BadRequestException('Chaque exercice doit avoir un nom.');
+      if (!name)
+        throw new BadRequestException('Chaque exercice doit avoir un nom.');
       if (name.length > 60) {
-        throw new BadRequestException('Le nom d\'exercice ne peut dépasser 60 caractères.');
+        throw new BadRequestException(
+          "Le nom d'exercice ne peut dépasser 60 caractères.",
+        );
       }
       if (!Array.isArray(ex.sets) || ex.sets.length === 0) {
-        throw new BadRequestException(`L'exercice "${name}" doit contenir au moins une série.`);
+        throw new BadRequestException(
+          `L'exercice "${name}" doit contenir au moins une série.`,
+        );
       }
       const sets = ex.sets.map((s) => {
         if (!Number.isInteger(s?.reps) || s.reps < 1) {
-          throw new BadRequestException(`Répétitions invalides pour "${name}" (entier ≥ 1).`);
+          throw new BadRequestException(
+            `Répétitions invalides pour "${name}" (entier ≥ 1).`,
+          );
         }
         const weight = Number(s?.weight);
         if (!Number.isFinite(weight) || weight < 0) {
-          throw new BadRequestException(`Charge invalide pour "${name}" (≥ 0).`);
+          throw new BadRequestException(
+            `Charge invalide pour "${name}" (≥ 0).`,
+          );
         }
         return { reps: s.reps, weight };
       });

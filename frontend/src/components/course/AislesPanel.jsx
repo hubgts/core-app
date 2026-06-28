@@ -28,7 +28,9 @@ export default function AislesPanel() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function run(fn) {
     setError('');
@@ -52,16 +54,20 @@ export default function AislesPanel() {
   }
 
   async function rename(a) {
-    const next = await promptDialog({ title: 'Renommer le rayon', defaultValue: a.name });
+    const next = await promptDialog({
+      title: 'Renommer le rayon',
+      defaultValue: a.name,
+    });
     if (next == null || !next.trim() || next.trim() === a.name) return;
     run(() => courseApi.updateAisle(a.id, { name: next.trim() }));
   }
 
   async function remove(a) {
     const n = a.articleCount ?? 0;
-    const msg = n > 0
-      ? `Supprimer « ${a.name} » ? ${n} article${n > 1 ? 's' : ''} repasseront « Autre ».`
-      : `Supprimer « ${a.name} » ?`;
+    const msg =
+      n > 0
+        ? `Supprimer « ${a.name} » ? ${n} article${n > 1 ? 's' : ''} repasseront « Autre ».`
+        : `Supprimer « ${a.name} » ?`;
     if (!(await confirmDialog({ message: msg, danger: true }))) return;
     run(() => courseApi.removeAisle(a.id));
   }
@@ -79,12 +85,16 @@ export default function AislesPanel() {
 
   return (
     <div>
-      <p className="course-import__lead">L'ordre des rayons = ton parcours en magasin.</p>
+      <p className="course-import__lead">
+        L'ordre des rayons = ton parcours en magasin.
+      </p>
       <form className="ref-add" onSubmit={create}>
         <button
           type="button"
           className="rcatman__icon"
-          onClick={() => setIconPickerFor(iconPickerFor === 'new' ? null : 'new')}
+          onClick={() =>
+            setIconPickerFor(iconPickerFor === 'new' ? null : 'new')
+          }
           title="Icône"
         >
           {draftIcon}
@@ -96,12 +106,27 @@ export default function AislesPanel() {
           maxLength={40}
           onChange={(e) => setDraftName(e.target.value)}
         />
-        <button type="submit" className="btn btn--primary" disabled={!draftName.trim()}>Ajouter</button>
+        <button
+          type="submit"
+          className="btn btn--primary"
+          disabled={!draftName.trim()}
+        >
+          Ajouter
+        </button>
       </form>
       {iconPickerFor === 'new' && (
         <div className="rcatman__picker">
           {AISLE_ICONS.map((ic) => (
-            <button key={ic} type="button" onClick={() => { setDraftIcon(ic); setIconPickerFor(null); }}>{ic}</button>
+            <button
+              key={ic}
+              type="button"
+              onClick={() => {
+                setDraftIcon(ic);
+                setIconPickerFor(null);
+              }}
+            >
+              {ic}
+            </button>
           ))}
         </div>
       )}
@@ -122,11 +147,18 @@ export default function AislesPanel() {
               onDrop={() => handleDrop(a.id)}
             >
               <div className="refcat__lead">
-                <span className="reditrow__grip" title="Glisser pour réordonner">⠿</span>
+                <span
+                  className="reditrow__grip"
+                  title="Glisser pour réordonner"
+                >
+                  ⠿
+                </span>
                 <button
                   type="button"
                   className="rcatman__icon"
-                  onClick={() => setIconPickerFor(iconPickerFor === a.id ? null : a.id)}
+                  onClick={() =>
+                    setIconPickerFor(iconPickerFor === a.id ? null : a.id)
+                  }
                   title="Changer l'icône"
                 >
                   {a.icon || '📦'}
@@ -135,8 +167,22 @@ export default function AislesPanel() {
                 <span className="rcatman__count">{a.articleCount ?? 0}</span>
               </div>
               <div className="ref-item__actions">
-                <button className="icon-btn" onClick={() => rename(a)} aria-label="Renommer" title="Renommer">✏️</button>
-                <button className="icon-btn" onClick={() => remove(a)} aria-label="Supprimer" title="Supprimer">🗑</button>
+                <button
+                  className="icon-btn"
+                  onClick={() => rename(a)}
+                  aria-label="Renommer"
+                  title="Renommer"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="icon-btn"
+                  onClick={() => remove(a)}
+                  aria-label="Supprimer"
+                  title="Supprimer"
+                >
+                  🗑
+                </button>
               </div>
               {iconPickerFor === a.id && (
                 <div className="rcatman__picker rcatman__picker--row">
@@ -144,10 +190,12 @@ export default function AislesPanel() {
                     <button
                       key={ic}
                       type="button"
-                      onClick={() => run(async () => {
-                        await courseApi.updateAisle(a.id, { icon: ic });
-                        setIconPickerFor(null);
-                      })}
+                      onClick={() =>
+                        run(async () => {
+                          await courseApi.updateAisle(a.id, { icon: ic });
+                          setIconPickerFor(null);
+                        })
+                      }
                     >
                       {ic}
                     </button>

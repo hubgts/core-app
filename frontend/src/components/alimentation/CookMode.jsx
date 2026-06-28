@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { formatQuantity, formatServings, isSection, scaleQuantity } from './constants';
+import {
+  formatQuantity,
+  formatServings,
+  isSection,
+  scaleQuantity,
+} from './constants';
 import { confirmDialog } from '../dialogs';
 
 /**
@@ -43,7 +48,10 @@ export default function CookMode({ recipe, scale = 1, onClose }) {
 
   // Items cochables = ingrédients (hors sections) + étapes.
   const checkableIds = useMemo(
-    () => [...ingredients.filter((i) => !isSection(i)).map((i) => i.id), ...steps.map((s) => s.id)],
+    () => [
+      ...ingredients.filter((i) => !isSection(i)).map((i) => i.id),
+      ...steps.map((s) => s.id),
+    ],
     [ingredients, steps],
   );
   const total = checkableIds.length;
@@ -59,7 +67,13 @@ export default function CookMode({ recipe, scale = 1, onClose }) {
   }
 
   async function close() {
-    if (checked.size > 0 && !(await confirmDialog({ message: 'Quitter le mode Cuisine ? Les cases cochées seront perdues.', danger: true }))) {
+    if (
+      checked.size > 0 &&
+      !(await confirmDialog({
+        message: 'Quitter le mode Cuisine ? Les cases cochées seront perdues.',
+        danger: true,
+      }))
+    ) {
       return;
     }
     onClose();
@@ -68,13 +82,25 @@ export default function CookMode({ recipe, scale = 1, onClose }) {
   return (
     <div className="alcook">
       <header className="alcook__head">
-        <button className="alcook__close" onClick={close} aria-label="Fermer">✕</button>
+        <button className="alcook__close" onClick={close} aria-label="Fermer">
+          ✕
+        </button>
         <span className="alcook__title">
           Cuisine · {recipe.title}
-          {shownServings != null && <span className="alcook__servings"> · {formatServings(shownServings)}</span>}
+          {shownServings != null && (
+            <span className="alcook__servings">
+              {' '}
+              · {formatServings(shownServings)}
+            </span>
+          )}
         </span>
         <span className="alcook__progress" aria-label={`${done} sur ${total}`}>
-          <span className="alcook__bar"><span className="alcook__barfill" style={{ width: total ? `${(done / total) * 100}%` : '0%' }} /></span>
+          <span className="alcook__bar">
+            <span
+              className="alcook__barfill"
+              style={{ width: total ? `${(done / total) * 100}%` : '0%' }}
+            />
+          </span>
           {done}/{total}
         </span>
       </header>
@@ -86,19 +112,30 @@ export default function CookMode({ recipe, scale = 1, onClose }) {
             <ul className="alcook__list">
               {ingredients.map((i) =>
                 isSection(i) ? (
-                  <li key={i.id} className="alcook__sectionlabel">{i.label.replace(/^[—-]\s*|\s*[—-]$/g, '')}</li>
+                  <li key={i.id} className="alcook__sectionlabel">
+                    {i.label.replace(/^[—-]\s*|\s*[—-]$/g, '')}
+                  </li>
                 ) : (
                   <li key={i.id}>
-                    <label className={`alcook__item${checked.has(i.id) ? ' alcook__item--done' : ''}`}>
-                      <input type="checkbox" checked={checked.has(i.id)} onChange={() => toggle(i.id)} />
+                    <label
+                      className={`alcook__item${checked.has(i.id) ? ' alcook__item--done' : ''}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked.has(i.id)}
+                        onChange={() => toggle(i.id)}
+                      />
                       <span>
                         {i.quantity != null && (
                           <strong className="alcook__qty">
-                            {formatQuantity(scaleQuantity(i.quantity, scale))}{i.unit ? ` ${i.unit}` : ''}
+                            {formatQuantity(scaleQuantity(i.quantity, scale))}
+                            {i.unit ? ` ${i.unit}` : ''}
                           </strong>
                         )}{' '}
                         {i.label}
-                        {i.note && <em className="alcook__note"> — {i.note}</em>}
+                        {i.note && (
+                          <em className="alcook__note"> — {i.note}</em>
+                        )}
                       </span>
                     </label>
                   </li>
@@ -117,8 +154,15 @@ export default function CookMode({ recipe, scale = 1, onClose }) {
                   <label
                     className={`alcook__item alcook__item--step${checked.has(s.id) ? ' alcook__item--done' : ''}${s.id === currentStepId ? ' alcook__item--current' : ''}`}
                   >
-                    <input type="checkbox" checked={checked.has(s.id)} onChange={() => toggle(s.id)} />
-                    <span><strong className="alcook__stepnum">{i + 1}.</strong> {s.text}</span>
+                    <input
+                      type="checkbox"
+                      checked={checked.has(s.id)}
+                      onChange={() => toggle(s.id)}
+                    />
+                    <span>
+                      <strong className="alcook__stepnum">{i + 1}.</strong>{' '}
+                      {s.text}
+                    </span>
                   </label>
                 </li>
               ))}
@@ -128,7 +172,9 @@ export default function CookMode({ recipe, scale = 1, onClose }) {
       </div>
 
       <footer className="alcook__foot">
-        <button className="btn btn--primary" onClick={onClose}>✓ Terminer</button>
+        <button className="btn btn--primary" onClick={onClose}>
+          ✓ Terminer
+        </button>
       </footer>
     </div>
   );

@@ -81,7 +81,8 @@ export class AlimentationService implements OnModuleInit {
     const name = this.validateMealTypeName(input.name);
     const nameKey = this.normalizeKey(name);
     const existing = await this.mealTypes.findOne({ where: { nameKey } });
-    if (existing) throw new ConflictException('Un type de repas porte déjà ce nom.');
+    if (existing)
+      throw new ConflictException('Un type de repas porte déjà ce nom.');
 
     const maxPos = await this.maxMealTypePosition();
     const saved = await this.mealTypes.save(
@@ -110,7 +111,8 @@ export class AlimentationService implements OnModuleInit {
       type.nameKey = nameKey;
     }
     if (input.icon !== undefined) type.icon = (input.icon ?? '').slice(0, 16);
-    if (input.color !== undefined) type.color = (input.color ?? '').slice(0, 16);
+    if (input.color !== undefined)
+      type.color = (input.color ?? '').slice(0, 16);
     return this.typeResponse(await this.mealTypes.save(type));
   }
 
@@ -193,12 +195,15 @@ export class AlimentationService implements OnModuleInit {
       await this.assertMealTypeExists(input.mealTypeId);
       item.mealTypeId = input.mealTypeId ?? null;
     }
-    if (input.labels !== undefined) item.labels = this.normalizeLabels(input.labels);
+    if (input.labels !== undefined)
+      item.labels = this.normalizeLabels(input.labels);
     if (input.ingredients !== undefined) {
       item.ingredients = this.normalizeIngredients(input.ingredients);
     }
-    if (input.steps !== undefined) item.steps = this.normalizeSteps(input.steps);
-    if (input.servings !== undefined) item.servings = this.normalizeInt(input.servings);
+    if (input.steps !== undefined)
+      item.steps = this.normalizeSteps(input.steps);
+    if (input.servings !== undefined)
+      item.servings = this.normalizeInt(input.servings);
     if (input.prepTimeMin !== undefined) {
       item.prepTimeMin = this.normalizeInt(input.prepTimeMin);
     }
@@ -211,7 +216,8 @@ export class AlimentationService implements OnModuleInit {
     if (input.difficulty !== undefined) {
       item.difficulty = this.normalizeDifficulty(input.difficulty);
     }
-    if (input.color !== undefined) item.color = (input.color ?? '').slice(0, 16);
+    if (input.color !== undefined)
+      item.color = (input.color ?? '').slice(0, 16);
     item.updatedAt = new Date();
     return this.toResponse(await this.recipes.save(item));
   }
@@ -347,7 +353,9 @@ export class AlimentationService implements OnModuleInit {
     const trimmed = (title ?? '').trim();
     if (!trimmed) throw new BadRequestException('Le titre est obligatoire.');
     if (trimmed.length > TITLE_MAX) {
-      throw new BadRequestException(`Le titre ne peut dépasser ${TITLE_MAX} caractères.`);
+      throw new BadRequestException(
+        `Le titre ne peut dépasser ${TITLE_MAX} caractères.`,
+      );
     }
     return trimmed;
   }
@@ -363,7 +371,9 @@ export class AlimentationService implements OnModuleInit {
     return trimmed;
   }
 
-  private normalizeDifficulty(value?: RecipeDifficulty | null): RecipeDifficulty | null {
+  private normalizeDifficulty(
+    value?: RecipeDifficulty | null,
+  ): RecipeDifficulty | null {
     if (value == null) return null;
     return DIFFICULTIES.includes(value) ? value : null;
   }
@@ -374,7 +384,9 @@ export class AlimentationService implements OnModuleInit {
     const seen = new Set<string>();
     const out: string[] = [];
     for (const raw of labels) {
-      const label = String(raw ?? '').trim().slice(0, 40);
+      const label = String(raw ?? '')
+        .trim()
+        .slice(0, 40);
       if (!label) continue;
       const key = this.normalizeKey(label);
       if (seen.has(key)) continue;
@@ -389,7 +401,9 @@ export class AlimentationService implements OnModuleInit {
     if (!Array.isArray(input)) return [];
     const out: RecipeIngredient[] = [];
     for (const i of input) {
-      const label = String(i?.label ?? '').trim().slice(0, 200);
+      const label = String(i?.label ?? '')
+        .trim()
+        .slice(0, 200);
       if (!label) continue;
       out.push({
         id: i?.id || randomUUID(),
@@ -407,7 +421,9 @@ export class AlimentationService implements OnModuleInit {
     if (!Array.isArray(input)) return [];
     const out: RecipeStep[] = [];
     for (const s of input) {
-      const text = String(s?.text ?? '').trim().slice(0, 2000);
+      const text = String(s?.text ?? '')
+        .trim()
+        .slice(0, 2000);
       if (!text) continue;
       out.push({ id: s?.id || randomUUID(), text });
     }
@@ -421,7 +437,8 @@ export class AlimentationService implements OnModuleInit {
   }
 
   private normalizeNumber(value?: number | null): number | null {
-    if (value === null || value === undefined || (value as unknown) === '') return null;
+    if (value === null || value === undefined || (value as unknown) === '')
+      return null;
     const n = Number(value);
     if (!Number.isFinite(n) || n < 0) return null;
     return Math.round(n * 1000) / 1000;

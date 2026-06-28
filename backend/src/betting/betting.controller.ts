@@ -71,10 +71,7 @@ export class BettingController {
   }
 
   @Post('selections/:id/settle')
-  settleSelection(
-    @Param('id') id: string,
-    @Body() body: { status: string },
-  ) {
+  settleSelection(@Param('id') id: string, @Body() body: { status: string }) {
     return this.betting.settleSelection(id, body?.status as never);
   }
 

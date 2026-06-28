@@ -37,7 +37,10 @@ export class BudgetTransactionEntity {
   categoryId: string | null;
 
   // Empêche la suppression d'une catégorie référencée (cf. RG-09).
-  @ManyToOne(() => BudgetCategoryEntity, { onDelete: 'RESTRICT', nullable: true })
+  @ManyToOne(() => BudgetCategoryEntity, {
+    onDelete: 'RESTRICT',
+    nullable: true,
+  })
   @JoinColumn({ name: 'category_id' })
   category?: BudgetCategoryEntity | null;
 

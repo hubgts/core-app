@@ -5,7 +5,13 @@ import { frenchFullDate } from '../../utils/date';
  * Carte d'une liste de courses sur le board (habillage façon Alimentation :
  * .alcard…). Affiche titre, date, progression « pris / total » et un menu.
  */
-export default function ListCard({ list, onOpen, onEdit, onDuplicate, onDelete }) {
+export default function ListCard({
+  list,
+  onOpen,
+  onEdit,
+  onDuplicate,
+  onDelete,
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const ratio = list.itemCount > 0 ? list.checkedCount / list.itemCount : 0;
 
@@ -46,7 +52,10 @@ export default function ListCard({ list, onOpen, onEdit, onDuplicate, onDelete }
       </p>
 
       <div className="course-progress" aria-hidden="true">
-        <div className="course-progress__bar" style={{ width: `${Math.round(ratio * 100)}%` }} />
+        <div
+          className="course-progress__bar"
+          style={{ width: `${Math.round(ratio * 100)}%` }}
+        />
       </div>
 
       <footer className="alcard__foot">
@@ -55,7 +64,10 @@ export default function ListCard({ list, onOpen, onEdit, onDuplicate, onDelete }
           title="Plus d'actions"
           aria-haspopup="true"
           aria-expanded={menuOpen}
-          onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setMenuOpen((v) => !v);
+          }}
         >
           ⋮
         </button>
@@ -65,10 +77,25 @@ export default function ListCard({ list, onOpen, onEdit, onDuplicate, onDelete }
         <>
           <div className="alcard__menu-backdrop" onClick={act(() => {})} />
           <div className="alcard__menu" onClick={(e) => e.stopPropagation()}>
-            <button className="almenu__item" onClick={act(() => onOpen(list.id))}>Ouvrir</button>
-            <button className="almenu__item" onClick={act(() => onEdit(list))}>Modifier (titre, date)</button>
-            <button className="almenu__item" onClick={act(() => onDuplicate(list))}>Dupliquer</button>
-            <button className="almenu__item almenu__item--danger" onClick={act(() => onDelete(list))}>
+            <button
+              className="almenu__item"
+              onClick={act(() => onOpen(list.id))}
+            >
+              Ouvrir
+            </button>
+            <button className="almenu__item" onClick={act(() => onEdit(list))}>
+              Modifier (titre, date)
+            </button>
+            <button
+              className="almenu__item"
+              onClick={act(() => onDuplicate(list))}
+            >
+              Dupliquer
+            </button>
+            <button
+              className="almenu__item almenu__item--danger"
+              onClick={act(() => onDelete(list))}
+            >
               Supprimer
             </button>
           </div>

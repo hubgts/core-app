@@ -46,7 +46,10 @@ export default function KnowHowCategoriesPanel() {
     e?.preventDefault?.();
     if (!draftName.trim()) return;
     run(async () => {
-      await knowhowApi.createCategory({ name: draftName.trim(), icon: draftIcon });
+      await knowhowApi.createCategory({
+        name: draftName.trim(),
+        icon: draftIcon,
+      });
       setDraftName('');
       setDraftIcon('📋');
       setIconPickerFor(null);
@@ -54,7 +57,10 @@ export default function KnowHowCategoriesPanel() {
   }
 
   async function rename(cat) {
-    const next = await promptDialog({ title: 'Renommer la catégorie', defaultValue: cat.name });
+    const next = await promptDialog({
+      title: 'Renommer la catégorie',
+      defaultValue: cat.name,
+    });
     if (next == null) return;
     const name = next.trim();
     if (!name || name === cat.name) return;
@@ -63,9 +69,10 @@ export default function KnowHowCategoriesPanel() {
 
   async function remove(cat) {
     const n = cat.knowhowCount ?? 0;
-    const msg = n > 0
-      ? `Supprimer « ${cat.name} » ? ${n} savoir-faire repasseront « sans catégorie ».`
-      : `Supprimer « ${cat.name} » ?`;
+    const msg =
+      n > 0
+        ? `Supprimer « ${cat.name} » ? ${n} savoir-faire repasseront « sans catégorie ».`
+        : `Supprimer « ${cat.name} » ?`;
     if (!(await confirmDialog({ message: msg, danger: true }))) return;
     run(() => knowhowApi.removeCategory(cat.id));
   }
@@ -87,7 +94,9 @@ export default function KnowHowCategoriesPanel() {
         <button
           type="button"
           className="rcatman__icon"
-          onClick={() => setIconPickerFor(iconPickerFor === 'new' ? null : 'new')}
+          onClick={() =>
+            setIconPickerFor(iconPickerFor === 'new' ? null : 'new')
+          }
           title="Icône"
         >
           {draftIcon}
@@ -99,14 +108,25 @@ export default function KnowHowCategoriesPanel() {
           maxLength={40}
           onChange={(e) => setDraftName(e.target.value)}
         />
-        <button type="submit" className="btn btn--primary" disabled={!draftName.trim()}>
+        <button
+          type="submit"
+          className="btn btn--primary"
+          disabled={!draftName.trim()}
+        >
           Ajouter
         </button>
       </form>
       {iconPickerFor === 'new' && (
         <div className="rcatman__picker">
           {CATEGORY_ICONS.map((ic) => (
-            <button key={ic} type="button" onClick={() => { setDraftIcon(ic); setIconPickerFor(null); }}>
+            <button
+              key={ic}
+              type="button"
+              onClick={() => {
+                setDraftIcon(ic);
+                setIconPickerFor(null);
+              }}
+            >
               {ic}
             </button>
           ))}
@@ -131,11 +151,18 @@ export default function KnowHowCategoriesPanel() {
               onDrop={() => handleDrop(cat.id)}
             >
               <div className="refcat__lead">
-                <span className="reditrow__grip" title="Glisser pour réordonner">⠿</span>
+                <span
+                  className="reditrow__grip"
+                  title="Glisser pour réordonner"
+                >
+                  ⠿
+                </span>
                 <button
                   type="button"
                   className="rcatman__icon"
-                  onClick={() => setIconPickerFor(iconPickerFor === cat.id ? null : cat.id)}
+                  onClick={() =>
+                    setIconPickerFor(iconPickerFor === cat.id ? null : cat.id)
+                  }
                   title="Changer l'icône"
                 >
                   {cat.icon || '🗂️'}
@@ -144,8 +171,22 @@ export default function KnowHowCategoriesPanel() {
                 <span className="rcatman__count">{cat.knowhowCount ?? 0}</span>
               </div>
               <div className="ref-item__actions">
-                <button className="icon-btn" onClick={() => rename(cat)} aria-label="Renommer" title="Renommer">✏️</button>
-                <button className="icon-btn" onClick={() => remove(cat)} aria-label="Supprimer" title="Supprimer">🗑</button>
+                <button
+                  className="icon-btn"
+                  onClick={() => rename(cat)}
+                  aria-label="Renommer"
+                  title="Renommer"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="icon-btn"
+                  onClick={() => remove(cat)}
+                  aria-label="Supprimer"
+                  title="Supprimer"
+                >
+                  🗑
+                </button>
               </div>
               {iconPickerFor === cat.id && (
                 <div className="rcatman__picker rcatman__picker--row">
@@ -153,10 +194,12 @@ export default function KnowHowCategoriesPanel() {
                     <button
                       key={ic}
                       type="button"
-                      onClick={() => run(async () => {
-                        await knowhowApi.updateCategory(cat.id, { icon: ic });
-                        setIconPickerFor(null);
-                      })}
+                      onClick={() =>
+                        run(async () => {
+                          await knowhowApi.updateCategory(cat.id, { icon: ic });
+                          setIconPickerFor(null);
+                        })
+                      }
                     >
                       {ic}
                     </button>

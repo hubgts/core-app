@@ -69,7 +69,9 @@ export default function Layout() {
         <span className="topbar__title">Core</span>
       </header>
 
-      {navOpen && <div className="nav-scrim" onClick={() => setNavOpen(false)} />}
+      {navOpen && (
+        <div className="nav-scrim" onClick={() => setNavOpen(false)} />
+      )}
 
       <aside className={`sidebar${navOpen ? ' sidebar--open' : ''}`}>
         <div className="sidebar__brand">

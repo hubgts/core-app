@@ -24,14 +24,19 @@ export class TrainingProgramWeekEntity {
   @Column({ name: 'program_id', type: 'uuid' })
   programId: string;
 
-  @ManyToOne(() => TrainingProgramEntity, (p) => p.weeks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TrainingProgramEntity, (p) => p.weeks, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'program_id' })
   program?: TrainingProgramEntity;
 
   @Column({ name: 'phase_id', type: 'uuid', nullable: true })
   phaseId: string | null;
 
-  @ManyToOne(() => TrainingProgramPhaseEntity, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => TrainingProgramPhaseEntity, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
   @JoinColumn({ name: 'phase_id' })
   phase?: TrainingProgramPhaseEntity | null;
 

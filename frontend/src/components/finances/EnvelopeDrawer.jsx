@@ -44,7 +44,10 @@ export default function EnvelopeDrawer({
   const obj = envelope.objective;
   const objPct = obj ? Math.min(Math.max(obj.progressPct, 0), 100) : 0;
   const objLate = Boolean(
-    obj && !obj.reached && ((obj.targetDate && obj.targetDate < todayStr()) || obj.paceStatus === 'behind'),
+    obj &&
+    !obj.reached &&
+    ((obj.targetDate && obj.targetDate < todayStr()) ||
+      obj.paceStatus === 'behind'),
   );
   const pace = objectivePace(obj);
   const isArchived = envelope.status === 'archived';
@@ -57,8 +60,12 @@ export default function EnvelopeDrawer({
     setSaving(true);
     setError('');
     try {
-      const payload = { amount: parseAmount(amount), note: note.trim() || null };
-      if (isInvest && gain.trim() !== '') payload.gain = parseAmount(gain, true);
+      const payload = {
+        amount: parseAmount(amount),
+        note: note.trim() || null,
+      };
+      if (isInvest && gain.trim() !== '')
+        payload.gain = parseAmount(gain, true);
       await onUpdateSnapshot(date, payload);
       setAdding(false);
       setAmount('');
@@ -83,16 +90,26 @@ export default function EnvelopeDrawer({
               {meta.label} · {isPassif ? 'Passif' : 'Actif'}
             </p>
           </div>
-          <button className="fdrawer__close" onClick={onClose} aria-label="Fermer">✕</button>
+          <button
+            className="fdrawer__close"
+            onClick={onClose}
+            aria-label="Fermer"
+          >
+            ✕
+          </button>
         </header>
 
         {/* Bandeau de chiffres clés */}
         <div className="fdrawer__kpis">
           <div className="fkpi">
-            <span className="fkpi__label">{isInvest ? 'Valeur' : 'Solde courant'}</span>
+            <span className="fkpi__label">
+              {isInvest ? 'Valeur' : 'Solde courant'}
+            </span>
             <span className="fkpi__value">{formatEur(envelope.balance)}</span>
             {envelope.lastSnapshotDate && (
-              <span className="fkpi__hint">au {frenchFullDate(envelope.lastSnapshotDate)}</span>
+              <span className="fkpi__hint">
+                au {frenchFullDate(envelope.lastSnapshotDate)}
+              </span>
             )}
           </div>
           {isInvest && envelope.gain != null && (
@@ -102,11 +119,15 @@ export default function EnvelopeDrawer({
                 <span className={`fkpi__value t-${trendClass(envelope.gain)}`}>
                   {formatSignedEur(envelope.gain)}
                 </span>
-                <span className="fkpi__hint">capital {formatEur(envelope.investedCapital)}</span>
+                <span className="fkpi__hint">
+                  capital {formatEur(envelope.investedCapital)}
+                </span>
               </div>
               <div className="fkpi">
                 <span className="fkpi__label">Performance</span>
-                <span className={`fkpi__value t-${trendClass(envelope.performancePct)}`}>
+                <span
+                  className={`fkpi__value t-${trendClass(envelope.performancePct)}`}
+                >
                   {formatSignedPct(envelope.performancePct)}
                 </span>
               </div>
@@ -115,7 +136,9 @@ export default function EnvelopeDrawer({
           {!isInvest && envelope.lastVariation != null && (
             <div className="fkpi">
               <span className="fkpi__label">Depuis le relevé</span>
-              <span className={`fkpi__value t-${trendClass(envelope.lastVariation)}`}>
+              <span
+                className={`fkpi__value t-${trendClass(envelope.lastVariation)}`}
+              >
                 {formatSignedEur(envelope.lastVariation)}
               </span>
             </div>
@@ -123,11 +146,15 @@ export default function EnvelopeDrawer({
           {envelope.totalChange != null && (
             <div className="fkpi">
               <span className="fkpi__label">Variation totale</span>
-              <span className={`fkpi__value t-${trendClass(envelope.totalChange)}`}>
+              <span
+                className={`fkpi__value t-${trendClass(envelope.totalChange)}`}
+              >
                 {formatSignedEur(envelope.totalChange)}
               </span>
               {envelope.firstSnapshotDate && (
-                <span className="fkpi__hint">depuis le {frenchFullDate(envelope.firstSnapshotDate)}</span>
+                <span className="fkpi__hint">
+                  depuis le {frenchFullDate(envelope.firstSnapshotDate)}
+                </span>
               )}
             </div>
           )}
@@ -139,7 +166,10 @@ export default function EnvelopeDrawer({
               <div className="fprog__track">
                 <div
                   className="fprog__fill"
-                  style={{ width: `${objPct}%`, background: obj.reached ? '#34d399' : meta.color }}
+                  style={{
+                    width: `${objPct}%`,
+                    background: obj.reached ? '#34d399' : meta.color,
+                  }}
                 />
               </div>
               <div className="fprog__meta">
@@ -149,25 +179,34 @@ export default function EnvelopeDrawer({
                     : `${formatEur(envelope.balance ?? 0)} / ${formatEur(obj.targetAmount)} · reste ${formatEur(obj.remaining)}`}
                 </span>
                 {obj.targetDate && (
-                  <span className={`fprog__date${objLate ? ' fprog__date--late' : ''}`}>
+                  <span
+                    className={`fprog__date${objLate ? ' fprog__date--late' : ''}`}
+                  >
                     🎯 {frenchMonthYear(obj.targetDate)}
                   </span>
                 )}
               </div>
-              {pace && <div className={`fprog__pace t-${pace.tone}`}>{pace.text}</div>}
+              {pace && (
+                <div className={`fprog__pace t-${pace.tone}`}>{pace.text}</div>
+              )}
             </div>
           </div>
         )}
 
         {!adding ? (
-          <button className="btn btn--primary fdrawer__update" onClick={() => setAdding(true)}>
+          <button
+            className="btn btn--primary fdrawer__update"
+            onClick={() => setAdding(true)}
+          >
             + Mettre à jour le solde
           </button>
         ) : (
           <form className="fdrawer__form" onSubmit={submitSnapshot}>
             <div className="ffield-row">
               <label className="ffield">
-                <span className="ffield__label">{isInvest ? 'Valeur (€)' : 'Solde (€)'}</span>
+                <span className="ffield__label">
+                  {isInvest ? 'Valeur (€)' : 'Solde (€)'}
+                </span>
                 <input
                   className="ffield__input"
                   type="text"
@@ -190,7 +229,9 @@ export default function EnvelopeDrawer({
             </div>
             {isInvest && (
               <label className="ffield">
-                <span className="ffield__label">Plus-value (€) — comprise dans la valeur</span>
+                <span className="ffield__label">
+                  Plus-value (€) — comprise dans la valeur
+                </span>
                 <input
                   className="ffield__input"
                   type="text"
@@ -214,10 +255,18 @@ export default function EnvelopeDrawer({
             </label>
             {error && <p className="modal__error">{error}</p>}
             <div className="fdrawer__formactions">
-              <button type="button" className="btn btn--ghost btn--sm" onClick={() => setAdding(false)}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={() => setAdding(false)}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary btn--sm" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary btn--sm"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>
@@ -237,7 +286,9 @@ export default function EnvelopeDrawer({
 
         <div className="fdrawer__history">
           <h3 className="fdrawer__h3">Historique des relevés</h3>
-          {history.length === 0 && <p className="fdrawer__empty">Aucun relevé.</p>}
+          {history.length === 0 && (
+            <p className="fdrawer__empty">Aucun relevé.</p>
+          )}
           <ul className="fhist">
             {[...history].reverse().map((s) => (
               <li key={s.id} className="fhist__row">
@@ -267,11 +318,17 @@ export default function EnvelopeDrawer({
         </div>
 
         <div className="fdrawer__actions">
-          <button className="btn btn--ghost btn--sm" onClick={() => onEdit(envelope)}>
+          <button
+            className="btn btn--ghost btn--sm"
+            onClick={() => onEdit(envelope)}
+          >
             Éditer l'enveloppe
           </button>
           {isArchived && onUnarchive && (
-            <button className="btn btn--ghost btn--sm" onClick={() => onUnarchive(envelope)}>
+            <button
+              className="btn btn--ghost btn--sm"
+              onClick={() => onUnarchive(envelope)}
+            >
               Réactiver
             </button>
           )}

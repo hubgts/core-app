@@ -115,8 +115,8 @@ export default function BilanPage() {
       </header>
 
       <p className="fbilan__intro">
-        Mettez à jour le solde de vos enveloppes à une même date, en une passe. Les lignes
-        laissées vides sont ignorées.
+        Mettez à jour le solde de vos enveloppes à une même date, en une passe.
+        Les lignes laissées vides sont ignorées.
       </p>
 
       <div className="fbilan__bar">
@@ -129,7 +129,11 @@ export default function BilanPage() {
             onChange={(e) => setDate(e.target.value)}
           />
         </label>
-        <button className="btn btn--primary" onClick={submit} disabled={saving || loading}>
+        <button
+          className="btn btn--primary"
+          onClick={submit}
+          disabled={saving || loading}
+        >
           {saving ? '…' : 'Enregistrer le bilan'}
         </button>
       </div>
@@ -154,18 +158,28 @@ export default function BilanPage() {
             {g.items.map((e) => {
               const isInvest = e.type === 'investissement';
               return (
-                <li key={e.id} className={`fbilan__row${e.stale ? ' fbilan__row--stale' : ''}`}>
-                  <span className="fbilan__icon" style={{ '--c': e.color || g.meta.color }}>
+                <li
+                  key={e.id}
+                  className={`fbilan__row${e.stale ? ' fbilan__row--stale' : ''}`}
+                >
+                  <span
+                    className="fbilan__icon"
+                    style={{ '--c': e.color || g.meta.color }}
+                  >
                     {e.icon || g.meta.icon}
                   </span>
                   <span className="fbilan__name">
                     {e.name}
-                    {e.stale && <span className="fbilan__tag">à actualiser</span>}
+                    {e.stale && (
+                      <span className="fbilan__tag">à actualiser</span>
+                    )}
                   </span>
                   <span className="fbilan__current">
                     {e.balance == null ? '—' : formatEur(e.balance)}
                     <span className="fbilan__ago">
-                      {e.lastSnapshotDate ? formatDaysAgo(e.daysSinceUpdate) : 'jamais'}
+                      {e.lastSnapshotDate
+                        ? formatDaysAgo(e.daysSinceUpdate)
+                        : 'jamais'}
                     </span>
                   </span>
                   <span className="fbilan__inputs">
@@ -175,7 +189,9 @@ export default function BilanPage() {
                       inputMode="decimal"
                       value={inputs[e.id]?.amount ?? ''}
                       placeholder={isInvest ? 'Valeur (€)' : 'Solde (€)'}
-                      onChange={(ev) => setField(e.id, 'amount', ev.target.value)}
+                      onChange={(ev) =>
+                        setField(e.id, 'amount', ev.target.value)
+                      }
                     />
                     {isInvest && (
                       <input
@@ -184,7 +200,9 @@ export default function BilanPage() {
                         inputMode="decimal"
                         value={inputs[e.id]?.gain ?? ''}
                         placeholder="Plus-value (€)"
-                        onChange={(ev) => setField(e.id, 'gain', ev.target.value)}
+                        onChange={(ev) =>
+                          setField(e.id, 'gain', ev.target.value)
+                        }
                       />
                     )}
                   </span>

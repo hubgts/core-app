@@ -1,9 +1,5 @@
 export type EnvelopeType =
-  | 'especes'
-  | 'compte_courant'
-  | 'epargne'
-  | 'investissement'
-  | 'dette';
+  'especes' | 'compte_courant' | 'epargne' | 'investissement' | 'dette';
 
 export const ENVELOPE_TYPES: EnvelopeType[] = [
   'especes',

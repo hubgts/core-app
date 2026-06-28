@@ -14,11 +14,17 @@
 
 /* Même gouttière que la rangée stats (50/50) pour aligner verticalement
    les deux rangées de cartes. */
-.bcf__charts { grid-template-columns: 1fr 1fr; }
+.bcf__charts {
+  grid-template-columns: 1fr 1fr;
+}
 
 /* Préfixe `bcfstat` (et non `bstat`) : `.bstat` est déjà utilisé par la page
    Paris pour un tout autre composant — collision globale à éviter. */
-.bcfstat { display: flex; flex-direction: column; gap: 4px; }
+.bcfstat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .bcfstat__big {
   font-size: 34px;
   font-weight: 800;
@@ -26,7 +32,11 @@
   font-variant-numeric: tabular-nums;
   margin-top: 2px;
 }
-.bcfstat__sub { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+.bcfstat__sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
 .bcfstat__bar {
   height: 8px;
   border-radius: 999px;
@@ -34,10 +44,20 @@
   overflow: hidden;
   margin-top: 12px;
 }
-.bcfstat__barfill { height: 100%; border-radius: 999px; }
+.bcfstat__barfill {
+  height: 100%;
+  border-radius: 999px;
+}
 
 /* Décomposition du report */
-.bcarry { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.bcarry {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .bcarry li {
   display: flex;
   align-items: baseline;
@@ -46,20 +66,37 @@
   font-size: 14px;
   color: var(--text-muted);
 }
-.bcarry li strong { font-variant-numeric: tabular-nums; }
+.bcarry li strong {
+  font-variant-numeric: tabular-nums;
+}
 .bcarry__total {
   border-top: 1px solid var(--border);
   padding-top: 8px;
   margin-top: 2px;
 }
-.bcarry__total span { color: var(--text); font-weight: 600; }
-.bcarry__total strong { font-size: 16px; }
+.bcarry__total span {
+  color: var(--text);
+  font-weight: 600;
+}
+.bcarry__total strong {
+  font-size: 16px;
+}
 
 /* Histogramme entrées vs sorties */
 /* hauteur auto : le SVG garde le ratio du viewBox (560×200) et ne s'étire plus. */
-.bcf__svg { width: 100%; height: auto; display: block; }
-.bcf__xlabel { fill: var(--text-faint); font-size: 11px; }
-.bcf__xlabel--cur { fill: var(--text); font-weight: 700; }
+.bcf__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.bcf__xlabel {
+  fill: var(--text-faint);
+  font-size: 11px;
+}
+.bcf__xlabel--cur {
+  fill: var(--text);
+  font-weight: 700;
+}
 .bcf__legend {
   display: flex;
   gap: 18px;
@@ -68,9 +105,20 @@
   color: var(--text-muted);
   font-size: 13px;
 }
-.bcf__legend span { display: inline-flex; align-items: center; gap: 6px; }
-.bcf__dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.bcf__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.bcf__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
 
 @media (max-width: 720px) {
-  .bcf__stats { grid-template-columns: 1fr; }
+  .bcf__stats {
+    grid-template-columns: 1fr;
+  }
 }

@@ -26,5 +26,6 @@ export const healthApi = {
       body: JSON.stringify(data),
     }),
 
-  clearGoal: (today) => request(`/health/goal${q(today)}`, { method: 'DELETE' }),
+  clearGoal: (today) =>
+    request(`/health/goal${q(today)}`, { method: 'DELETE' }),
 };

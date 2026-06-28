@@ -9,7 +9,12 @@ const C = 2 * Math.PI * R;
  * Donut de répartition générique. `slices` = [{ key, label, color, total, pct }]
  * (déjà filtrées/triées côté appelant). `gross` = total affiché au centre.
  */
-export default function Donut({ slices, gross, label = 'Répartition des actifs', centerSub = 'actifs' }) {
+export default function Donut({
+  slices,
+  gross,
+  label = 'Répartition des actifs',
+  centerSub = 'actifs',
+}) {
   const data = (slices ?? []).filter((d) => d.total > 0);
 
   if (data.length === 0) {
@@ -33,9 +38,20 @@ export default function Donut({ slices, gross, label = 'Répartition des actifs'
 
   return (
     <div className="fdonut">
-      <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={label}>
+      <svg
+        width={SIZE}
+        height={SIZE}
+        viewBox={`0 0 ${SIZE} ${SIZE}`}
+        role="img"
+        aria-label={label}
+      >
         <g transform={`translate(${SIZE / 2}, ${SIZE / 2})`}>
-          <circle r={R} fill="none" stroke="var(--surface-3)" strokeWidth={STROKE} />
+          <circle
+            r={R}
+            fill="none"
+            stroke="var(--surface-3)"
+            strokeWidth={STROKE}
+          />
           {arcs.map((a) => (
             <circle
               key={a.key}

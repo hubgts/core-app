@@ -12,7 +12,10 @@ import { round2 } from '../common/round.util';
 import { RecipeEntity } from '../alimentation/entities/recipe.entity';
 import { AisleEntity } from './entities/aisle.entity';
 import { ArticleEntity } from './entities/article.entity';
-import { ShoppingItem, ShoppingListEntity } from './entities/shopping-list.entity';
+import {
+  ShoppingItem,
+  ShoppingListEntity,
+} from './entities/shopping-list.entity';
 import {
   ShoppingTemplateEntity,
   TemplateItem,
@@ -149,7 +152,8 @@ export class CourseService implements OnModuleInit {
       aisle.nameKey = nameKey;
     }
     if (input.icon !== undefined) aisle.icon = (input.icon ?? '').slice(0, 16);
-    if (input.color !== undefined) aisle.color = (input.color ?? '').slice(0, 16);
+    if (input.color !== undefined)
+      aisle.color = (input.color ?? '').slice(0, 16);
     return this.aisleResponse(await this.aisles.save(aisle));
   }
 
@@ -187,7 +191,11 @@ export class CourseService implements OnModuleInit {
   }
 
   async createArticle(input: ArticleInput) {
-    const name = this.validateName(input.name, ARTICLE_NAME_MAX, "Le nom de l'article");
+    const name = this.validateName(
+      input.name,
+      ARTICLE_NAME_MAX,
+      "Le nom de l'article",
+    );
     const nameKey = this.normalizeKey(name);
     if (await this.articles.findOne({ where: { nameKey } })) {
       throw new ConflictException('Un article porte déjà ce nom.');
@@ -210,7 +218,11 @@ export class CourseService implements OnModuleInit {
   async updateArticle(id: string, input: ArticleInput) {
     const article = await this.getArticleOrThrow(id);
     if (input.name !== undefined) {
-      const name = this.validateName(input.name, ARTICLE_NAME_MAX, "Le nom de l'article");
+      const name = this.validateName(
+        input.name,
+        ARTICLE_NAME_MAX,
+        "Le nom de l'article",
+      );
       const nameKey = this.normalizeKey(name);
       const clash = await this.articles.findOne({ where: { nameKey } });
       if (clash && clash.id !== id) {
@@ -289,7 +301,10 @@ export class CourseService implements OnModuleInit {
     }
     if (input.date !== undefined) list.date = this.normalizeDate(input.date);
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   /** Duplique une liste : items copiés, cochage remis à zéro (RG-13). */
@@ -305,7 +320,10 @@ export class CourseService implements OnModuleInit {
       createdAt: now,
       updatedAt: now,
     });
-    return this.listDetail(await this.lists.save(copy), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(copy),
+      await this.buildContext(),
+    );
   }
 
   async removeList(id: string): Promise<void> {
@@ -333,7 +351,10 @@ export class CourseService implements OnModuleInit {
     const article = await this.resolveArticle(input);
     this.mergeItem(list.items, this.buildItem(article, input));
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   async updateItem(listId: string, itemId: string, input: ShoppingItemInput) {
@@ -344,14 +365,19 @@ export class CourseService implements OnModuleInit {
       await this.getArticleOrThrow(input.articleId);
       item.articleId = input.articleId;
     }
-    if (input.quantity !== undefined) item.quantity = this.normalizeNumber(input.quantity);
+    if (input.quantity !== undefined)
+      item.quantity = this.normalizeNumber(input.quantity);
     if (input.unit !== undefined) {
       item.unit = this.normalizeText(input.unit, UNIT_MAX);
     }
-    if (input.note !== undefined) item.note = this.normalizeText(input.note, 200);
+    if (input.note !== undefined)
+      item.note = this.normalizeText(input.note, 200);
     if (input.checked !== undefined) item.checked = !!input.checked;
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   async toggleItem(listId: string, itemId: string) {
@@ -360,14 +386,20 @@ export class CourseService implements OnModuleInit {
     if (!item) throw new NotFoundException('Item introuvable.');
     item.checked = !item.checked;
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   async removeItem(listId: string, itemId: string) {
     const list = await this.getListOrThrow(listId);
     list.items = list.items.filter((i) => i.id !== itemId);
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   async reorderItems(listId: string, ids: string[]) {
@@ -376,18 +408,22 @@ export class CourseService implements OnModuleInit {
       throw new BadRequestException('Le corps doit contenir un tableau "ids".');
     }
     const order = new Map(ids.map((id, i) => [id, i]));
-    list.items.sort(
-      (a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
-    );
+    list.items.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   async uncheckAll(listId: string) {
     const list = await this.getListOrThrow(listId);
     list.items.forEach((i) => (i.checked = false));
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   /** Vide les items cochés (« pris ») de la liste (RG-09). */
@@ -395,7 +431,10 @@ export class CourseService implements OnModuleInit {
     const list = await this.getListOrThrow(listId);
     list.items = list.items.filter((i) => !i.checked);
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -439,7 +478,10 @@ export class CourseService implements OnModuleInit {
       t.items = await this.resolveTemplateItems(input.items);
     }
     t.updatedAt = new Date();
-    return this.templateResponse(await this.templates.save(t), await this.buildContext());
+    return this.templateResponse(
+      await this.templates.save(t),
+      await this.buildContext(),
+    );
   }
 
   async removeTemplate(id: string): Promise<void> {
@@ -492,7 +534,10 @@ export class CourseService implements OnModuleInit {
       });
     }
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   /** Enregistre une liste comme modèle : items copiés, cochage ignoré (RG-16). */
@@ -559,7 +604,10 @@ export class CourseService implements OnModuleInit {
     const added = await this.recipeItems(input);
     for (const it of added) this.mergeItem(list.items, it);
     list.updatedAt = new Date();
-    return this.listDetail(await this.lists.save(list), await this.buildContext());
+    return this.listDetail(
+      await this.lists.save(list),
+      await this.buildContext(),
+    );
   }
 
   /** Crée une nouvelle liste à partir d'une recette (RG-12/18). */
@@ -606,7 +654,10 @@ export class CourseService implements OnModuleInit {
   }
 
   /** Facteur d'échelle : portions cible / portions de référence, sinon 1. */
-  private scaleFactor(reference: number | null, target?: number | null): number {
+  private scaleFactor(
+    reference: number | null,
+    target?: number | null,
+  ): number {
     if (target == null || reference == null || reference <= 0) return 1;
     const f = Number(target) / reference;
     return Number.isFinite(f) && f > 0 ? f : 1;
@@ -617,7 +668,9 @@ export class CourseService implements OnModuleInit {
   // ---------------------------------------------------------------------------
 
   /** Résout l'article d'un input (id prioritaire, sinon nom → création RG-17). */
-  private async resolveArticle(input: ShoppingItemInput): Promise<ArticleEntity> {
+  private async resolveArticle(
+    input: ShoppingItemInput,
+  ): Promise<ArticleEntity> {
     if (input.articleId) return this.getArticleOrThrow(input.articleId);
     const name = (input.articleName ?? '').trim();
     if (!name) throw new BadRequestException('Un article est obligatoire.');
@@ -646,7 +699,10 @@ export class CourseService implements OnModuleInit {
     );
   }
 
-  private buildItem(article: ArticleEntity, input: ShoppingItemInput): ShoppingItem {
+  private buildItem(
+    article: ArticleEntity,
+    input: ShoppingItemInput,
+  ): ShoppingItem {
     const unit =
       input.unit !== undefined
         ? this.normalizeText(input.unit, UNIT_MAX)
@@ -728,7 +784,10 @@ export class CourseService implements OnModuleInit {
     };
   }
 
-  private decorateItem(item: ShoppingItem, ctx: Awaited<ReturnType<typeof this.buildContext>>) {
+  private decorateItem(
+    item: ShoppingItem,
+    ctx: Awaited<ReturnType<typeof this.buildContext>>,
+  ) {
     const article = ctx.articleById.get(item.articleId);
     const aisle = article?.aisleId ? ctx.aisleById.get(article.aisleId) : null;
     return {
@@ -789,7 +848,9 @@ export class CourseService implements OnModuleInit {
       items: t.items
         .map((i) => {
           const article = ctx.articleById.get(i.articleId);
-          const aisle = article?.aisleId ? ctx.aisleById.get(article.aisleId) : null;
+          const aisle = article?.aisleId
+            ? ctx.aisleById.get(article.aisleId)
+            : null;
           return {
             id: i.id,
             articleId: i.articleId,
@@ -841,7 +902,9 @@ export class CourseService implements OnModuleInit {
     return list;
   }
 
-  private async getTemplateOrThrow(id: string): Promise<ShoppingTemplateEntity> {
+  private async getTemplateOrThrow(
+    id: string,
+  ): Promise<ShoppingTemplateEntity> {
     const t = await this.templates.findOne({ where: { id } });
     if (!t) throw new NotFoundException('Modèle introuvable.');
     if (!Array.isArray(t.items)) t.items = [];
@@ -881,11 +944,17 @@ export class CourseService implements OnModuleInit {
     return n;
   }
 
-  private validateName(value: string | undefined, max: number, label: string): string {
+  private validateName(
+    value: string | undefined,
+    max: number,
+    label: string,
+  ): string {
     const trimmed = (value ?? '').trim();
     if (!trimmed) throw new BadRequestException(`${label} est obligatoire.`);
     if (trimmed.length > max) {
-      throw new BadRequestException(`${label} ne peut dépasser ${max} caractères.`);
+      throw new BadRequestException(
+        `${label} ne peut dépasser ${max} caractères.`,
+      );
     }
     return trimmed;
   }
@@ -902,19 +971,24 @@ export class CourseService implements OnModuleInit {
     const trimmed = String(value).trim();
     if (!trimmed) return null;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-      throw new BadRequestException('Date invalide (format attendu AAAA-MM-JJ).');
+      throw new BadRequestException(
+        'Date invalide (format attendu AAAA-MM-JJ).',
+      );
     }
     return trimmed;
   }
 
   private normalizeNumber(value?: number | null): number | null {
-    if (value === null || value === undefined || (value as unknown) === '') return null;
+    if (value === null || value === undefined || (value as unknown) === '')
+      return null;
     const n = Number(value);
     if (!Number.isFinite(n) || n < 0) return null;
     return round2(n);
   }
 
-  private async maxPosition(repo: Repository<{ position: number }>): Promise<number> {
+  private async maxPosition(
+    repo: Repository<{ position: number }>,
+  ): Promise<number> {
     const row = await repo
       .createQueryBuilder('e')
       .select('MAX(e.position)', 'max')

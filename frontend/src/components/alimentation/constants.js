@@ -16,8 +16,26 @@ export const CARD_COLORS = [
 
 // Émojis proposés pour personnaliser un type de repas.
 export const MEAL_TYPE_ICONS = [
-  '🥗', '🍽️', '🍰', '🥐', '🥂', '🥤', '🫙', '📋', '🍲', '🍜',
-  '🥘', '🍝', '🍕', '🥪', '🌮', '🍳', '🧁', '🍫', '🥧', '🍷',
+  '🥗',
+  '🍽️',
+  '🍰',
+  '🥐',
+  '🥂',
+  '🥤',
+  '🫙',
+  '📋',
+  '🍲',
+  '🍜',
+  '🥘',
+  '🍝',
+  '🍕',
+  '🥪',
+  '🌮',
+  '🍳',
+  '🧁',
+  '🍫',
+  '🥧',
+  '🍷',
 ];
 
 // Niveaux de difficulté (valeur backend → libellé).
@@ -30,7 +48,12 @@ export const difficultyLabel = (v) =>
   DIFFICULTIES.find((d) => d.value === v)?.label ?? '';
 
 // Repère visuel pour les recettes sans type de repas.
-export const NO_MEAL_TYPE = { id: null, name: 'Sans type', icon: '🗂️', color: '#93A3B5' };
+export const NO_MEAL_TYPE = {
+  id: null,
+  name: 'Sans type',
+  icon: '🗂️',
+  color: '#93A3B5',
+};
 
 /** Indexe les types de repas par id pour un accès O(1) ; null → NO_MEAL_TYPE. */
 export function indexMealTypes(types = []) {
@@ -74,5 +97,7 @@ export function formatServings(n) {
 /** Une ligne d'ingrédient utilisée comme titre de section (« — Pour la garniture — »). */
 export function isSection(ingredient) {
   const l = (ingredient?.label ?? '').trim();
-  return ingredient?.quantity == null && !ingredient?.unit && /^[—-].*[—-]$/.test(l);
+  return (
+    ingredient?.quantity == null && !ingredient?.unit && /^[—-].*[—-]$/.test(l)
+  );
 }

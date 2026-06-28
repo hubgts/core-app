@@ -23,7 +23,13 @@ export default function EventDrawer({ event, onEdit, onDelete, onClose }) {
             <h2 className="drawer__title">{meta.label}</h2>
             <p className="drawer__date">{frenchFullDate(event.date)}</p>
           </div>
-          <button className="drawer__close" onClick={onClose} aria-label="Fermer">✕</button>
+          <button
+            className="drawer__close"
+            onClick={onClose}
+            aria-label="Fermer"
+          >
+            ✕
+          </button>
         </header>
 
         {event.programLabel && (
@@ -31,7 +37,9 @@ export default function EventDrawer({ event, onEdit, onDelete, onClose }) {
             <span className="drawer__program-badge">🗓 Programme</span>
             <span className="drawer__program-name">{event.programLabel}</span>
             {event.programObjective && (
-              <span className="drawer__program-obj">Objectif : {event.programObjective}</span>
+              <span className="drawer__program-obj">
+                Objectif : {event.programObjective}
+              </span>
             )}
           </div>
         )}
@@ -43,7 +51,9 @@ export default function EventDrawer({ event, onEdit, onDelete, onClose }) {
             <span className="drawer__badge drawer__badge--day">Journée</span>
           )}
           {duration && <span className="drawer__badge">⏱ {duration}</span>}
-          {event.feeling != null && <span className="drawer__badge">Ressenti {event.feeling}/5</span>}
+          {event.feeling != null && (
+            <span className="drawer__badge">Ressenti {event.feeling}/5</span>
+          )}
         </div>
 
         <div className="drawer__body">
@@ -55,14 +65,16 @@ export default function EventDrawer({ event, onEdit, onDelete, onClose }) {
                   <ul className="drawer__sets">
                     {ex.sets.map((s, i) => (
                       <li key={s.id}>
-                        Série {i + 1} : <strong>{s.reps}</strong> × <strong>{s.weight} kg</strong>
+                        Série {i + 1} : <strong>{s.reps}</strong> ×{' '}
+                        <strong>{s.weight} kg</strong>
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
               <div className="drawer__tonnage">
-                Tonnage de la séance : <strong>{tonnageOf(event).toLocaleString('fr-FR')} kg</strong>
+                Tonnage de la séance :{' '}
+                <strong>{tonnageOf(event).toLocaleString('fr-FR')} kg</strong>
               </div>
             </>
           )}
@@ -72,11 +84,17 @@ export default function EventDrawer({ event, onEdit, onDelete, onClose }) {
               {zone && (
                 <p className="drawer__line">
                   <span className="drawer__k">Zone</span>
-                  <span>{zone.id} — {zone.label} ({zone.pct})</span>
+                  <span>
+                    {zone.id} — {zone.label} ({zone.pct})
+                  </span>
                 </p>
               )}
-              {event.description && <p className="drawer__desc">{event.description}</p>}
-              {!zone && !event.description && <p className="muted">Pas de détail.</p>}
+              {event.description && (
+                <p className="drawer__desc">{event.description}</p>
+              )}
+              {!zone && !event.description && (
+                <p className="muted">Pas de détail.</p>
+              )}
             </>
           )}
 
@@ -86,14 +104,20 @@ export default function EventDrawer({ event, onEdit, onDelete, onClose }) {
                 <span className="drawer__k">Titre</span>
                 <span>{event.title}</span>
               </p>
-              {event.description && <p className="drawer__desc">{event.description}</p>}
+              {event.description && (
+                <p className="drawer__desc">{event.description}</p>
+              )}
             </>
           )}
         </div>
 
         <footer className="drawer__actions">
-          <button className="btn btn--danger" onClick={() => onDelete(event)}>Supprimer</button>
-          <button className="btn btn--primary" onClick={() => onEdit(event)}>Éditer</button>
+          <button className="btn btn--danger" onClick={() => onDelete(event)}>
+            Supprimer
+          </button>
+          <button className="btn btn--primary" onClick={() => onEdit(event)}>
+            Éditer
+          </button>
         </footer>
       </aside>
     </div>

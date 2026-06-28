@@ -52,7 +52,9 @@ const REFERENTIALS = [
 
 export default function ReferentialPage() {
   const [searchParams] = useSearchParams();
-  const initialKind = REFERENTIALS.some((r) => r.kind === searchParams.get('kind'))
+  const initialKind = REFERENTIALS.some(
+    (r) => r.kind === searchParams.get('kind'),
+  )
     ? searchParams.get('kind')
     : REFERENTIALS[0].kind;
 
@@ -101,7 +103,10 @@ export default function ReferentialPage() {
   }
 
   async function rename(item) {
-    const next = await promptDialog({ title: 'Renommer', defaultValue: item.name });
+    const next = await promptDialog({
+      title: 'Renommer',
+      defaultValue: item.name,
+    });
     if (next == null) return;
     const name = next.trim();
     if (!name || name === item.name) return;
@@ -115,7 +120,13 @@ export default function ReferentialPage() {
   }
 
   async function remove(item) {
-    if (!(await confirmDialog({ message: `Supprimer « ${item.name} » du référentiel ?`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer « ${item.name} » du référentiel ?`,
+        danger: true,
+      }))
+    )
+      return;
     setError('');
     try {
       await referentialApi.remove(kind, item.id);
@@ -173,7 +184,11 @@ export default function ReferentialPage() {
                   placeholder={`Ajouter un ${ref.singular} — ${ref.placeholder}`}
                   onChange={(e) => setDraft(e.target.value)}
                 />
-                <button type="submit" className="btn btn--primary" disabled={!draft.trim()}>
+                <button
+                  type="submit"
+                  className="btn btn--primary"
+                  disabled={!draft.trim()}
+                >
                   Ajouter
                 </button>
               </form>

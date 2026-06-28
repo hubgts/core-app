@@ -52,7 +52,9 @@ export default function KnowHowFormModal({
     recipe?.totalTimeMin != null ? String(recipe.totalTimeMin) : '',
   );
   const [color, setColor] = useState(recipe?.color ?? '');
-  const [components, setComponents] = useState(toComponentRows(recipe?.components));
+  const [components, setComponents] = useState(
+    toComponentRows(recipe?.components),
+  );
   const [steps, setSteps] = useState(toStepRows(recipe?.steps));
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -81,10 +83,15 @@ export default function KnowHowFormModal({
 
   // --- Composants ---
   function updateComponent(key, field, value) {
-    setComponents((rows) => rows.map((r) => (r.key === key ? { ...r, [field]: value } : r)));
+    setComponents((rows) =>
+      rows.map((r) => (r.key === key ? { ...r, [field]: value } : r)),
+    );
   }
   function addComponent() {
-    setComponents((rows) => [...rows, { key: nextKey(), quantity: '', unit: '', label: '', note: '' }]);
+    setComponents((rows) => [
+      ...rows,
+      { key: nextKey(), quantity: '', unit: '', label: '', note: '' },
+    ]);
   }
   function removeComponent(key) {
     setComponents((rows) => rows.filter((r) => r.key !== key));
@@ -92,7 +99,9 @@ export default function KnowHowFormModal({
 
   // --- Étapes ---
   function updateStep(key, value) {
-    setSteps((rows) => rows.map((r) => (r.key === key ? { ...r, text: value } : r)));
+    setSteps((rows) =>
+      rows.map((r) => (r.key === key ? { ...r, text: value } : r)),
+    );
   }
   function addStep() {
     setSteps((rows) => [...rows, { key: nextKey(), text: '' }]);
@@ -134,10 +143,14 @@ export default function KnowHowFormModal({
           label: r.label.trim(),
           note: r.note.trim() || null,
         })),
-      steps: steps.filter((r) => r.text.trim()).map((r) => ({ text: r.text.trim() })),
+      steps: steps
+        .filter((r) => r.text.trim())
+        .map((r) => ({ text: r.text.trim() })),
       yieldText: yieldText.trim() || null,
       yieldBase: parseQty(yieldBase),
-      totalTimeMin: totalTimeMin.trim() ? Math.round(Number(totalTimeMin.replace(',', '.'))) || null : null,
+      totalTimeMin: totalTimeMin.trim()
+        ? Math.round(Number(totalTimeMin.replace(',', '.'))) || null
+        : null,
       color,
     };
     try {
@@ -151,7 +164,9 @@ export default function KnowHowFormModal({
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal modal--lg" onMouseDown={(e) => e.stopPropagation()}>
-        <h2 className="modal__title">{isEdit ? 'Modifier le savoir-faire' : 'Nouveau savoir-faire'}</h2>
+        <h2 className="modal__title">
+          {isEdit ? 'Modifier le savoir-faire' : 'Nouveau savoir-faire'}
+        </h2>
 
         <form onSubmit={submit}>
           <label className="ffield">
@@ -206,7 +221,13 @@ export default function KnowHowFormModal({
               {labels.map((l) => (
                 <span key={l} className="rchip rchip--removable">
                   {l}
-                  <button type="button" onClick={() => removeLabel(l)} aria-label={`Retirer ${l}`}>×</button>
+                  <button
+                    type="button"
+                    onClick={() => removeLabel(l)}
+                    aria-label={`Retirer ${l}`}
+                  >
+                    ×
+                  </button>
                 </span>
               ))}
               <input
@@ -272,30 +293,43 @@ export default function KnowHowFormModal({
                   draggable
                   onDragStart={() => (dragRef.current = r.key)}
                   onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => reorder(components, setComponents, dragRef.current, r.key)}
+                  onDrop={() =>
+                    reorder(components, setComponents, dragRef.current, r.key)
+                  }
                 >
-                  <span className="reditrow__grip" title="Glisser pour réordonner">⠿</span>
+                  <span
+                    className="reditrow__grip"
+                    title="Glisser pour réordonner"
+                  >
+                    ⠿
+                  </span>
                   <input
                     className="ffield__input reditrow__qty"
                     type="text"
                     inputMode="decimal"
                     value={r.quantity}
                     placeholder="Qté"
-                    onChange={(e) => updateComponent(r.key, 'quantity', e.target.value)}
+                    onChange={(e) =>
+                      updateComponent(r.key, 'quantity', e.target.value)
+                    }
                   />
                   <input
                     className="ffield__input reditrow__unit"
                     type="text"
                     value={r.unit}
                     placeholder="Unité"
-                    onChange={(e) => updateComponent(r.key, 'unit', e.target.value)}
+                    onChange={(e) =>
+                      updateComponent(r.key, 'unit', e.target.value)
+                    }
                   />
                   <input
                     className="ffield__input reditrow__label"
                     type="text"
                     value={r.label}
                     placeholder="Intitulé (ex : farine)"
-                    onChange={(e) => updateComponent(r.key, 'label', e.target.value)}
+                    onChange={(e) =>
+                      updateComponent(r.key, 'label', e.target.value)
+                    }
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -303,15 +337,27 @@ export default function KnowHowFormModal({
                       }
                     }}
                   />
-                  <button type="button" className="reditrow__del" onClick={() => removeComponent(r.key)} aria-label="Supprimer la ligne">×</button>
+                  <button
+                    type="button"
+                    className="reditrow__del"
+                    onClick={() => removeComponent(r.key)}
+                    aria-label="Supprimer la ligne"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
-            <button type="button" className="btn btn--ghost btn--sm" onClick={addComponent}>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={addComponent}
+            >
               + Composant
             </button>
             <span className="ffield__hint">
-              Astuce : une ligne « — Pour la pâte — » (sans quantité) sert de titre de section.
+              Astuce : une ligne « — Pour la pâte — » (sans quantité) sert de
+              titre de section.
             </span>
           </div>
 
@@ -326,7 +372,9 @@ export default function KnowHowFormModal({
                   draggable
                   onDragStart={() => (dragRef.current = r.key)}
                   onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => reorder(steps, setSteps, dragRef.current, r.key)}
+                  onDrop={() =>
+                    reorder(steps, setSteps, dragRef.current, r.key)
+                  }
                 >
                   <span className="reditrow__num">{i + 1}</span>
                   <textarea
@@ -336,11 +384,22 @@ export default function KnowHowFormModal({
                     placeholder="Décris l'étape…"
                     onChange={(e) => updateStep(r.key, e.target.value)}
                   />
-                  <button type="button" className="reditrow__del" onClick={() => removeStep(r.key)} aria-label="Supprimer l'étape">×</button>
+                  <button
+                    type="button"
+                    className="reditrow__del"
+                    onClick={() => removeStep(r.key)}
+                    aria-label="Supprimer l'étape"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
-            <button type="button" className="btn btn--ghost btn--sm" onClick={addStep}>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={addStep}
+            >
               + Étape
             </button>
           </div>
@@ -367,19 +426,35 @@ export default function KnowHowFormModal({
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--ghost" onClick={() => onArchive(recipe)}>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={() => onArchive(recipe)}
+                >
                   Archiver
                 </button>
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(recipe)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(recipe)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

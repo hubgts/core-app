@@ -16,12 +16,35 @@ export const CARD_COLORS = [
 
 // Émojis proposés pour personnaliser une catégorie.
 export const CATEGORY_ICONS = [
-  '🍳', '🧼', '🧴', '🔧', '📋', '🥗', '🍰', '🧹', '🌿', '🧽',
-  '🪛', '🏠', '💡', '🎨', '🧶', '🪴', '🐾', '💊', '🚗', '🎁',
+  '🍳',
+  '🧼',
+  '🧴',
+  '🔧',
+  '📋',
+  '🥗',
+  '🍰',
+  '🧹',
+  '🌿',
+  '🧽',
+  '🪛',
+  '🏠',
+  '💡',
+  '🎨',
+  '🧶',
+  '🪴',
+  '🐾',
+  '💊',
+  '🚗',
+  '🎁',
 ];
 
 // Repère visuel pour les savoir-faire sans catégorie.
-export const NO_CATEGORY = { id: null, name: 'Sans catégorie', icon: '🗂️', color: '#93A3B5' };
+export const NO_CATEGORY = {
+  id: null,
+  name: 'Sans catégorie',
+  icon: '🗂️',
+  color: '#93A3B5',
+};
 
 /** Indexe les catégories par id pour un accès O(1) ; null → NO_CATEGORY. */
 export function indexCategories(categories = []) {
@@ -59,5 +82,7 @@ export function formatDuration(min) {
 /** Une ligne de composant utilisée comme titre de section (« — Pour la pâte — »). */
 export function isSection(component) {
   const l = (component?.label ?? '').trim();
-  return component?.quantity == null && !component?.unit && /^[—-].*[—-]$/.test(l);
+  return (
+    component?.quantity == null && !component?.unit && /^[—-].*[—-]$/.test(l)
+  );
 }

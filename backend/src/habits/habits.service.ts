@@ -11,8 +11,14 @@ import { HabitCheckEntity } from './entities/habit-check.entity';
 import { HabitStats } from './types';
 
 const DEFAULT_COLORS = [
-  '#4F46E5', '#0EA5E9', '#10B981', '#F59E0B',
-  '#EF4444', '#EC4899', '#8B5CF6', '#14B8A6',
+  '#4F46E5',
+  '#0EA5E9',
+  '#10B981',
+  '#F59E0B',
+  '#EF4444',
+  '#EC4899',
+  '#8B5CF6',
+  '#14B8A6',
 ];
 /** Paliers de streak : jours pour une habitude quotidienne, semaines sinon. */
 const MILESTONES_DAYS = [7, 30, 100, 365];
@@ -57,13 +63,19 @@ export class HabitsService {
     return habits.map((h) => {
       const weeklyTarget = this.normalizeTarget(h.weeklyTarget);
       const dates = byHabit.get(h.id) ?? new Set<string>();
-      return { ...h, weeklyTarget, stats: this.computeStats(dates, ref, weeklyTarget) };
+      return {
+        ...h,
+        weeklyTarget,
+        stats: this.computeStats(dates, ref, weeklyTarget),
+      };
     });
   }
 
   async checksInRange(from: string, to: string): Promise<HabitCheckEntity[]> {
     if (!isValidDateStr(from) || !isValidDateStr(to)) {
-      throw new BadRequestException('Paramètres "from" / "to" invalides (YYYY-MM-DD attendu).');
+      throw new BadRequestException(
+        'Paramètres "from" / "to" invalides (YYYY-MM-DD attendu).',
+      );
     }
     return this.checks.find({
       where: { date: Between(from, to) },
@@ -88,7 +100,8 @@ export class HabitsService {
     const habit = this.habits.create({
       name,
       weeklyTarget: this.validateTarget(input.weeklyTarget),
-      color: input.color || DEFAULT_COLORS[(maxPos + 1) % DEFAULT_COLORS.length],
+      color:
+        input.color || DEFAULT_COLORS[(maxPos + 1) % DEFAULT_COLORS.length],
       icon: (input.icon || '').slice(0, 8),
       position: maxPos + 1,
       status: 'active',
@@ -99,7 +112,12 @@ export class HabitsService {
 
   async update(
     id: string,
-    input: { name?: string; weeklyTarget?: number; color?: string; icon?: string },
+    input: {
+      name?: string;
+      weeklyTarget?: number;
+      color?: string;
+      icon?: string;
+    },
   ): Promise<HabitEntity> {
     const habit = await this.getOrThrow(id);
     if (input.name !== undefined) {
@@ -169,7 +187,11 @@ export class HabitsService {
     const ref = isValidDateStr(today) ? (today as string) : todayStr();
     const rows = await this.checks.find({ where: { habitId } });
     const dates = new Set(rows.map((c) => c.date));
-    return this.computeStats(dates, ref, this.normalizeTarget(habit.weeklyTarget));
+    return this.computeStats(
+      dates,
+      ref,
+      this.normalizeTarget(habit.weeklyTarget),
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -177,7 +199,10 @@ export class HabitsService {
   // ---------------------------------------------------------------------------
 
   /** Paliers franchis par la série en cours, selon l'unité du streak. */
-  milestonesForStreak(streak: number, unit: 'days' | 'weeks' = 'days'): number[] {
+  milestonesForStreak(
+    streak: number,
+    unit: 'days' | 'weeks' = 'days',
+  ): number[] {
     const milestones = unit === 'weeks' ? MILESTONES_WEEKS : MILESTONES_DAYS;
     return milestones.filter((m) => streak >= m);
   }
@@ -292,7 +317,9 @@ export class HabitsService {
     const trimmed = (name ?? '').trim();
     if (!trimmed) throw new BadRequestException('Le nom est obligatoire.');
     if (trimmed.length > NAME_MAX) {
-      throw new BadRequestException(`Le nom ne peut dépasser ${NAME_MAX} caractères.`);
+      throw new BadRequestException(
+        `Le nom ne peut dépasser ${NAME_MAX} caractères.`,
+      );
     }
     return trimmed;
   }
@@ -315,7 +342,10 @@ export class HabitsService {
       : DEFAULT_WEEKLY_TARGET;
   }
 
-  private async assertNameUnique(name: string, exceptId: string | null): Promise<void> {
+  private async assertNameUnique(
+    name: string,
+    exceptId: string | null,
+  ): Promise<void> {
     const qb = this.habits
       .createQueryBuilder('h')
       .where('h.status = :status', { status: 'active' })

@@ -1,8 +1,18 @@
 // Utilitaires de dates calendaires côté client (YYYY-MM-DD, date locale).
 
 const MONTHS_FR = [
-  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+  'Janvier',
+  'Février',
+  'Mars',
+  'Avril',
+  'Mai',
+  'Juin',
+  'Juillet',
+  'Août',
+  'Septembre',
+  'Octobre',
+  'Novembre',
+  'Décembre',
 ];
 
 // Initiale du jour de semaine, index 0 = dimanche.
@@ -43,8 +53,18 @@ export function addMonths(year, month, delta) {
 }
 
 const MONTHS_SHORT_FR = [
-  'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
-  'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc',
+  'Jan',
+  'Fév',
+  'Mar',
+  'Avr',
+  'Mai',
+  'Jun',
+  'Jui',
+  'Aoû',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Déc',
 ];
 
 export function monthShort(month) {
@@ -92,7 +112,15 @@ export function monthGridDates(year, month) {
   return Array.from({ length: 42 }, (_, i) => addDaysStr(start, i));
 }
 
-const WEEKDAYS_FR = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+const WEEKDAYS_FR = [
+  'lundi',
+  'mardi',
+  'mercredi',
+  'jeudi',
+  'vendredi',
+  'samedi',
+  'dimanche',
+];
 
 // "samedi 14 juin 2026"
 export function frenchFullDate(dateStr) {

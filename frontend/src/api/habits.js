@@ -3,8 +3,7 @@ import { request } from './client';
 export const habitsApi = {
   list: (today) => request(`/habits?today=${encodeURIComponent(today)}`),
 
-  checksInRange: (from, to) =>
-    request(`/habits/checks?from=${from}&to=${to}`),
+  checksInRange: (from, to) => request(`/habits/checks?from=${from}&to=${to}`),
 
   create: (data) =>
     request('/habits', { method: 'POST', body: JSON.stringify(data) }),
@@ -17,7 +16,10 @@ export const habitsApi = {
   remove: (id) => request(`/habits/${id}`, { method: 'DELETE' }),
 
   reorder: (ids) =>
-    request('/habits/reorder', { method: 'PUT', body: JSON.stringify({ ids }) }),
+    request('/habits/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ ids }),
+    }),
 
   setCheck: (id, date, checked, today) =>
     request(`/habits/${id}/checks/${date}?today=${encodeURIComponent(today)}`, {

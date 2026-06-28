@@ -11,20 +11,34 @@ function initExercises(event) {
   if (event?.type === 'musculation' && event.exercises?.length) {
     return event.exercises.map((ex) => ({
       name: ex.name,
-      sets: ex.sets.map((s) => ({ reps: String(s.reps), weight: String(s.weight) })),
+      sets: ex.sets.map((s) => ({
+        reps: String(s.reps),
+        weight: String(s.weight),
+      })),
     }));
   }
   return [emptyExercise()];
 }
 
-export default function EventFormModal({ event, presetDate, presetTime, onSave, onDelete, onClose }) {
+export default function EventFormModal({
+  event,
+  presetDate,
+  presetTime,
+  onSave,
+  onDelete,
+  onClose,
+}) {
   const isEdit = Boolean(event);
   const [type, setType] = useState(event?.type ?? null);
 
   const [date, setDate] = useState(event?.date ?? presetDate ?? todayStr());
-  const [hasTime, setHasTime] = useState(Boolean(event?.startTime ?? presetTime));
+  const [hasTime, setHasTime] = useState(
+    Boolean(event?.startTime ?? presetTime),
+  );
   const [time, setTime] = useState(event?.startTime ?? presetTime ?? '08:00');
-  const [duration, setDuration] = useState(event?.durationMin != null ? String(event.durationMin) : '');
+  const [duration, setDuration] = useState(
+    event?.durationMin != null ? String(event.durationMin) : '',
+  );
   const [feeling, setFeeling] = useState(event?.feeling ?? null);
 
   const [exercises, setExercises] = useState(() => initExercises(event));
@@ -83,7 +97,10 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
           ? tpl.exercises.map((ex) => ({
               name: ex.name,
               sets: ex.sets.length
-                ? ex.sets.map((s) => ({ reps: String(s.reps), weight: String(s.weight) }))
+                ? ex.sets.map((s) => ({
+                    reps: String(s.reps),
+                    weight: String(s.weight),
+                  }))
                 : [emptySet()],
             }))
           : [emptyExercise()],
@@ -99,12 +116,17 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
 
   // --- musculation : édition des exercices/séries ---
   const updateExercise = (i, patch) =>
-    setExercises((prev) => prev.map((ex, idx) => (idx === i ? { ...ex, ...patch } : ex)));
+    setExercises((prev) =>
+      prev.map((ex, idx) => (idx === i ? { ...ex, ...patch } : ex)),
+    );
   const updateSet = (ei, si, patch) =>
     setExercises((prev) =>
       prev.map((ex, idx) =>
         idx === ei
-          ? { ...ex, sets: ex.sets.map((s, j) => (j === si ? { ...s, ...patch } : s)) }
+          ? {
+              ...ex,
+              sets: ex.sets.map((s, j) => (j === si ? { ...s, ...patch } : s)),
+            }
           : ex,
       ),
     );
@@ -123,7 +145,8 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
       ),
     );
   const addExercise = () => setExercises((prev) => [...prev, emptyExercise()]);
-  const removeExercise = (ei) => setExercises((prev) => prev.filter((_, idx) => idx !== ei));
+  const removeExercise = (ei) =>
+    setExercises((prev) => prev.filter((_, idx) => idx !== ei));
 
   const liveTonnage = exercises.reduce(
     (t, ex) =>
@@ -151,7 +174,10 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
     if (type === 'musculation') {
       payload.exercises = exercises.map((ex) => ({
         name: ex.name.trim(),
-        sets: ex.sets.map((s) => ({ reps: Number(s.reps), weight: Number(s.weight || 0) })),
+        sets: ex.sets.map((s) => ({
+          reps: Number(s.reps),
+          weight: Number(s.weight || 0),
+        })),
       }));
     } else if (type === 'cardio') {
       payload.zone = zone;
@@ -174,10 +200,17 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
   if (!type) {
     return (
       <div className="modal-overlay" onMouseDown={onClose}>
-        <div className="modal modal--pick" onMouseDown={(e) => e.stopPropagation()}>
+        <div
+          className="modal modal--pick"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           <h2 className="modal__title">Nouvelle séance</h2>
 
-          <div className="segmented pick-toggle" role="radiogroup" aria-label="Mode de création">
+          <div
+            className="segmented pick-toggle"
+            role="radiogroup"
+            aria-label="Mode de création"
+          >
             <button
               role="radio"
               aria-checked={pickMode === 'template'}
@@ -256,12 +289,16 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
                           {tpl.tags.length > 0 && (
                             <span className="tpl-pick__tags">
                               {tpl.tags.map((tag) => (
-                                <span key={tag} className="tpl-pick__tag">{tag}</span>
+                                <span key={tag} className="tpl-pick__tag">
+                                  {tag}
+                                </span>
                               ))}
                             </span>
                           )}
                         </span>
-                        <span className="tpl-pick__go" aria-hidden="true">›</span>
+                        <span className="tpl-pick__go" aria-hidden="true">
+                          ›
+                        </span>
                       </button>
                     );
                   })
@@ -272,7 +309,13 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
 
           <div className="modal__actions">
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
             </div>
           </div>
         </div>
@@ -287,7 +330,9 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
       <div className="modal modal--lg" onMouseDown={(e) => e.stopPropagation()}>
         <h2 className="modal__title">
           <span style={{ marginRight: 8 }}>{meta.icon}</span>
-          {isEdit ? `Modifier — ${meta.label}` : `Nouvelle séance — ${meta.label}`}
+          {isEdit
+            ? `Modifier — ${meta.label}`
+            : `Nouvelle séance — ${meta.label}`}
         </h2>
 
         <form onSubmit={submit}>
@@ -392,7 +437,9 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
                           min="1"
                           className="field__input field__input--xs"
                           value={s.reps}
-                          onChange={(e) => updateSet(ei, si, { reps: e.target.value })}
+                          onChange={(e) =>
+                            updateSet(ei, si, { reps: e.target.value })
+                          }
                         />
                         <input
                           type="number"
@@ -400,7 +447,9 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
                           step="0.5"
                           className="field__input field__input--xs"
                           value={s.weight}
-                          onChange={(e) => updateSet(ei, si, { weight: e.target.value })}
+                          onChange={(e) =>
+                            updateSet(ei, si, { weight: e.target.value })
+                          }
                         />
                         <button
                           type="button"
@@ -413,23 +462,36 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
                         </button>
                       </div>
                     ))}
-                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => addSet(ei)}>
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--sm"
+                      onClick={() => addSet(ei)}
+                    >
                       + série
                     </button>
                   </div>
                 </div>
               ))}
-              <button type="button" className="btn btn--ghost btn--sm" onClick={addExercise}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={addExercise}
+              >
                 + exercice
               </button>
-              <p className="tonnage-live">Tonnage : <strong>{liveTonnage.toLocaleString('fr-FR')} kg</strong></p>
+              <p className="tonnage-live">
+                Tonnage :{' '}
+                <strong>{liveTonnage.toLocaleString('fr-FR')} kg</strong>
+              </p>
             </div>
           )}
 
           {type === 'cardio' && (
             <>
               <div className="field">
-                <span className="field__label">Zone de fréquence cardiaque</span>
+                <span className="field__label">
+                  Zone de fréquence cardiaque
+                </span>
                 <div className="zone-picker">
                   {CARDIO_ZONES.map((z) => (
                     <button
@@ -488,14 +550,28 @@ export default function EventFormModal({ event, presetDate, presetTime, onSave, 
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(event)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(event)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

@@ -63,7 +63,9 @@ export default function RecipeFormModal({
   );
   const [difficulty, setDifficulty] = useState(recipe?.difficulty ?? '');
   const [color, setColor] = useState(recipe?.color ?? '');
-  const [ingredients, setIngredients] = useState(toIngredientRows(recipe?.ingredients));
+  const [ingredients, setIngredients] = useState(
+    toIngredientRows(recipe?.ingredients),
+  );
   const [steps, setSteps] = useState(toStepRows(recipe?.steps));
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -78,8 +80,12 @@ export default function RecipeFormModal({
   }, [onClose]);
 
   // Temps total = somme des temps renseignés (aperçu ; le backend recalcule).
-  const totalParts = [prepTime, cookTime, restTime].map(parseInt0).filter((v) => v != null);
-  const totalPreview = totalParts.length ? totalParts.reduce((a, b) => a + b, 0) : null;
+  const totalParts = [prepTime, cookTime, restTime]
+    .map(parseInt0)
+    .filter((v) => v != null);
+  const totalPreview = totalParts.length
+    ? totalParts.reduce((a, b) => a + b, 0)
+    : null;
 
   // --- Labels ---
   function addLabel() {
@@ -96,10 +102,15 @@ export default function RecipeFormModal({
 
   // --- Ingrédients ---
   function updateIngredient(key, field, value) {
-    setIngredients((rows) => rows.map((r) => (r.key === key ? { ...r, [field]: value } : r)));
+    setIngredients((rows) =>
+      rows.map((r) => (r.key === key ? { ...r, [field]: value } : r)),
+    );
   }
   function addIngredient() {
-    setIngredients((rows) => [...rows, { key: nextKey(), quantity: '', unit: '', label: '', note: '' }]);
+    setIngredients((rows) => [
+      ...rows,
+      { key: nextKey(), quantity: '', unit: '', label: '', note: '' },
+    ]);
   }
   function removeIngredient(key) {
     setIngredients((rows) => rows.filter((r) => r.key !== key));
@@ -107,7 +118,9 @@ export default function RecipeFormModal({
 
   // --- Étapes ---
   function updateStep(key, value) {
-    setSteps((rows) => rows.map((r) => (r.key === key ? { ...r, text: value } : r)));
+    setSteps((rows) =>
+      rows.map((r) => (r.key === key ? { ...r, text: value } : r)),
+    );
   }
   function addStep() {
     setSteps((rows) => [...rows, { key: nextKey(), text: '' }]);
@@ -149,7 +162,9 @@ export default function RecipeFormModal({
           label: r.label.trim(),
           note: r.note.trim() || null,
         })),
-      steps: steps.filter((r) => r.text.trim()).map((r) => ({ text: r.text.trim() })),
+      steps: steps
+        .filter((r) => r.text.trim())
+        .map((r) => ({ text: r.text.trim() })),
       servings: parseInt0(servings),
       prepTimeMin: parseInt0(prepTime),
       cookTimeMin: parseInt0(cookTime),
@@ -168,7 +183,9 @@ export default function RecipeFormModal({
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal modal--lg" onMouseDown={(e) => e.stopPropagation()}>
-        <h2 className="modal__title">{isEdit ? 'Modifier la recette' : 'Nouvelle recette'}</h2>
+        <h2 className="modal__title">
+          {isEdit ? 'Modifier la recette' : 'Nouvelle recette'}
+        </h2>
 
         <form onSubmit={submit}>
           <label className="alfield">
@@ -224,7 +241,10 @@ export default function RecipeFormModal({
                 placeholder="—"
                 options={[
                   { value: '', label: '—' },
-                  ...DIFFICULTIES.map((d) => ({ value: d.value, label: d.label })),
+                  ...DIFFICULTIES.map((d) => ({
+                    value: d.value,
+                    label: d.label,
+                  })),
                 ]}
               />
             </label>
@@ -236,7 +256,13 @@ export default function RecipeFormModal({
               {labels.map((l) => (
                 <span key={l} className="alchip alchip--removable">
                   {l}
-                  <button type="button" onClick={() => removeLabel(l)} aria-label={`Retirer ${l}`}>×</button>
+                  <button
+                    type="button"
+                    onClick={() => removeLabel(l)}
+                    aria-label={`Retirer ${l}`}
+                  >
+                    ×
+                  </button>
                 </span>
               ))}
               <input
@@ -303,7 +329,9 @@ export default function RecipeFormModal({
             </label>
           </div>
           {totalPreview != null && (
-            <p className="alfield__total">Temps total : {formatDuration(totalPreview)}</p>
+            <p className="alfield__total">
+              Temps total : {formatDuration(totalPreview)}
+            </p>
           )}
 
           {/* Ingrédients */}
@@ -317,30 +345,43 @@ export default function RecipeFormModal({
                   draggable
                   onDragStart={() => (dragRef.current = r.key)}
                   onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => reorder(ingredients, setIngredients, dragRef.current, r.key)}
+                  onDrop={() =>
+                    reorder(ingredients, setIngredients, dragRef.current, r.key)
+                  }
                 >
-                  <span className="aleditrow__grip" title="Glisser pour réordonner">⠿</span>
+                  <span
+                    className="aleditrow__grip"
+                    title="Glisser pour réordonner"
+                  >
+                    ⠿
+                  </span>
                   <input
                     className="alfield__input aleditrow__qty"
                     type="text"
                     inputMode="decimal"
                     value={r.quantity}
                     placeholder="Qté"
-                    onChange={(e) => updateIngredient(r.key, 'quantity', e.target.value)}
+                    onChange={(e) =>
+                      updateIngredient(r.key, 'quantity', e.target.value)
+                    }
                   />
                   <input
                     className="alfield__input aleditrow__unit"
                     type="text"
                     value={r.unit}
                     placeholder="Unité"
-                    onChange={(e) => updateIngredient(r.key, 'unit', e.target.value)}
+                    onChange={(e) =>
+                      updateIngredient(r.key, 'unit', e.target.value)
+                    }
                   />
                   <input
                     className="alfield__input aleditrow__label"
                     type="text"
                     value={r.label}
                     placeholder="Ingrédient (ex : farine)"
-                    onChange={(e) => updateIngredient(r.key, 'label', e.target.value)}
+                    onChange={(e) =>
+                      updateIngredient(r.key, 'label', e.target.value)
+                    }
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -348,15 +389,27 @@ export default function RecipeFormModal({
                       }
                     }}
                   />
-                  <button type="button" className="aleditrow__del" onClick={() => removeIngredient(r.key)} aria-label="Supprimer la ligne">×</button>
+                  <button
+                    type="button"
+                    className="aleditrow__del"
+                    onClick={() => removeIngredient(r.key)}
+                    aria-label="Supprimer la ligne"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
-            <button type="button" className="btn btn--ghost btn--sm" onClick={addIngredient}>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={addIngredient}
+            >
               + Ingrédient
             </button>
             <span className="alfield__hint">
-              Astuce : une ligne « — Pour la garniture — » (sans quantité) sert de titre de section.
+              Astuce : une ligne « — Pour la garniture — » (sans quantité) sert
+              de titre de section.
             </span>
           </div>
 
@@ -371,7 +424,9 @@ export default function RecipeFormModal({
                   draggable
                   onDragStart={() => (dragRef.current = r.key)}
                   onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => reorder(steps, setSteps, dragRef.current, r.key)}
+                  onDrop={() =>
+                    reorder(steps, setSteps, dragRef.current, r.key)
+                  }
                 >
                   <span className="aleditrow__num">{i + 1}</span>
                   <textarea
@@ -381,11 +436,22 @@ export default function RecipeFormModal({
                     placeholder="Décris l'étape…"
                     onChange={(e) => updateStep(r.key, e.target.value)}
                   />
-                  <button type="button" className="aleditrow__del" onClick={() => removeStep(r.key)} aria-label="Supprimer l'étape">×</button>
+                  <button
+                    type="button"
+                    className="aleditrow__del"
+                    onClick={() => removeStep(r.key)}
+                    aria-label="Supprimer l'étape"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
-            <button type="button" className="btn btn--ghost btn--sm" onClick={addStep}>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={addStep}
+            >
               + Étape
             </button>
           </div>
@@ -412,19 +478,35 @@ export default function RecipeFormModal({
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--ghost" onClick={() => onArchive(recipe)}>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={() => onArchive(recipe)}
+                >
                   Archiver
                 </button>
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(recipe)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(recipe)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

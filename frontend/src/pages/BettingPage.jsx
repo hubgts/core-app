@@ -67,7 +67,8 @@ export default function BettingPage() {
 
       {bankrolls.length === 0 ? (
         <p className="bempty">
-          Aucune bankroll pour l'instant. Créez-en une pour commencer à suivre vos paris.
+          Aucune bankroll pour l'instant. Créez-en une pour commencer à suivre
+          vos paris.
         </p>
       ) : (
         <div className="bcards">
@@ -84,13 +85,20 @@ export default function BettingPage() {
                   <span className="bcard__icon">{b.icon || '🎰'}</span>
                   <span className="bcard__name">{b.name}</span>
                 </div>
-                <div className="bcard__capital">{formatEur(s.currentCapital)}</div>
+                <div className="bcard__capital">
+                  {formatEur(s.currentCapital)}
+                </div>
                 <div className={`bcard__prog t-${trendClass(s.progression)}`}>
                   {formatPct(s.progression, { signed: true })}
-                  <span className="bcard__proghint"> · bénéf. {formatSignedEur(s.profit)}</span>
+                  <span className="bcard__proghint">
+                    {' '}
+                    · bénéf. {formatSignedEur(s.profit)}
+                  </span>
                 </div>
                 <div className="bcard__foot">
-                  <span>{s.betCount} pari{s.betCount > 1 ? 's' : ''}</span>
+                  <span>
+                    {s.betCount} pari{s.betCount > 1 ? 's' : ''}
+                  </span>
                   <span>ROI {formatPct(s.roi)}</span>
                   <span>Réussite {formatPct(s.successRate)}</span>
                 </div>

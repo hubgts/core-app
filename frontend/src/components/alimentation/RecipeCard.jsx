@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { CARD_COLORS, formatDuration, formatQuantity, formatServings, isSection } from './constants';
+import {
+  CARD_COLORS,
+  formatDuration,
+  formatQuantity,
+  formatServings,
+  isSection,
+} from './constants';
 
 /**
  * Carte du board façon Google Keep : couleur de fond, type de repas, aperçu du
@@ -18,11 +24,14 @@ export default function RecipeCard({
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { ingredients = [], steps = [], labels = [] } = recipe;
-  const previewIngredients = ingredients.filter((i) => !isSection(i)).slice(0, 3);
+  const previewIngredients = ingredients
+    .filter((i) => !isSection(i))
+    .slice(0, 3);
 
   const metaBits = [];
   if (recipe.servings != null) metaBits.push(formatServings(recipe.servings));
-  if (recipe.totalTimeMin != null) metaBits.push(formatDuration(recipe.totalTimeMin));
+  if (recipe.totalTimeMin != null)
+    metaBits.push(formatDuration(recipe.totalTimeMin));
 
   function act(fn) {
     return (e) => {
@@ -63,7 +72,9 @@ export default function RecipeCard({
 
       <h3 className="alcard__title">{recipe.title}</h3>
 
-      {metaBits.length > 0 && <p className="alcard__meta">{metaBits.join(' · ')}</p>}
+      {metaBits.length > 0 && (
+        <p className="alcard__meta">{metaBits.join(' · ')}</p>
+      )}
 
       {previewIngredients.length > 0 ? (
         <ul className="alcard__preview">
@@ -79,21 +90,27 @@ export default function RecipeCard({
             </li>
           ))}
           {ingredients.length > previewIngredients.length && (
-            <li className="alcard__more">+{ingredients.length - previewIngredients.length} de plus…</li>
+            <li className="alcard__more">
+              +{ingredients.length - previewIngredients.length} de plus…
+            </li>
           )}
         </ul>
       ) : (
         <p className="alcard__counts">
-          {ingredients.length > 0 && `${ingredients.length} ingrédient${ingredients.length > 1 ? 's' : ''}`}
+          {ingredients.length > 0 &&
+            `${ingredients.length} ingrédient${ingredients.length > 1 ? 's' : ''}`}
           {ingredients.length > 0 && steps.length > 0 && ' · '}
-          {steps.length > 0 && `${steps.length} étape${steps.length > 1 ? 's' : ''}`}
+          {steps.length > 0 &&
+            `${steps.length} étape${steps.length > 1 ? 's' : ''}`}
         </p>
       )}
 
       {labels.length > 0 && (
         <div className="alcard__labels">
           {labels.map((l) => (
-            <span key={l} className="alchip">{l}</span>
+            <span key={l} className="alchip">
+              {l}
+            </span>
           ))}
         </div>
       )}
@@ -128,16 +145,28 @@ export default function RecipeCard({
                 />
               ))}
             </div>
-            <button className="almenu__item" onClick={act(() => onTogglePin(recipe))}>
+            <button
+              className="almenu__item"
+              onClick={act(() => onTogglePin(recipe))}
+            >
               {recipe.pinned ? 'Désépingler' : 'Épingler'}
             </button>
-            <button className="almenu__item" onClick={act(() => onDuplicate(recipe))}>
+            <button
+              className="almenu__item"
+              onClick={act(() => onDuplicate(recipe))}
+            >
               Dupliquer
             </button>
-            <button className="almenu__item" onClick={act(() => onArchive(recipe))}>
+            <button
+              className="almenu__item"
+              onClick={act(() => onArchive(recipe))}
+            >
               Archiver
             </button>
-            <button className="almenu__item almenu__item--danger" onClick={act(() => onDelete(recipe))}>
+            <button
+              className="almenu__item almenu__item--danger"
+              onClick={act(() => onDelete(recipe))}
+            >
               Supprimer
             </button>
           </div>

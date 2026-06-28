@@ -6,7 +6,12 @@ import { courseApi } from '../../api/course';
  * Sélectionner un article renvoie `{ articleId, name, unit }` (mesure pré-remplie).
  * Une saisie inédite propose « Créer l'article » → renvoie `{ articleName: saisie }`.
  */
-export default function ArticlePicker({ value, onPick, placeholder, autoFocus }) {
+export default function ArticlePicker({
+  value,
+  onPick,
+  placeholder,
+  autoFocus,
+}) {
   const [query, setQuery] = useState(value ?? '');
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -77,7 +82,11 @@ export default function ArticlePicker({ value, onPick, placeholder, autoFocus })
         <ul className="artpick__menu">
           {results.map((a) => (
             <li key={a.id}>
-              <button type="button" className="artpick__opt" onMouseDown={() => selectArticle(a)}>
+              <button
+                type="button"
+                className="artpick__opt"
+                onMouseDown={() => selectArticle(a)}
+              >
                 <span>{a.name}</span>
                 <span className="artpick__unit">{a.unit || ''}</span>
               </button>
@@ -85,7 +94,11 @@ export default function ArticlePicker({ value, onPick, placeholder, autoFocus })
           ))}
           {trimmed && !exact && (
             <li>
-              <button type="button" className="artpick__opt artpick__create" onMouseDown={createNew}>
+              <button
+                type="button"
+                className="artpick__opt artpick__create"
+                onMouseDown={createNew}
+              >
                 ✚ Créer l'article « {trimmed} »
               </button>
             </li>

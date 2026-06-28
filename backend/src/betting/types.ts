@@ -15,12 +15,7 @@ export const BET_TYPES: BetType[] = ['simple', 'combine'];
  * - cashout   : clôture anticipée → retour = cashoutAmount
  */
 export type BetStatus =
-  | 'pending'
-  | 'won'
-  | 'lost'
-  | 'void'
-  | 'cancelled'
-  | 'cashout';
+  'pending' | 'won' | 'lost' | 'void' | 'cancelled' | 'cashout';
 export const BET_STATUSES: BetStatus[] = [
   'pending',
   'won',
@@ -134,7 +129,9 @@ export function betProfit(bet: {
  * Cote d'un combiné = produit des cotes des sélections, les sélections
  * remboursées (void) étant ramenées à 1,00 (RG-09).
  */
-export function combineOdds(selections: { odds: number; status: SelectionStatus }[]): number {
+export function combineOdds(
+  selections: { odds: number; status: SelectionStatus }[],
+): number {
   return selections.reduce(
     (acc, s) => acc * (s.status === 'void' ? 1 : s.odds),
     1,

@@ -6,22 +6,68 @@ export { formatEur, formatSignedEur, trendClass } from '../finances/constants';
 export const clampPct = (v) => Math.min(Math.max(v ?? 0, 0), 100);
 
 export const BUDGET_COLORS = [
-  '#38bdf8', '#a78bfa', '#34d399', '#fbbf24', '#f472b6', '#f87171', '#22d3ee', '#c084fc',
+  '#38bdf8',
+  '#a78bfa',
+  '#34d399',
+  '#fbbf24',
+  '#f472b6',
+  '#f87171',
+  '#22d3ee',
+  '#c084fc',
 ];
 
-export const BUDGET_ICONS = ['🏠', '🍔', '🐷', '🎉', '🚗', '💡', '🎁', '📈', '🩺', '✈️'];
+export const BUDGET_ICONS = [
+  '🏠',
+  '🍔',
+  '🐷',
+  '🎉',
+  '🚗',
+  '💡',
+  '🎁',
+  '📈',
+  '🩺',
+  '✈️',
+];
 
 // Plan proposé au démarrage (50/30/20) — l'utilisateur peut tout modifier.
 export const DEFAULT_PLAN = [
-  { name: 'Besoins', targetPct: 50, kind: 'depense', icon: '🏠', color: '#38bdf8' },
-  { name: 'Plaisirs', targetPct: 30, kind: 'depense', icon: '🎉', color: '#a78bfa' },
-  { name: 'Épargne', targetPct: 20, kind: 'epargne', icon: '🐷', color: '#34d399' },
+  {
+    name: 'Besoins',
+    targetPct: 50,
+    kind: 'depense',
+    icon: '🏠',
+    color: '#38bdf8',
+  },
+  {
+    name: 'Plaisirs',
+    targetPct: 30,
+    kind: 'depense',
+    icon: '🎉',
+    color: '#a78bfa',
+  },
+  {
+    name: 'Épargne',
+    targetPct: 20,
+    kind: 'epargne',
+    icon: '🐷',
+    color: '#34d399',
+  },
 ];
 
 // "Mars 2026" depuis un mois 'YYYY-MM'.
 const MONTHS_FR = [
-  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+  'Janvier',
+  'Février',
+  'Mars',
+  'Avril',
+  'Mai',
+  'Juin',
+  'Juillet',
+  'Août',
+  'Septembre',
+  'Octobre',
+  'Novembre',
+  'Décembre',
 ];
 export function monthLabel(month) {
   const [y, m] = month.split('-').map(Number);
@@ -43,10 +89,15 @@ export function currentMonth() {
 // État d'une catégorie vs sa cible → libellé + tendance (couleur).
 export function statusMeta(state) {
   switch (state) {
-    case 'within': return { label: 'Dans la cible', tone: 'up' };
-    case 'over': return { label: 'Dépassement', tone: 'down' };
-    case 'reached': return { label: 'Objectif atteint', tone: 'up' };
-    case 'insufficient': return { label: 'Sous l’objectif', tone: 'down' };
-    default: return null;
+    case 'within':
+      return { label: 'Dans la cible', tone: 'up' };
+    case 'over':
+      return { label: 'Dépassement', tone: 'down' };
+    case 'reached':
+      return { label: 'Objectif atteint', tone: 'up' };
+    case 'insufficient':
+      return { label: 'Sous l’objectif', tone: 'down' };
+    default:
+      return null;
   }
 }

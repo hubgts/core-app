@@ -44,7 +44,9 @@ export default function TagInput({ value, onChange, placeholder }) {
       <input
         className="tag-input__field"
         value={draft}
-        placeholder={value.length ? '' : placeholder ?? 'Ajouter une étiquette…'}
+        placeholder={
+          value.length ? '' : (placeholder ?? 'Ajouter une étiquette…')
+        }
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={onKeyDown}
         onBlur={() => add(draft)}

@@ -9,15 +9,63 @@ export const GOAL_COLOR = '#fbbf24'; // ligne d'objectif (ambre)
 // Métrique « poids » + mensurations connues, orientées musculation.
 // `unit` et `icon` pour l'UI. Ordre = haut → bas du corps.
 export const METRIC_META = {
-  weight: { label: 'Poids', short: 'Poids', unit: 'kg', icon: '⚖️', decimals: 1 },
+  weight: {
+    label: 'Poids',
+    short: 'Poids',
+    unit: 'kg',
+    icon: '⚖️',
+    decimals: 1,
+  },
   neck: { label: 'Cou', short: 'Cou', unit: 'cm', icon: '🧣', decimals: 1 },
-  shoulders: { label: 'Épaules', short: 'Épaules', unit: 'cm', icon: '🤸', decimals: 1 },
-  chest: { label: 'Torse (poitrine)', short: 'Torse', unit: 'cm', icon: '🎽', decimals: 1 },
-  arm: { label: 'Biceps', short: 'Biceps', unit: 'cm', icon: '💪', decimals: 1 },
-  forearm: { label: 'Avant-bras', short: 'Avant-bras', unit: 'cm', icon: '✊', decimals: 1 },
-  hips: { label: 'Hanches', short: 'Hanches', unit: 'cm', icon: '🍑', decimals: 1 },
-  thigh: { label: 'Cuisse', short: 'Cuisse', unit: 'cm', icon: '🦵', decimals: 1 },
-  calf: { label: 'Mollet', short: 'Mollet', unit: 'cm', icon: '🦶', decimals: 1 },
+  shoulders: {
+    label: 'Épaules',
+    short: 'Épaules',
+    unit: 'cm',
+    icon: '🤸',
+    decimals: 1,
+  },
+  chest: {
+    label: 'Torse (poitrine)',
+    short: 'Torse',
+    unit: 'cm',
+    icon: '🎽',
+    decimals: 1,
+  },
+  arm: {
+    label: 'Biceps',
+    short: 'Biceps',
+    unit: 'cm',
+    icon: '💪',
+    decimals: 1,
+  },
+  forearm: {
+    label: 'Avant-bras',
+    short: 'Avant-bras',
+    unit: 'cm',
+    icon: '✊',
+    decimals: 1,
+  },
+  hips: {
+    label: 'Hanches',
+    short: 'Hanches',
+    unit: 'cm',
+    icon: '🍑',
+    decimals: 1,
+  },
+  thigh: {
+    label: 'Cuisse',
+    short: 'Cuisse',
+    unit: 'cm',
+    icon: '🦵',
+    decimals: 1,
+  },
+  calf: {
+    label: 'Mollet',
+    short: 'Mollet',
+    unit: 'cm',
+    icon: '🦶',
+    decimals: 1,
+  },
 };
 
 // Toutes les mensurations configurables (hors poids), dans l'ordre canonique.
@@ -40,7 +88,15 @@ export const PERIODS = [
 ];
 
 export function metricMeta(key) {
-  return METRIC_META[key] ?? { label: key, short: key, unit: '', icon: '•', decimals: 1 };
+  return (
+    METRIC_META[key] ?? {
+      label: key,
+      short: key,
+      unit: '',
+      icon: '•',
+      decimals: 1,
+    }
+  );
 }
 
 // "78,4 kg" — formatage français d'une valeur d'une métrique donnée.

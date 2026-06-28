@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { CARD_COLORS, formatDuration, formatQuantity, isSection } from './constants';
+import {
+  CARD_COLORS,
+  formatDuration,
+  formatQuantity,
+  isSection,
+} from './constants';
 
 /**
  * Carte du board façon Google Keep : couleur de fond, catégorie, aperçu du
@@ -22,7 +27,8 @@ export default function KnowHowCard({
 
   const metaBits = [];
   if (recipe.yieldText) metaBits.push(recipe.yieldText);
-  if (recipe.totalTimeMin != null) metaBits.push(formatDuration(recipe.totalTimeMin));
+  if (recipe.totalTimeMin != null)
+    metaBits.push(formatDuration(recipe.totalTimeMin));
 
   function act(fn) {
     return (e) => {
@@ -63,7 +69,9 @@ export default function KnowHowCard({
 
       <h3 className="rcard__title">{recipe.title}</h3>
 
-      {metaBits.length > 0 && <p className="rcard__meta">{metaBits.join(' · ')}</p>}
+      {metaBits.length > 0 && (
+        <p className="rcard__meta">{metaBits.join(' · ')}</p>
+      )}
 
       {previewComponents.length > 0 ? (
         <ul className="rcard__preview">
@@ -79,21 +87,27 @@ export default function KnowHowCard({
             </li>
           ))}
           {components.length > previewComponents.length && (
-            <li className="rcard__more">+{components.length - previewComponents.length} de plus…</li>
+            <li className="rcard__more">
+              +{components.length - previewComponents.length} de plus…
+            </li>
           )}
         </ul>
       ) : (
         <p className="rcard__counts">
-          {components.length > 0 && `${components.length} composant${components.length > 1 ? 's' : ''}`}
+          {components.length > 0 &&
+            `${components.length} composant${components.length > 1 ? 's' : ''}`}
           {components.length > 0 && steps.length > 0 && ' · '}
-          {steps.length > 0 && `${steps.length} étape${steps.length > 1 ? 's' : ''}`}
+          {steps.length > 0 &&
+            `${steps.length} étape${steps.length > 1 ? 's' : ''}`}
         </p>
       )}
 
       {labels.length > 0 && (
         <div className="rcard__labels">
           {labels.map((l) => (
-            <span key={l} className="rchip">{l}</span>
+            <span key={l} className="rchip">
+              {l}
+            </span>
           ))}
         </div>
       )}
@@ -128,16 +142,28 @@ export default function KnowHowCard({
                 />
               ))}
             </div>
-            <button className="rmenu__item" onClick={act(() => onTogglePin(recipe))}>
+            <button
+              className="rmenu__item"
+              onClick={act(() => onTogglePin(recipe))}
+            >
               {recipe.pinned ? 'Désépingler' : 'Épingler'}
             </button>
-            <button className="rmenu__item" onClick={act(() => onDuplicate(recipe))}>
+            <button
+              className="rmenu__item"
+              onClick={act(() => onDuplicate(recipe))}
+            >
               Dupliquer
             </button>
-            <button className="rmenu__item" onClick={act(() => onArchive(recipe))}>
+            <button
+              className="rmenu__item"
+              onClick={act(() => onArchive(recipe))}
+            >
               Archiver
             </button>
-            <button className="rmenu__item rmenu__item--danger" onClick={act(() => onDelete(recipe))}>
+            <button
+              className="rmenu__item rmenu__item--danger"
+              onClick={act(() => onDelete(recipe))}
+            >
               Supprimer
             </button>
           </div>

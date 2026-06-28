@@ -43,7 +43,13 @@ export default function ProgramsPage() {
   }
 
   async function handleDelete(p) {
-    if (!(await confirmDialog({ message: `Supprimer le programme « ${p.name} » ? (les séances déjà placées ne sont pas touchées)`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer le programme « ${p.name} » ? (les séances déjà placées ne sont pas touchées)`,
+        danger: true,
+      }))
+    )
+      return;
     await trainingApi.removeProgram(p.id);
     await load();
     flash('Programme supprimé.');
@@ -74,11 +80,14 @@ export default function ProgramsPage() {
         <div>
           <h1 className="page-head__title">Programmes</h1>
           <p className="page-head__subtitle">
-            Construis des cycles (phases, semaines, deload) et déroule-les dans ton planning.
+            Construis des cycles (phases, semaines, deload) et déroule-les dans
+            ton planning.
           </p>
         </div>
         <div className="page__headactions">
-          <button className="btn btn--primary" onClick={() => setEditing({})}>+ Programme</button>
+          <button className="btn btn--primary" onClick={() => setEditing({})}>
+            + Programme
+          </button>
         </div>
       </header>
 
@@ -91,35 +100,59 @@ export default function ProgramsPage() {
           <span className="prog-empty__icon">🗓</span>
           <h2 className="prog-empty__title">Crée ton premier programme</h2>
           <p className="muted">
-            Un programme ordonne des séances dans le temps : phases, semaines S1…Sn, et un
-            démarrage à la date de ton choix qui remplit le planning.
+            Un programme ordonne des séances dans le temps : phases, semaines
+            S1…Sn, et un démarrage à la date de ton choix qui remplit le
+            planning.
           </p>
-          <button className="btn btn--primary" onClick={() => setEditing({})}>+ Programme</button>
+          <button className="btn btn--primary" onClick={() => setEditing({})}>
+            + Programme
+          </button>
         </div>
       ) : (
         <div className="prog-grid">
           {programs.map((p) => (
             <div key={p.id} className="prog-card">
-              <button type="button" className="prog-card__main" onClick={() => openEdit(p)}>
+              <button
+                type="button"
+                className="prog-card__main"
+                onClick={() => openEdit(p)}
+              >
                 <div className="prog-card__head">
                   <span className="prog-card__icon">🗓</span>
                   <span className="prog-card__name">{p.name}</span>
                 </div>
                 <span className="prog-card__meta">
-                  {p.phaseCount} phase{p.phaseCount > 1 ? 's' : ''} · {p.weekCount} semaine
-                  {p.weekCount > 1 ? 's' : ''} · {p.sessionCount} séance{p.sessionCount > 1 ? 's' : ''}
+                  {p.phaseCount} phase{p.phaseCount > 1 ? 's' : ''} ·{' '}
+                  {p.weekCount} semaine
+                  {p.weekCount > 1 ? 's' : ''} · {p.sessionCount} séance
+                  {p.sessionCount > 1 ? 's' : ''}
                 </span>
                 {p.phaseObjectives.length > 0 && (
-                  <span className="prog-card__phases">{p.phaseObjectives.join(' › ')}</span>
+                  <span className="prog-card__phases">
+                    {p.phaseObjectives.join(' › ')}
+                  </span>
                 )}
               </button>
               <div className="prog-card__actions">
-                <button className="btn btn--ghost btn--sm" onClick={() => setStarting(p)}>Démarrer</button>
+                <button
+                  className="btn btn--ghost btn--sm"
+                  onClick={() => setStarting(p)}
+                >
+                  Démarrer
+                </button>
                 <KebabMenu
                   label={`Actions pour ${p.name}`}
                   actions={[
-                    { icon: '✎', label: 'Modifier', onClick: () => openEdit(p) },
-                    { icon: '🗑', label: 'Supprimer', onClick: () => handleDelete(p) },
+                    {
+                      icon: '✎',
+                      label: 'Modifier',
+                      onClick: () => openEdit(p),
+                    },
+                    {
+                      icon: '🗑',
+                      label: 'Supprimer',
+                      onClick: () => handleDelete(p),
+                    },
                   ]}
                 />
               </div>

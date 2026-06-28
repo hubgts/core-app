@@ -7,7 +7,12 @@ import BetFormModal from '../components/betting/BetFormModal';
 import OverviewTab from '../components/betting/OverviewTab';
 import BetsTab from '../components/betting/BetsTab';
 import StatsTab from '../components/betting/StatsTab';
-import { formatEur, formatPct, formatSignedEur, trendClass } from '../components/betting/constants';
+import {
+  formatEur,
+  formatPct,
+  formatSignedEur,
+  trendClass,
+} from '../components/betting/constants';
 import './BettingPage.css';
 
 const TABS = [
@@ -61,7 +66,13 @@ export default function BankrollDetailPage() {
     navigate('/paris');
   }
   async function deleteBankroll() {
-    if (!(await confirmDialog({ message: `Supprimer « ${bankroll.name} » et tous ses paris ? Action irréversible.`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer « ${bankroll.name} » et tous ses paris ? Action irréversible.`,
+        danger: true,
+      }))
+    )
+      return;
     await bettingApi.removeBankroll(id);
     navigate('/paris');
   }
@@ -78,18 +89,27 @@ export default function BankrollDetailPage() {
     setBankroll(await bettingApi.settleSelection(selectionId, status));
   }
   async function deleteBet(bet) {
-    if (!(await confirmDialog({ message: 'Supprimer ce pari ?', danger: true }))) return;
+    if (
+      !(await confirmDialog({ message: 'Supprimer ce pari ?', danger: true }))
+    )
+      return;
     setBankroll(await bettingApi.removeBet(bet.id));
     flash('Pari supprimé.');
   }
 
   if (loading) {
-    return <div className="bpage"><div className="bpage__loading">Chargement…</div></div>;
+    return (
+      <div className="bpage">
+        <div className="bpage__loading">Chargement…</div>
+      </div>
+    );
   }
   if (error || !bankroll) {
     return (
       <div className="bpage">
-        <button className="blink" onClick={() => navigate('/paris')}>← Paris sportifs</button>
+        <button className="blink" onClick={() => navigate('/paris')}>
+          ← Paris sportifs
+        </button>
         <p className="bpage__error">{error || 'Bankroll introuvable.'}</p>
       </div>
     );
@@ -100,7 +120,12 @@ export default function BankrollDetailPage() {
 
   return (
     <div className="bpage">
-      <button className="blink bdetail__back" onClick={() => navigate('/paris')}>← Paris sportifs</button>
+      <button
+        className="blink bdetail__back"
+        onClick={() => navigate('/paris')}
+      >
+        ← Paris sportifs
+      </button>
 
       {/* En-tête : identité + KPIs toujours visibles */}
       <header className="bdetail__head" style={{ '--c': color }}>
@@ -108,12 +133,24 @@ export default function BankrollDetailPage() {
           <span className="bdetail__icon">{bankroll.icon || '🎰'}</span>
           <div>
             <h1 className="bdetail__title">{bankroll.name}</h1>
-            {bankroll.bookmaker && <p className="bdetail__sub">{bankroll.bookmaker}</p>}
+            {bankroll.bookmaker && (
+              <p className="bdetail__sub">{bankroll.bookmaker}</p>
+            )}
           </div>
         </div>
         <div className="bdetail__actions">
-          <button className="btn btn--primary btn--sm" onClick={() => setBetModal(true)}>+ Pari</button>
-          <button className="btn btn--ghost btn--sm" onClick={() => setEditModal(true)}>Éditer</button>
+          <button
+            className="btn btn--primary btn--sm"
+            onClick={() => setBetModal(true)}
+          >
+            + Pari
+          </button>
+          <button
+            className="btn btn--ghost btn--sm"
+            onClick={() => setEditModal(true)}
+          >
+            Éditer
+          </button>
         </div>
       </header>
 
@@ -124,11 +161,15 @@ export default function BankrollDetailPage() {
         </div>
         <div className="bkpi">
           <span className="bkpi__label">Progression</span>
-          <span className={`bkpi__value t-${trendClass(s.progression)}`}>{formatPct(s.progression, { signed: true })}</span>
+          <span className={`bkpi__value t-${trendClass(s.progression)}`}>
+            {formatPct(s.progression, { signed: true })}
+          </span>
         </div>
         <div className="bkpi">
           <span className="bkpi__label">Bénéfice</span>
-          <span className={`bkpi__value t-${trendClass(s.profit)}`}>{formatSignedEur(s.profit)}</span>
+          <span className={`bkpi__value t-${trendClass(s.profit)}`}>
+            {formatSignedEur(s.profit)}
+          </span>
         </div>
         <div className="bkpi">
           <span className="bkpi__label">ROI</span>
@@ -149,7 +190,9 @@ export default function BankrollDetailPage() {
             onClick={() => setTab(t.id)}
           >
             {t.label}
-            {t.id === 'bets' && s.betCount > 0 && <span className="btabs__badge">{s.betCount}</span>}
+            {t.id === 'bets' && s.betCount > 0 && (
+              <span className="btabs__badge">{s.betCount}</span>
+            )}
           </button>
         ))}
       </nav>
@@ -177,7 +220,9 @@ export default function BankrollDetailPage() {
           onClose={() => setEditModal(false)}
         />
       )}
-      {betModal && <BetFormModal onSave={createBet} onClose={() => setBetModal(false)} />}
+      {betModal && (
+        <BetFormModal onSave={createBet} onClose={() => setBetModal(false)} />
+      )}
 
       {toast && <div className="btoast">{toast}</div>}
     </div>

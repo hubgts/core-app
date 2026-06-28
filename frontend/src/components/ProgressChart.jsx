@@ -133,7 +133,14 @@ export default function ProgressChart({ habits, checks, columns, periodDays }) {
                 stroke={s.color}
               />
               {pts.map((p, i) => (
-                <circle key={i} className="chart__dot" cx={p.x} cy={p.y} r={3} fill={s.color}>
+                <circle
+                  key={i}
+                  className="chart__dot"
+                  cx={p.x}
+                  cy={p.y}
+                  r={3}
+                  fill={s.color}
+                >
                   <title>{`${s.name} · ${columns[i].label} · ${s.values[i]} cumulées`}</title>
                 </circle>
               ))}
@@ -157,7 +164,10 @@ export default function ProgressChart({ habits, checks, columns, periodDays }) {
             onClick={() => toggle(s.id)}
             title="Afficher / masquer cette courbe"
           >
-            <span className="chart__legend-swatch" style={{ background: s.color }} />
+            <span
+              className="chart__legend-swatch"
+              style={{ background: s.color }}
+            />
             {s.name}
             <span className="chart__legend-meta">
               {s.total}/{s.target}

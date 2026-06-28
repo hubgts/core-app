@@ -36,8 +36,26 @@ export function sportIcon(sport) {
   return '🏅';
 }
 
-export const BANKROLL_ICONS = ['🎰', '🥊', '⚽', '🎯', '🍀', '🔥', '💰', '📈', '🏆', '🎲'];
-export const BANKROLL_COLORS = ['#818cf8', '#34d399', '#fbbf24', '#f87171', '#38bdf8', '#a78bfa'];
+export const BANKROLL_ICONS = [
+  '🎰',
+  '🥊',
+  '⚽',
+  '🎯',
+  '🍀',
+  '🔥',
+  '💰',
+  '📈',
+  '🏆',
+  '🎲',
+];
+export const BANKROLL_COLORS = [
+  '#818cf8',
+  '#34d399',
+  '#fbbf24',
+  '#f87171',
+  '#38bdf8',
+  '#a78bfa',
+];
 
 // "57,00 €"
 export function formatEur(n, { decimals = 2 } = {}) {
@@ -67,13 +85,17 @@ export function formatPct(n, { signed = false } = {}) {
 // "8,000" (cotes à 3 décimales)
 export function formatOdds(n) {
   if (n == null || Number.isNaN(n)) return '—';
-  return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+  return n.toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 3,
+  });
 }
 
 // Parse une cote "2,97" / "2.97" → 2.97. Lève si invalide ou < 1.
 export function parseOdds(str) {
   const n = Number(String(str).replace(',', '.').trim());
-  if (!Number.isFinite(n) || n < 1) throw new Error('Cote invalide (≥ 1 attendu).');
+  if (!Number.isFinite(n) || n < 1)
+    throw new Error('Cote invalide (≥ 1 attendu).');
   return n;
 }
 

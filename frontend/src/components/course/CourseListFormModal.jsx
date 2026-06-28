@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
  * Création / édition d'une liste de courses : un titre et une date (optionnelle).
  * Même habillage que les modales d'entraînement (.modal / .field / .modal__actions).
  */
-export default function CourseListFormModal({ list, onSave, onDelete, onClose }) {
+export default function CourseListFormModal({
+  list,
+  onSave,
+  onDelete,
+  onClose,
+}) {
   const isEdit = Boolean(list);
   const [title, setTitle] = useState(list?.title ?? '');
   const [date, setDate] = useState(list?.date ?? '');
@@ -69,14 +74,28 @@ export default function CourseListFormModal({ list, onSave, onDelete, onClose })
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--danger" onClick={() => onDelete(list)}>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  onClick={() => onDelete(list)}
+                >
                   Supprimer
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

@@ -5,7 +5,20 @@ const W = 760;
 const H = 320;
 const PAD = { top: 18, right: 18, bottom: 30, left: 46 };
 
-const MONTHS_SHORT = ['jan', 'fév', 'mar', 'avr', 'mai', 'jun', 'jui', 'aoû', 'sep', 'oct', 'nov', 'déc'];
+const MONTHS_SHORT = [
+  'jan',
+  'fév',
+  'mar',
+  'avr',
+  'mai',
+  'jun',
+  'jui',
+  'aoû',
+  'sep',
+  'oct',
+  'nov',
+  'déc',
+];
 
 const dayNum = (d) => {
   const [y, m, day] = d.split('-').map(Number);
@@ -35,7 +48,14 @@ function smoothPath(pts) {
  * `goal`    : { target, eta } | null  (eta = { date, value } facultatif).
  * `color`   : couleur de la tendance (hex).
  */
-export default function MetricChart({ data, metricKey, color, goal, label, onPointClick }) {
+export default function MetricChart({
+  data,
+  metricKey,
+  color,
+  goal,
+  label,
+  onPointClick,
+}) {
   const meta = metricMeta(metricKey);
   const [hover, setHover] = useState(null); // index du point survolé
 
@@ -71,7 +91,11 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
     const xAt = (d) => PAD.left + ((dayNum(d) - xMin) / (xMax - xMin)) * plotW;
     const yAt = (v) => PAD.top + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
 
-    const rawPts = points.map((p) => ({ ...p, x: xAt(p.date), y: yAt(p.value) }));
+    const rawPts = points.map((p) => ({
+      ...p,
+      x: xAt(p.date),
+      y: yAt(p.value),
+    }));
     const trendPts = points.map((p) => ({ x: xAt(p.date), y: yAt(p.trend) }));
 
     // Graduations Y (~4).
@@ -90,8 +114,14 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
     });
 
     // Bande de tendance : ±0,8 % autour de la tendance (ombrage léger).
-    const bandUp = trendPts.map((p, i) => ({ x: p.x, y: yAt(points[i].trend * 1.008) }));
-    const bandDown = trendPts.map((p, i) => ({ x: p.x, y: yAt(points[i].trend * 0.992) }));
+    const bandUp = trendPts.map((p, i) => ({
+      x: p.x,
+      y: yAt(points[i].trend * 1.008),
+    }));
+    const bandDown = trendPts.map((p, i) => ({
+      x: p.x,
+      y: yAt(points[i].trend * 0.992),
+    }));
     const bandPath = `${smoothPath(bandUp)} L ${bandDown[bandDown.length - 1].x} ${bandDown[bandDown.length - 1].y} ${smoothPath([...bandDown].reverse()).replace('M', 'L')} Z`;
 
     // Segment de projection jusqu'à l'ETA.
@@ -121,7 +151,12 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
   if (!layout) {
     return (
       <div className="hchart">
-        <svg className="hchart__svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
+        <svg
+          className="hchart__svg"
+          viewBox={`0 0 ${W} ${H}`}
+          role="img"
+          aria-label={label}
+        >
           <text className="hchart__empty" x={W / 2} y={H / 2}>
             Pas encore de données sur cette période.
           </text>
@@ -130,7 +165,8 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
     );
   }
 
-  const { rawPts, trendPath, bandPath, ticks, yAt, xlabels, goalY, etaSeg } = layout;
+  const { rawPts, trendPath, bandPath, ticks, yAt, xlabels, goalY, etaSeg } =
+    layout;
   const gid = `hchart-band-${metricKey}`;
 
   return (
@@ -153,7 +189,13 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
         {/* Grille + axes Y */}
         {ticks.map((v, i) => (
           <g key={i}>
-            <line className="hchart__gridline" x1={PAD.left} x2={W - PAD.right} y1={yAt(v)} y2={yAt(v)} />
+            <line
+              className="hchart__gridline"
+              x1={PAD.left}
+              x2={W - PAD.right}
+              y1={yAt(v)}
+              y2={yAt(v)}
+            />
             <text className="hchart__ylabel" x={PAD.left - 8} y={yAt(v) + 4}>
               {v.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}
             </text>
@@ -174,7 +216,12 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
               y2={goalY}
               stroke={GOAL_COLOR}
             />
-            <text className="hchart__goallabel" x={W - PAD.right} y={goalY - 6} fill={GOAL_COLOR}>
+            <text
+              className="hchart__goallabel"
+              x={W - PAD.right}
+              y={goalY - 6}
+              fill={GOAL_COLOR}
+            >
               🎯 objectif
             </text>
           </>
@@ -191,7 +238,13 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
               y2={etaSeg.y2}
               stroke={color}
             />
-            <circle className="hchart__etadot" cx={etaSeg.x2} cy={etaSeg.y2} r={5} fill={GOAL_COLOR} />
+            <circle
+              className="hchart__etadot"
+              cx={etaSeg.x2}
+              cy={etaSeg.y2}
+              r={5}
+              fill={GOAL_COLOR}
+            />
           </>
         )}
 
@@ -221,7 +274,14 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
         {hover != null && rawPts[hover] && (
           <g transform={`translate(${rawPts[hover].x}, ${rawPts[hover].y})`}>
             <g transform="translate(0, -14)">
-              <rect className="hchart__tip" x={-58} y={-30} width={116} height={26} rx={6} />
+              <rect
+                className="hchart__tip"
+                x={-58}
+                y={-30}
+                width={116}
+                height={26}
+                rx={6}
+              />
               <text className="hchart__tiptext" x={0} y={-12}>
                 {`${rawPts[hover].value} ${meta.unit} · t. ${rawPts[hover].trend}`}
               </text>
@@ -231,7 +291,12 @@ export default function MetricChart({ data, metricKey, color, goal, label, onPoi
 
         {/* Labels X */}
         {xlabels.map((l, i) => (
-          <text key={i} className="hchart__xlabel" x={l.x} y={H - PAD.bottom + 18}>
+          <text
+            key={i}
+            className="hchart__xlabel"
+            x={l.x}
+            y={H - PAD.bottom + 18}
+          >
             {l.label}
           </text>
         ))}

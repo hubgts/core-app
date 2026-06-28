@@ -5,7 +5,11 @@ import { confirmDialog } from '../components/dialogs';
 import EnvelopeCard from '../components/finances/EnvelopeCard';
 import EnvelopeFormModal from '../components/finances/EnvelopeFormModal';
 import EnvelopeDrawer from '../components/finances/EnvelopeDrawer';
-import { TYPE_META, TYPE_ORDER, formatEur } from '../components/finances/constants';
+import {
+  TYPE_META,
+  TYPE_ORDER,
+  formatEur,
+} from '../components/finances/constants';
 import './FinancesPage.css';
 import './EnvelopesPage.css';
 
@@ -80,7 +84,9 @@ export default function EnvelopesPage() {
       else next.push(...active.filter((e) => e.type === t));
     }
     setActive(next);
-    financesApi.reorder(next.map((e) => e.id)).catch((e) => flash(`Erreur : ${e.message}`));
+    financesApi
+      .reorder(next.map((e) => e.id))
+      .catch((e) => flash(`Erreur : ${e.message}`));
   }
 
   async function openDrawer(id, adding = false) {
@@ -142,7 +148,10 @@ export default function EnvelopesPage() {
   }
 
   async function deleteSnapshot(snapshotId) {
-    if (!(await confirmDialog({ message: 'Supprimer ce relevé ?', danger: true }))) return;
+    if (
+      !(await confirmDialog({ message: 'Supprimer ce relevé ?', danger: true }))
+    )
+      return;
     const detail = await financesApi.removeSnapshot(snapshotId);
     setDrawer(detail);
     flash('Relevé supprimé.');
@@ -172,14 +181,15 @@ export default function EnvelopesPage() {
 
       {staleCount > 0 && (
         <Link className="freminder" to="/finances/bilan">
-          ⚠ {staleCount} enveloppe{staleCount > 1 ? 's' : ''} à actualiser — faire le bilan →
+          ⚠ {staleCount} enveloppe{staleCount > 1 ? 's' : ''} à actualiser —
+          faire le bilan →
         </Link>
       )}
 
       {!loading && groups.length === 0 && (
         <p className="fempty">
-          Aucune enveloppe pour l'instant. Créez votre première enveloppe pour commencer
-          à suivre votre patrimoine.
+          Aucune enveloppe pour l'instant. Créez votre première enveloppe pour
+          commencer à suivre votre patrimoine.
         </p>
       )}
 
@@ -195,7 +205,9 @@ export default function EnvelopesPage() {
                 key={e.id}
                 className="fcard-drag"
                 draggable
-                onDragStart={() => (dragRef.current = { type: g.type, index: idx })}
+                onDragStart={() =>
+                  (dragRef.current = { type: g.type, index: idx })
+                }
                 onDragOver={(ev) => ev.preventDefault()}
                 onDrop={() => onDrop(g.type, idx)}
               >
@@ -208,7 +220,10 @@ export default function EnvelopesPage() {
 
       {archived.length > 0 && (
         <section className="farch">
-          <button className="farch__toggle" onClick={() => setShowArchived((v) => !v)}>
+          <button
+            className="farch__toggle"
+            onClick={() => setShowArchived((v) => !v)}
+          >
             {showArchived ? '▾' : '▸'} Archivées ({archived.length})
           </button>
           {showArchived && (
@@ -217,7 +232,10 @@ export default function EnvelopesPage() {
                 const meta = TYPE_META[e.type];
                 return (
                   <li key={e.id} className="fenv fenv--arch">
-                    <span className="fenv__icon" style={{ '--c': e.color || meta.color }}>
+                    <span
+                      className="fenv__icon"
+                      style={{ '--c': e.color || meta.color }}
+                    >
                       {e.icon || meta.icon}
                     </span>
                     <span className="fenv__name">{e.name}</span>

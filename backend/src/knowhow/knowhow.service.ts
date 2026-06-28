@@ -69,14 +69,18 @@ export class KnowHowService implements OnModuleInit {
       .groupBy('r.category_id')
       .getRawMany<{ categoryId: string; count: string }>();
     const counts = new Map(rows.map((r) => [r.categoryId, Number(r.count)]));
-    return cats.map((c) => ({ ...this.catResponse(c), knowhowCount: counts.get(c.id) ?? 0 }));
+    return cats.map((c) => ({
+      ...this.catResponse(c),
+      knowhowCount: counts.get(c.id) ?? 0,
+    }));
   }
 
   async createCategory(input: CategoryInput) {
     const name = this.validateCategoryName(input.name);
     const nameKey = this.normalizeKey(name);
     const existing = await this.categories.findOne({ where: { nameKey } });
-    if (existing) throw new ConflictException('Une catégorie porte déjà ce nom.');
+    if (existing)
+      throw new ConflictException('Une catégorie porte déjà ce nom.');
 
     const maxPos = await this.maxCategoryPosition();
     const saved = await this.categories.save(
@@ -179,24 +183,29 @@ export class KnowHowService implements OnModuleInit {
   async update(id: string, input: KnowHowInput) {
     const item = await this.getOrThrow(id);
     if (input.title !== undefined) item.title = this.validateTitle(input.title);
-    if (input.goal !== undefined) item.goal = this.normalizeText(input.goal, 2000);
+    if (input.goal !== undefined)
+      item.goal = this.normalizeText(input.goal, 2000);
     if (input.categoryId !== undefined) {
       await this.assertCategoryExists(input.categoryId);
       item.categoryId = input.categoryId ?? null;
     }
-    if (input.labels !== undefined) item.labels = this.normalizeLabels(input.labels);
+    if (input.labels !== undefined)
+      item.labels = this.normalizeLabels(input.labels);
     if (input.components !== undefined) {
       item.components = this.normalizeComponents(input.components);
     }
-    if (input.steps !== undefined) item.steps = this.normalizeSteps(input.steps);
+    if (input.steps !== undefined)
+      item.steps = this.normalizeSteps(input.steps);
     if (input.yieldText !== undefined) {
       item.yieldText = this.normalizeText(input.yieldText, 80);
     }
-    if (input.yieldBase !== undefined) item.yieldBase = this.normalizeNumber(input.yieldBase);
+    if (input.yieldBase !== undefined)
+      item.yieldBase = this.normalizeNumber(input.yieldBase);
     if (input.totalTimeMin !== undefined) {
       item.totalTimeMin = this.normalizeInt(input.totalTimeMin);
     }
-    if (input.color !== undefined) item.color = (input.color ?? '').slice(0, 16);
+    if (input.color !== undefined)
+      item.color = (input.color ?? '').slice(0, 16);
     item.updatedAt = new Date();
     return this.toResponse(await this.knowhow.save(item));
   }
@@ -318,7 +327,9 @@ export class KnowHowService implements OnModuleInit {
     const trimmed = (title ?? '').trim();
     if (!trimmed) throw new BadRequestException('Le titre est obligatoire.');
     if (trimmed.length > TITLE_MAX) {
-      throw new BadRequestException(`Le titre ne peut dépasser ${TITLE_MAX} caractères.`);
+      throw new BadRequestException(
+        `Le titre ne peut dépasser ${TITLE_MAX} caractères.`,
+      );
     }
     return trimmed;
   }
@@ -340,7 +351,9 @@ export class KnowHowService implements OnModuleInit {
     const seen = new Set<string>();
     const out: string[] = [];
     for (const raw of labels) {
-      const label = String(raw ?? '').trim().slice(0, 40);
+      const label = String(raw ?? '')
+        .trim()
+        .slice(0, 40);
       if (!label) continue;
       const key = this.normalizeKey(label);
       if (seen.has(key)) continue;
@@ -355,7 +368,9 @@ export class KnowHowService implements OnModuleInit {
     if (!Array.isArray(input)) return [];
     const out: KnowHowComponent[] = [];
     for (const c of input) {
-      const label = String(c?.label ?? '').trim().slice(0, 200);
+      const label = String(c?.label ?? '')
+        .trim()
+        .slice(0, 200);
       if (!label) continue;
       out.push({
         id: c?.id || randomUUID(),
@@ -373,7 +388,9 @@ export class KnowHowService implements OnModuleInit {
     if (!Array.isArray(input)) return [];
     const out: KnowHowStep[] = [];
     for (const s of input) {
-      const text = String(s?.text ?? '').trim().slice(0, 2000);
+      const text = String(s?.text ?? '')
+        .trim()
+        .slice(0, 2000);
       if (!text) continue;
       out.push({ id: s?.id || randomUUID(), text });
     }
@@ -387,7 +404,8 @@ export class KnowHowService implements OnModuleInit {
   }
 
   private normalizeNumber(value?: number | null): number | null {
-    if (value === null || value === undefined || (value as unknown) === '') return null;
+    if (value === null || value === undefined || (value as unknown) === '')
+      return null;
     const n = Number(value);
     if (!Number.isFinite(n) || n < 0) return null;
     return Math.round(n * 1000) / 1000;

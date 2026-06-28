@@ -24,7 +24,9 @@ export class TrainingProgramSessionEntity {
   @Column({ name: 'week_id', type: 'uuid' })
   weekId: string;
 
-  @ManyToOne(() => TrainingProgramWeekEntity, (w) => w.sessions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TrainingProgramWeekEntity, (w) => w.sessions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'week_id' })
   week?: TrainingProgramWeekEntity;
 

@@ -2,7 +2,7 @@ COMPOSE = docker compose -f docker/docker-compose.yml
 WEB_ROOT ?= /var/www/core-app
 
 .PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean \
-        update-dev update-prod
+        update-dev update-prod check
 
 ## init : construit les images, démarre les conteneurs et attend qu'ils soient prêts
 init: dc-build dc-up
@@ -48,6 +48,14 @@ update-dev:
 	git pull
 	$(COMPOSE) up -d --build --wait
 	@echo "✅ Dev à jour : http://localhost:5173 (API :3000)"
+
+# ================== QUALITÉ DU CODE ==================
+# Analyse statique + lint + formatage (analogue à PHPStan / PHP-CS-Fixer).
+
+## check : tout vérifier — typecheck back + ESLint & Prettier (back + front)
+check:
+	cd backend && npm run typecheck && npm run lint && npm run format:check
+	cd frontend && npm run lint && npm run format:check
 
 # ================== PRODUCTION (VPS, sans Docker) ==================
 # Installation native : Node + PostgreSQL + nginx. Voir docs/deploiement/production.md.

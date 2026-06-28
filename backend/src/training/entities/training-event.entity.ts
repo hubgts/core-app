@@ -46,11 +46,21 @@ export class TrainingEventEntity {
 
   // --- programme (snapshot figé au démarrage, aucun lien vivant) ---
   /** Nom du programme d'origine, ou null si séance hors programme. */
-  @Column({ name: 'program_label', type: 'varchar', length: 80, nullable: true })
+  @Column({
+    name: 'program_label',
+    type: 'varchar',
+    length: 80,
+    nullable: true,
+  })
   programLabel: string | null;
 
   /** Objectif résolu (semaine sinon phase) figé au démarrage. */
-  @Column({ name: 'program_objective', type: 'varchar', length: 120, nullable: true })
+  @Column({
+    name: 'program_objective',
+    type: 'varchar',
+    length: 120,
+    nullable: true,
+  })
   programObjective: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

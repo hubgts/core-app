@@ -15,7 +15,10 @@ export const trainingApi = {
     request('/training/events', { method: 'POST', body: JSON.stringify(data) }),
 
   update: (id, data) =>
-    request(`/training/events/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    request(`/training/events/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 
   remove: (id) => request(`/training/events/${id}`, { method: 'DELETE' }),
 
@@ -32,12 +35,19 @@ export const trainingApi = {
   template: (id) => request(`/training/templates/${id}`),
 
   createTemplate: (data) =>
-    request('/training/templates', { method: 'POST', body: JSON.stringify(data) }),
+    request('/training/templates', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 
   updateTemplate: (id, data) =>
-    request(`/training/templates/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    request(`/training/templates/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 
-  removeTemplate: (id) => request(`/training/templates/${id}`, { method: 'DELETE' }),
+  removeTemplate: (id) =>
+    request(`/training/templates/${id}`, { method: 'DELETE' }),
 
   // --- Programmes / cycles ---
 
@@ -47,15 +57,24 @@ export const trainingApi = {
   program: (id) => request(`/training/programs/${id}`),
 
   createProgram: (data) =>
-    request('/training/programs', { method: 'POST', body: JSON.stringify(data) }),
+    request('/training/programs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 
   updateProgram: (id, data) =>
-    request(`/training/programs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    request(`/training/programs/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 
-  removeProgram: (id) => request(`/training/programs/${id}`, { method: 'DELETE' }),
+  removeProgram: (id) =>
+    request(`/training/programs/${id}`, { method: 'DELETE' }),
 
   previewProgram: (id, startDate) =>
-    request(`/training/programs/${id}/preview?startDate=${encodeURIComponent(startDate)}`),
+    request(
+      `/training/programs/${id}/preview?startDate=${encodeURIComponent(startDate)}`,
+    ),
 
   startProgram: (id, startDate) =>
     request(`/training/programs/${id}/start`, {

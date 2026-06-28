@@ -41,14 +41,20 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/finances/bilan" element={<BilanPage />} />
           <Route path="/budget" element={<CashflowPage />} />
           <Route path="/budget/plan" element={<BudgetPage />} />
-          <Route path="/finances/budget" element={<Navigate to="/budget/plan" replace />} />
+          <Route
+            path="/finances/budget"
+            element={<Navigate to="/budget/plan" replace />}
+          />
           <Route path="/savoir-faire" element={<KnowHowPage />} />
           <Route path="/alimentation" element={<AlimentationPage />} />
           <Route path="/course" element={<CoursePage />} />
           <Route path="/course/:id" element={<ShoppingListPage />} />
           <Route path="/paris" element={<BettingPage />} />
           <Route path="/paris/:id" element={<BankrollDetailPage />} />
-          <Route path="/sante" element={<Navigate to="/entrainement/mensuration" replace />} />
+          <Route
+            path="/sante"
+            element={<Navigate to="/entrainement/mensuration" replace />}
+          />
           <Route path="/referentiel" element={<ReferentialPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

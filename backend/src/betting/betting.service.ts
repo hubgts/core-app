@@ -113,9 +113,11 @@ export class BettingService {
       await this.assertNameUnique(name, id);
       bankroll.name = name;
     }
-    if (input.bookmaker !== undefined) bankroll.bookmaker = (input.bookmaker ?? '').trim();
+    if (input.bookmaker !== undefined)
+      bankroll.bookmaker = (input.bookmaker ?? '').trim();
     if (input.color !== undefined) bankroll.color = input.color;
-    if (input.icon !== undefined) bankroll.icon = (input.icon ?? '').slice(0, 8);
+    if (input.icon !== undefined)
+      bankroll.icon = (input.icon ?? '').slice(0, 8);
     await this.bankrolls.save(bankroll);
     return this.getBankroll(id);
   }
@@ -154,11 +156,11 @@ export class BettingService {
 
     const status = this.normalizeBetStatus(input.status) ?? 'pending';
     const odds =
-      type === 'combine'
-        ? round3(combineOdds(selections))
-        : selections[0].odds;
+      type === 'combine' ? round3(combineOdds(selections)) : selections[0].odds;
 
-    const placedAt = isValidDateStr(input.placedAt) ? input.placedAt! : todayStr();
+    const placedAt = isValidDateStr(input.placedAt)
+      ? input.placedAt!
+      : todayStr();
     const settledAt = this.resolveSettledAt(status, input.settledAt, placedAt);
 
     const bet = await this.bets.save(
@@ -188,9 +190,14 @@ export class BettingService {
   async updateBet(betId: string, input: BetInput) {
     const bet = await this.getBetOrThrow(betId);
 
-    if (input.stake !== undefined) bet.stake = this.validatePositive(input.stake, 'La mise');
+    if (input.stake !== undefined)
+      bet.stake = this.validatePositive(input.stake, 'La mise');
     if (input.commission !== undefined) {
-      bet.commission = this.validateNonNeg(input.commission, 'La commission', 0);
+      bet.commission = this.validateNonNeg(
+        input.commission,
+        'La commission',
+        0,
+      );
     }
     if (input.closingOdds !== undefined) {
       bet.closingOdds = this.validateOptionalOdds(input.closingOdds);
@@ -207,7 +214,8 @@ export class BettingService {
       bet.selections = next.map((s, i) =>
         this.selections.create({ ...s, betId, position: i }),
       );
-      bet.odds = bet.type === 'combine' ? round3(combineOdds(next)) : next[0].odds;
+      bet.odds =
+        bet.type === 'combine' ? round3(combineOdds(next)) : next[0].odds;
     }
 
     if (input.status !== undefined) {
@@ -226,7 +234,11 @@ export class BettingService {
     const status = this.normalizeBetStatus(input.status);
     if (!status) throw new BadRequestException('Statut de pari invalide.');
     if (input.commission !== undefined) {
-      bet.commission = this.validateNonNeg(input.commission, 'La commission', 0);
+      bet.commission = this.validateNonNeg(
+        input.commission,
+        'La commission',
+        0,
+      );
     }
     this.applyStatus(bet, status, input.cashoutAmount, input.settledAt);
     await this.bets.save(bet);
@@ -238,7 +250,9 @@ export class BettingService {
     if (!SELECTION_STATUSES.includes(status)) {
       throw new BadRequestException('Statut de sélection invalide.');
     }
-    const selection = await this.selections.findOne({ where: { id: selectionId } });
+    const selection = await this.selections.findOne({
+      where: { id: selectionId },
+    });
     if (!selection) throw new NotFoundException('Sélection introuvable.');
     selection.status = status;
     await this.selections.save(selection);
@@ -249,7 +263,7 @@ export class BettingService {
     const derived = deriveBetStatus(all);
     bet.status = derived;
     bet.settledAt =
-      derived === 'pending' ? null : bet.settledAt ?? todayStr();
+      derived === 'pending' ? null : (bet.settledAt ?? todayStr());
     if (derived !== 'cashout') bet.cashoutAmount = null;
     await this.bets.save(bet);
     return this.getBankroll(bet.bankrollId);
@@ -351,14 +365,17 @@ export class BettingService {
   ) {
     const list = Array.isArray(input) ? input : [];
     if (type === 'simple' && list.length !== 1) {
-      throw new BadRequestException('Un pari simple a exactement une sélection.');
+      throw new BadRequestException(
+        'Un pari simple a exactement une sélection.',
+      );
     }
     if (type === 'combine' && list.length < 2) {
       throw new BadRequestException('Un combiné a au moins deux sélections.');
     }
     return list.map((s) => {
       const sport = (s.sport ?? '').trim();
-      if (!sport) throw new BadRequestException('Chaque sélection doit avoir un sport.');
+      if (!sport)
+        throw new BadRequestException('Chaque sélection doit avoir un sport.');
       const odds = Number(s.odds);
       if (!Number.isFinite(odds) || odds < 1) {
         throw new BadRequestException('La cote doit être ≥ 1.');
@@ -381,7 +398,9 @@ export class BettingService {
 
   private normalizeBetStatus(status: string | undefined): BetStatus | null {
     if (!status) return null;
-    return BET_STATUSES.includes(status as BetStatus) ? (status as BetStatus) : null;
+    return BET_STATUSES.includes(status as BetStatus)
+      ? (status as BetStatus)
+      : null;
   }
 
   private async maxPosition(): Promise<number> {
@@ -411,7 +430,9 @@ export class BettingService {
     const trimmed = (name ?? '').trim();
     if (!trimmed) throw new BadRequestException('Le nom est obligatoire.');
     if (trimmed.length > NAME_MAX) {
-      throw new BadRequestException(`Le nom ne peut dépasser ${NAME_MAX} caractères.`);
+      throw new BadRequestException(
+        `Le nom ne peut dépasser ${NAME_MAX} caractères.`,
+      );
     }
     return trimmed;
   }
@@ -439,8 +460,11 @@ export class BettingService {
     return round2(n);
   }
 
-  private validateOptionalOdds(value: number | null | undefined): number | null {
-    if (value === null || value === undefined || (value as unknown) === '') return null;
+  private validateOptionalOdds(
+    value: number | null | undefined,
+  ): number | null {
+    if (value === null || value === undefined || (value as unknown) === '')
+      return null;
     const n = Number(value);
     if (!Number.isFinite(n) || n < 1) {
       throw new BadRequestException('La cote de clôture doit être ≥ 1.');
@@ -452,7 +476,10 @@ export class BettingService {
     return trimOrNull(note, 500);
   }
 
-  private async assertNameUnique(name: string, exceptId: string | null): Promise<void> {
+  private async assertNameUnique(
+    name: string,
+    exceptId: string | null,
+  ): Promise<void> {
     const qb = this.bankrolls
       .createQueryBuilder('b')
       .where('b.status = :status', { status: 'active' })

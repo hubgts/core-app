@@ -78,23 +78,30 @@ export function computeStats(
       : null;
 
   const avgStake = action.length > 0 ? round2(turnover / action.length) : null;
-  const maxStake = bets.length > 0 ? round2(Math.max(...bets.map((b) => b.stake))) : null;
+  const maxStake =
+    bets.length > 0 ? round2(Math.max(...bets.map((b) => b.stake))) : null;
   const avgOdds =
     settled.length > 0
       ? round3(settled.reduce((s, b) => s + b.odds, 0) / settled.length)
       : null;
-  const bestWonOdds = won.length > 0 ? round3(Math.max(...won.map((b) => b.odds))) : null;
+  const bestWonOdds =
+    won.length > 0 ? round3(Math.max(...won.map((b) => b.odds))) : null;
   const profits = settled.map(profitOf);
   const biggestWin = profits.length > 0 ? round2(Math.max(...profits)) : null;
   const biggestLoss = profits.length > 0 ? round2(Math.min(...profits)) : null;
-  const commissions = round2(settled.reduce((s, b) => s + (b.commission ?? 0), 0));
+  const commissions = round2(
+    settled.reduce((s, b) => s + (b.commission ?? 0), 0),
+  );
 
   // CLV : moyenne de (cote prise / cote clôture − 1) là où la clôture est connue.
   const withClosing = settled.filter((b) => b.closingOdds && b.closingOdds > 0);
   const clv =
     withClosing.length > 0
       ? round2(
-          (withClosing.reduce((s, b) => s + (b.odds / (b.closingOdds as number) - 1), 0) /
+          (withClosing.reduce(
+            (s, b) => s + (b.odds / (b.closingOdds as number) - 1),
+            0,
+          ) /
             withClosing.length) *
             100,
         )
@@ -261,7 +268,10 @@ function computeTri(
   return round2(((lo + hi) / 2) * 100);
 }
 
-function bankrollStartDate(bankroll: BankrollEntity, settled: BetEntity[]): string {
+function bankrollStartDate(
+  bankroll: BankrollEntity,
+  settled: BetEntity[],
+): string {
   const dates = [dateOf(bankroll.createdAt)];
   for (const b of settled) dates.push(b.placedAt || settleDate(b));
   return dates.sort((a, b) => a.localeCompare(b))[0];

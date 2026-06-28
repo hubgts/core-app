@@ -1,6 +1,10 @@
 export type TrainingType = 'musculation' | 'cardio' | 'autre';
 
-export const TRAINING_TYPES: TrainingType[] = ['musculation', 'cardio', 'autre'];
+export const TRAINING_TYPES: TrainingType[] = [
+  'musculation',
+  'cardio',
+  'autre',
+];
 
 export type CardioZone = 'Z1' | 'Z2' | 'Z3' | 'Z4' | 'Z5';
 

@@ -6,16 +6,15 @@ import RecipeFormModal from '../components/alimentation/RecipeFormModal';
 import RecipeDrawer from '../components/alimentation/RecipeDrawer';
 import CookMode from '../components/alimentation/CookMode';
 import KebabMenu from '../components/KebabMenu';
-import { indexMealTypes, NO_MEAL_TYPE } from '../components/alimentation/constants';
+import {
+  indexMealTypes,
+  NO_MEAL_TYPE,
+} from '../components/alimentation/constants';
 import './AlimentationPage.css';
 
 // Normalisation pour la recherche : minuscule, sans accents.
 const norm = (s) =>
-  (s ?? '')
-    .toString()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
+  (s ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export default function AlimentationPage() {
   const [recipes, setRecipes] = useState([]);
@@ -63,20 +62,34 @@ export default function AlimentationPage() {
 
   const allLabels = useMemo(() => {
     const seen = new Map();
-    for (const r of recipes) for (const l of r.labels) if (!seen.has(l.toLowerCase())) seen.set(l.toLowerCase(), l);
+    for (const r of recipes)
+      for (const l of r.labels)
+        if (!seen.has(l.toLowerCase())) seen.set(l.toLowerCase(), l);
     return [...seen.values()].sort((a, b) => a.localeCompare(b, 'fr'));
   }, [recipes]);
 
-  const isFiltering = query.trim() !== '' || activeTypes.size > 0 || activeLabels.size > 0;
+  const isFiltering =
+    query.trim() !== '' || activeTypes.size > 0 || activeLabels.size > 0;
 
   const filtered = useMemo(() => {
     const q = norm(query);
     return recipes.filter((r) => {
-      if (activeTypes.size > 0 && !activeTypes.has(r.mealTypeId ?? '∅')) return false;
-      if (activeLabels.size > 0 && !r.labels.some((l) => activeLabels.has(l.toLowerCase()))) return false;
+      if (activeTypes.size > 0 && !activeTypes.has(r.mealTypeId ?? '∅'))
+        return false;
+      if (
+        activeLabels.size > 0 &&
+        !r.labels.some((l) => activeLabels.has(l.toLowerCase()))
+      )
+        return false;
       if (q) {
         const hay = norm(
-          [r.title, r.description, r.labels.join(' '), r.ingredients.map((i) => i.label).join(' '), r.steps.map((s) => s.text).join(' ')].join(' '),
+          [
+            r.title,
+            r.description,
+            r.labels.join(' '),
+            r.ingredients.map((i) => i.label).join(' '),
+            r.steps.map((s) => s.text).join(' '),
+          ].join(' '),
         );
         if (!hay.includes(q)) return false;
       }
@@ -113,7 +126,9 @@ export default function AlimentationPage() {
 
   // --- Actions recette ---
   async function togglePin(recipe) {
-    await (recipe.pinned ? alimentationApi.unpin(recipe.id) : alimentationApi.pin(recipe.id));
+    await (recipe.pinned
+      ? alimentationApi.unpin(recipe.id)
+      : alimentationApi.pin(recipe.id));
     await load();
   }
   async function setColor(recipe, color) {
@@ -133,7 +148,13 @@ export default function AlimentationPage() {
     await load();
   }
   async function deleteRecipe(recipe) {
-    if (!(await confirmDialog({ message: `Supprimer « ${recipe.title} » ? Cette action est irréversible.\n\nAstuce : « Archiver » conserve la recette.`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer « ${recipe.title} » ? Cette action est irréversible.\n\nAstuce : « Archiver » conserve la recette.`,
+        danger: true,
+      }))
+    )
+      return;
     await alimentationApi.remove(recipe.id);
     setModal(null);
     setDrawer(null);
@@ -164,7 +185,10 @@ export default function AlimentationPage() {
     // Optimiste : réordonne localement puis persiste.
     const byId = new Map(recipes.map((r) => [r.id, r]));
     setRecipes(ids.map((id) => byId.get(id)));
-    alimentationApi.reorder(ids).then(load).catch((e) => flash(e.message));
+    alimentationApi
+      .reorder(ids)
+      .then(load)
+      .catch((e) => flash(e.message));
   }
 
   function renderCard(r) {
@@ -196,10 +220,16 @@ export default function AlimentationPage() {
       <header className="alpage__head">
         <h1 className="alpage__title">🍽️ Alimentation</h1>
         <div className="page__headactions">
-          <button className="btn btn--primary" onClick={() => setModal({})}>+ Recette</button>
+          <button className="btn btn--primary" onClick={() => setModal({})}>
+            + Recette
+          </button>
           <KebabMenu
             actions={[
-              { icon: '⚙', label: 'Gérer les types de repas', to: '/referentiel?kind=meal_type' },
+              {
+                icon: '⚙',
+                label: 'Gérer les types de repas',
+                to: '/referentiel?kind=meal_type',
+              },
             ]}
           />
         </div>
@@ -257,12 +287,16 @@ export default function AlimentationPage() {
         <div className="alempty">
           <div className="alempty__icon">🍽️</div>
           <p>Ajoute ta première recette : un plat, un dessert, une sauce…</p>
-          <button className="btn btn--primary" onClick={() => setModal({})}>+ Recette</button>
+          <button className="btn btn--primary" onClick={() => setModal({})}>
+            + Recette
+          </button>
         </div>
       ) : filtered.length === 0 ? (
         <div className="alempty">
           <p>Aucune recette ne correspond à ta recherche.</p>
-          <button className="btn btn--ghost" onClick={resetFilters}>Réinitialiser les filtres</button>
+          <button className="btn btn--ghost" onClick={resetFilters}>
+            Réinitialiser les filtres
+          </button>
         </div>
       ) : (
         <>
@@ -274,7 +308,9 @@ export default function AlimentationPage() {
           )}
           {others.length > 0 && (
             <section className="alboard-section">
-              {pinned.length > 0 && <h2 className="alboard-section__title">Autres</h2>}
+              {pinned.length > 0 && (
+                <h2 className="alboard-section__title">Autres</h2>
+              )}
               <div className="alboard">{others.map(renderCard)}</div>
             </section>
           )}

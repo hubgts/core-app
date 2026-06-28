@@ -30,8 +30,15 @@
   --m-health: #f472b6;
   --m-course: #4ade80;
 
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif;
+  font-family:
+    'Manrope',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   color: var(--text);
   /* Contrôles natifs (date pickers, selects, scrollbars) en sombre. */
   color-scheme: dark;
@@ -66,7 +73,10 @@ body {
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    opacity 0.15s;
 }
 
 .btn:disabled {

@@ -10,10 +10,19 @@ function parseNum(str) {
 }
 
 /** Définition / modification de l'objectif de poids (un seul actif). */
-export default function GoalModal({ goal, currentWeight, today, onSave, onClear, onClose }) {
+export default function GoalModal({
+  goal,
+  currentWeight,
+  today,
+  onSave,
+  onClear,
+  onClose,
+}) {
   const isEdit = Boolean(goal);
   const [target, setTarget] = useState(
-    goal?.targetWeightKg != null ? String(goal.targetWeightKg).replace('.', ',') : '',
+    goal?.targetWeightKg != null
+      ? String(goal.targetWeightKg).replace('.', ',')
+      : '',
   );
   const [date, setDate] = useState(goal?.targetDate ?? '');
   const [error, setError] = useState('');
@@ -64,7 +73,9 @@ export default function GoalModal({ goal, currentWeight, today, onSave, onClear,
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
-        <h2 className="modal__title">{isEdit ? "Modifier l'objectif" : 'Définir un objectif'}</h2>
+        <h2 className="modal__title">
+          {isEdit ? "Modifier l'objectif" : 'Définir un objectif'}
+        </h2>
 
         <form onSubmit={submit}>
           <label className="hfield">
@@ -80,14 +91,16 @@ export default function GoalModal({ goal, currentWeight, today, onSave, onClear,
             />
             {dir && currentWeight != null && (
               <span className="hfield__hint">
-                {dir} {Math.abs(currentWeight - targetNum).toFixed(1)} kg
-                depuis {currentWeight} kg (tendance actuelle).
+                {dir} {Math.abs(currentWeight - targetNum).toFixed(1)} kg depuis{' '}
+                {currentWeight} kg (tendance actuelle).
               </span>
             )}
           </label>
 
           <label className="hfield">
-            <span className="hfield__label">Échéance souhaitée (optionnel)</span>
+            <span className="hfield__label">
+              Échéance souhaitée (optionnel)
+            </span>
             <input
               className="hfield__input"
               type="date"
@@ -105,16 +118,28 @@ export default function GoalModal({ goal, currentWeight, today, onSave, onClear,
           <div className="modal__actions">
             {isEdit && (
               <div className="modal__actions-left">
-                <button type="button" className="btn btn--ghost" onClick={onClear}>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={onClear}
+                >
                   Retirer l'objectif
                 </button>
               </div>
             )}
             <div className="modal__actions-right">
-              <button type="button" className="btn btn--ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onClose}
+              >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--primary" disabled={saving}>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={saving}
+              >
                 {saving ? '…' : 'Enregistrer'}
               </button>
             </div>

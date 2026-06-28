@@ -77,7 +77,11 @@ function projectTarget(
   target: number,
   targetDate: string | null,
   ref: string,
-): { eta: string | null; paceStatus: PaceStatus; requiredMonthly: number | null } {
+): {
+  eta: string | null;
+  paceStatus: PaceStatus;
+  requiredMonthly: number | null;
+} {
   if (current >= target) {
     return { eta: null, paceStatus: 'reached', requiredMonthly: null };
   }
@@ -124,7 +128,9 @@ export class FinancesService {
     });
     if (envelopes.length === 0) return [];
 
-    const byEnvelope = await this.snapshotsByEnvelope(envelopes.map((e) => e.id));
+    const byEnvelope = await this.snapshotsByEnvelope(
+      envelopes.map((e) => e.id),
+    );
     return envelopes.map((e) => this.decorate(e, byEnvelope.get(e.id) ?? []));
   }
 
@@ -166,7 +172,11 @@ export class FinancesService {
    * Vue d'ensemble : patrimoine net, répartition, plus-values, et courbe
    * d'évolution mensuelle (report du dernier solde connu, RG-12).
    */
-  async overview(monthsParam?: string, today?: string, projectionParam?: string) {
+  async overview(
+    monthsParam?: string,
+    today?: string,
+    projectionParam?: string,
+  ) {
     const ref = isValidDateStr(today) ? (today as string) : todayStr();
     const months = this.clampMonths(monthsParam);
 
@@ -174,7 +184,9 @@ export class FinancesService {
       where: { status: 'active' },
       order: { position: 'ASC' },
     });
-    const byEnvelope = await this.snapshotsByEnvelope(envelopes.map((e) => e.id));
+    const byEnvelope = await this.snapshotsByEnvelope(
+      envelopes.map((e) => e.id),
+    );
 
     const decorated = envelopes.map((e) =>
       this.decorate(e, byEnvelope.get(e.id) ?? []),
@@ -206,7 +218,10 @@ export class FinancesService {
       .map((type) => ({
         type,
         total: round2(byType.get(type) ?? 0),
-        pct: grossAssets > 0 ? round2(((byType.get(type) ?? 0) / grossAssets) * 100) : 0,
+        pct:
+          grossAssets > 0
+            ? round2(((byType.get(type) ?? 0) / grossAssets) * 100)
+            : 0,
       }))
       .filter((r) => r.total > 0);
 
@@ -220,7 +235,10 @@ export class FinancesService {
         color: e.color,
         icon: e.icon,
         total: round2(e.balance as number),
-        pct: grossAssets > 0 ? round2(((e.balance as number) / grossAssets) * 100) : 0,
+        pct:
+          grossAssets > 0
+            ? round2(((e.balance as number) / grossAssets) * 100)
+            : 0,
       }))
       .sort((a, b) => b.total - a.total);
 
@@ -257,16 +275,23 @@ export class FinancesService {
     const variation = {
       fromDate: prevDate,
       amount: round2(netWorth - prevNet),
-      pct: prevNet !== 0 ? round2(((netWorth - prevNet) / Math.abs(prevNet)) * 100) : null,
+      pct:
+        prevNet !== 0
+          ? round2(((netWorth - prevNet) / Math.abs(prevNet)) * 100)
+          : null,
     };
 
     // #7 — Composition : solde par type actif à chaque date de la courbe.
-    const activeAssetTypes = ENVELOPE_TYPES.filter((t) => natureOf(t) === 'actif');
+    const activeAssetTypes = ENVELOPE_TYPES.filter(
+      (t) => natureOf(t) === 'actif',
+    );
     const assetSeries = decorated
       .filter((e) => e.nature === 'actif')
       .map((e) => ({
         type: e.type,
-        snaps: (byEnvelope.get(e.id) ?? []).slice().sort((a, b) => a.date.localeCompare(b.date)),
+        snaps: (byEnvelope.get(e.id) ?? [])
+          .slice()
+          .sort((a, b) => a.date.localeCompare(b.date)),
       }));
     const evolutionByType = evolution.map(({ date }) => {
       const point: Record<string, string | number> = { date };
@@ -298,12 +323,16 @@ export class FinancesService {
         const { year, month } = addMonthsYM(ey, em, i);
         const date = i === span ? ref : lastDayOfMonth(year, month);
         const value = round2(netAt(date));
-        if (!allTimeHigh || value > allTimeHigh.amount) allTimeHigh = { amount: value, date };
+        if (!allTimeHigh || value > allTimeHigh.amount)
+          allTimeHigh = { amount: value, date };
       }
     }
     const kpis = {
       ytd: { fromDate: `${y - 1}-12-31`, amount: round2(netWorth - ytdNet) },
-      oneYear: { fromDate: addDaysStr(ref, -365), amount: round2(netWorth - oneYearNet) },
+      oneYear: {
+        fromDate: addDaysStr(ref, -365),
+        amount: round2(netWorth - oneYearNet),
+      },
       allTimeHigh,
     };
 
@@ -321,7 +350,8 @@ export class FinancesService {
       }
     }
     const savingsSlope = slopePerDay(savingsBasePts, ref, 1_000_000);
-    const monthlySavings = savingsSlope != null ? round2(savingsSlope * (365 / 12)) : null;
+    const monthlySavings =
+      savingsSlope != null ? round2(savingsSlope * (365 / 12)) : null;
 
     const projectionMonths = this.clampProjection(projectionParam);
     const projection: { date: string; net: number }[] = [];
@@ -337,25 +367,29 @@ export class FinancesService {
 
     // #10 — Objectif de patrimoine net global (réglages singleton).
     const cfg = await this.getSettings();
-    let netObjective:
-      | {
-          target: number;
-          targetDate: string | null;
-          progressPct: number;
-          remaining: number;
-          reached: boolean;
-          eta: string | null;
-          paceStatus: PaceStatus;
-          requiredMonthly: number | null;
-        }
-      | null = null;
+    let netObjective: {
+      target: number;
+      targetDate: string | null;
+      progressPct: number;
+      remaining: number;
+      reached: boolean;
+      eta: string | null;
+      paceStatus: PaceStatus;
+      requiredMonthly: number | null;
+    } | null = null;
     if (cfg.netWorthTarget != null && cfg.netWorthTarget > 0) {
       const target = round2(cfg.netWorthTarget);
       const slope = slopePerDay(
         evolution.map((p) => ({ date: p.date, value: p.net })),
         ref,
       );
-      const proj = projectTarget(slope, netWorth, target, cfg.netWorthTargetDate ?? null, ref);
+      const proj = projectTarget(
+        slope,
+        netWorth,
+        target,
+        cfg.netWorthTargetDate ?? null,
+        ref,
+      );
       netObjective = {
         target,
         targetDate: cfg.netWorthTargetDate ?? null,
@@ -375,7 +409,9 @@ export class FinancesService {
       plusValueTotal: round2(plusValueTotal),
       investedCapital: round2(investedCapital),
       performancePct:
-        investedCapital > 0 ? round2((plusValueTotal / investedCapital) * 100) : null,
+        investedCapital > 0
+          ? round2((plusValueTotal / investedCapital) * 100)
+          : null,
       variation,
       repartition,
       repartitionByEnvelope,
@@ -423,7 +459,7 @@ export class FinancesService {
       : todayStr();
     await this.setSnapshot(envelope.id, initialDate, {
       amount: input.initialAmount ?? 0,
-      gain: type === 'investissement' ? input.initialGain ?? null : null,
+      gain: type === 'investissement' ? (input.initialGain ?? null) : null,
     });
 
     return this.getEnvelope(envelope.id);
@@ -493,9 +529,7 @@ export class FinancesService {
     }
     const amount = this.validateAmount(input.amount);
     const gain =
-      envelope.type === 'investissement'
-        ? this.validateGain(input.gain)
-        : null;
+      envelope.type === 'investissement' ? this.validateGain(input.gain) : null;
 
     const existing = await this.snapshots.findOne({
       where: { envelopeId, date },
@@ -575,7 +609,9 @@ export class FinancesService {
       cfg.netWorthTarget = this.validateTargetAmount(input.netWorthTarget);
     }
     if (input.netWorthTargetDate !== undefined) {
-      cfg.netWorthTargetDate = this.validateTargetDate(input.netWorthTargetDate);
+      cfg.netWorthTargetDate = this.validateTargetDate(
+        input.netWorthTargetDate,
+      );
     }
     return this.settings.save(cfg);
   }
@@ -630,7 +666,9 @@ export class FinancesService {
       gain = round2(last.gain);
       investedCapital = round2(last.amount - last.gain);
       performancePct =
-        investedCapital > 0 ? round2((last.gain / investedCapital) * 100) : null;
+        investedCapital > 0
+          ? round2((last.gain / investedCapital) * 100)
+          : null;
     }
 
     const ref = todayStr();
@@ -649,23 +687,22 @@ export class FinancesService {
       const amount = round2(balance - balance30);
       trend30 = {
         amount,
-        pct: balance30 !== 0 ? round2((amount / Math.abs(balance30)) * 100) : null,
+        pct:
+          balance30 !== 0 ? round2((amount / Math.abs(balance30)) * 100) : null,
       };
     }
 
     // Objectif : progression du solde vers la cible + projection (#6, calcul backend).
-    let objective:
-      | {
-          targetAmount: number;
-          targetDate: string | null;
-          progressPct: number;
-          remaining: number;
-          reached: boolean;
-          eta: string | null;
-          paceStatus: PaceStatus;
-          requiredMonthly: number | null;
-        }
-      | null = null;
+    let objective: {
+      targetAmount: number;
+      targetDate: string | null;
+      progressPct: number;
+      remaining: number;
+      reached: boolean;
+      eta: string | null;
+      paceStatus: PaceStatus;
+      requiredMonthly: number | null;
+    } | null = null;
     if (envelope.targetAmount != null && envelope.targetAmount > 0) {
       const current = balance ?? 0;
       const target = round2(envelope.targetAmount);
@@ -673,7 +710,13 @@ export class FinancesService {
         snapsDesc.map((s) => ({ date: s.date, value: s.amount })),
         ref,
       );
-      const proj = projectTarget(slope, current, target, envelope.targetDate ?? null, ref);
+      const proj = projectTarget(
+        slope,
+        current,
+        target,
+        envelope.targetDate ?? null,
+        ref,
+      );
       objective = {
         targetAmount: target,
         targetDate: envelope.targetDate ?? null,
@@ -744,7 +787,9 @@ export class FinancesService {
     const trimmed = (name ?? '').trim();
     if (!trimmed) throw new BadRequestException('Le nom est obligatoire.');
     if (trimmed.length > NAME_MAX) {
-      throw new BadRequestException(`Le nom ne peut dépasser ${NAME_MAX} caractères.`);
+      throw new BadRequestException(
+        `Le nom ne peut dépasser ${NAME_MAX} caractères.`,
+      );
     }
     return trimmed;
   }
@@ -786,7 +831,9 @@ export class FinancesService {
   private validateTargetDate(value?: string | null): string | null {
     if (value === null || value === undefined || value === '') return null;
     if (!isValidDateStr(value)) {
-      throw new BadRequestException("L'échéance est invalide (YYYY-MM-DD attendu).");
+      throw new BadRequestException(
+        "L'échéance est invalide (YYYY-MM-DD attendu).",
+      );
     }
     return value;
   }
@@ -797,7 +844,10 @@ export class FinancesService {
     return trimmed ? trimmed.slice(0, 500) : null;
   }
 
-  private async assertNameUnique(name: string, exceptId: string | null): Promise<void> {
+  private async assertNameUnique(
+    name: string,
+    exceptId: string | null,
+  ): Promise<void> {
     const qb = this.envelopes
       .createQueryBuilder('e')
       .where('e.status = :status', { status: 'active' })

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { addDays, daysBetween, isValidDateStr, todayStr } from './date.util';
@@ -112,7 +116,8 @@ export class HealthService {
 
     return {
       profile: {
-        heightCm: profile.heightCm == null ? null : round1(num(profile.heightCm)),
+        heightCm:
+          profile.heightCm == null ? null : round1(num(profile.heightCm)),
         sex: profile.sex,
         metrics: profile.metrics,
       },
@@ -139,7 +144,9 @@ export class HealthService {
     }
     const ref = isValidDateStr(today) ? (today as string) : todayStr();
     if (date > ref) {
-      throw new BadRequestException('Une mesure ne peut pas être dans le futur.');
+      throw new BadRequestException(
+        'Une mesure ne peut pas être dans le futur.',
+      );
     }
 
     const weightKg = this.validateWeight(input.weightKg);
@@ -188,7 +195,10 @@ export class HealthService {
   // Profil
   // ---------------------------------------------------------------------------
 
-  async updateProfile(input: ProfileInput, today?: string): Promise<HealthOverview> {
+  async updateProfile(
+    input: ProfileInput,
+    today?: string,
+  ): Promise<HealthOverview> {
     const profile = await this.getProfile();
     if (input.heightCm !== undefined) {
       profile.heightCm = this.validateHeight(input.heightCm);
@@ -209,7 +219,11 @@ export class HealthService {
 
   async setGoal(input: GoalInput, today?: string): Promise<HealthOverview> {
     const target = num(input.targetWeightKg);
-    if (!Number.isFinite(target) || target < WEIGHT_MIN || target > WEIGHT_MAX) {
+    if (
+      !Number.isFinite(target) ||
+      target < WEIGHT_MIN ||
+      target > WEIGHT_MAX
+    ) {
       throw new BadRequestException('Poids cible invalide.');
     }
     const ref = isValidDateStr(today) ? (today as string) : todayStr();
@@ -353,7 +367,10 @@ export class HealthService {
           paceStatus = 'on_track';
         } else {
           paceStatus = 'behind';
-          const weeksLeft = Math.max(daysBetween(ref, goal.targetDate) / 7, 0.1);
+          const weeksLeft = Math.max(
+            daysBetween(ref, goal.targetDate) / 7,
+            0.1,
+          );
           requiredWeeklyKg = round1(Math.abs(target - current) / weeksLeft);
         }
       } else {
@@ -431,7 +448,8 @@ export class HealthService {
     if (!values) return [];
     const out: { key: string; value: number }[] = [];
     for (const [key, raw] of Object.entries(values)) {
-      if (raw === null || raw === undefined || (raw as unknown) === '') continue;
+      if (raw === null || raw === undefined || (raw as unknown) === '')
+        continue;
       if (!(KNOWN_METRICS as readonly string[]).includes(key)) {
         throw new BadRequestException(`Mensuration inconnue : ${key}.`);
       }

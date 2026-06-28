@@ -46,7 +46,10 @@ export default function MealTypesPanel() {
     e?.preventDefault?.();
     if (!draftName.trim()) return;
     run(async () => {
-      await alimentationApi.createMealType({ name: draftName.trim(), icon: draftIcon });
+      await alimentationApi.createMealType({
+        name: draftName.trim(),
+        icon: draftIcon,
+      });
       setDraftName('');
       setDraftIcon('🍽️');
       setIconPickerFor(null);
@@ -54,7 +57,10 @@ export default function MealTypesPanel() {
   }
 
   async function rename(type) {
-    const next = await promptDialog({ title: 'Renommer le type de repas', defaultValue: type.name });
+    const next = await promptDialog({
+      title: 'Renommer le type de repas',
+      defaultValue: type.name,
+    });
     if (next == null) return;
     const name = next.trim();
     if (!name || name === type.name) return;
@@ -63,9 +69,10 @@ export default function MealTypesPanel() {
 
   async function remove(type) {
     const n = type.recipeCount ?? 0;
-    const msg = n > 0
-      ? `Supprimer « ${type.name} » ? ${n} recette${n > 1 ? 's' : ''} repasseront « sans type ».`
-      : `Supprimer « ${type.name} » ?`;
+    const msg =
+      n > 0
+        ? `Supprimer « ${type.name} » ? ${n} recette${n > 1 ? 's' : ''} repasseront « sans type ».`
+        : `Supprimer « ${type.name} » ?`;
     if (!(await confirmDialog({ message: msg, danger: true }))) return;
     run(() => alimentationApi.removeMealType(type.id));
   }
@@ -87,7 +94,9 @@ export default function MealTypesPanel() {
         <button
           type="button"
           className="rcatman__icon"
-          onClick={() => setIconPickerFor(iconPickerFor === 'new' ? null : 'new')}
+          onClick={() =>
+            setIconPickerFor(iconPickerFor === 'new' ? null : 'new')
+          }
           title="Icône"
         >
           {draftIcon}
@@ -99,14 +108,25 @@ export default function MealTypesPanel() {
           maxLength={40}
           onChange={(e) => setDraftName(e.target.value)}
         />
-        <button type="submit" className="btn btn--primary" disabled={!draftName.trim()}>
+        <button
+          type="submit"
+          className="btn btn--primary"
+          disabled={!draftName.trim()}
+        >
           Ajouter
         </button>
       </form>
       {iconPickerFor === 'new' && (
         <div className="rcatman__picker">
           {MEAL_TYPE_ICONS.map((ic) => (
-            <button key={ic} type="button" onClick={() => { setDraftIcon(ic); setIconPickerFor(null); }}>
+            <button
+              key={ic}
+              type="button"
+              onClick={() => {
+                setDraftIcon(ic);
+                setIconPickerFor(null);
+              }}
+            >
               {ic}
             </button>
           ))}
@@ -118,7 +138,9 @@ export default function MealTypesPanel() {
       {loading ? (
         <p className="ref-empty">Chargement…</p>
       ) : types.length === 0 ? (
-        <p className="ref-empty">Aucun type de repas. Ajoutes-en un ci-dessus.</p>
+        <p className="ref-empty">
+          Aucun type de repas. Ajoutes-en un ci-dessus.
+        </p>
       ) : (
         <ul className="ref-list">
           {types.map((type) => (
@@ -131,11 +153,18 @@ export default function MealTypesPanel() {
               onDrop={() => handleDrop(type.id)}
             >
               <div className="refcat__lead">
-                <span className="reditrow__grip" title="Glisser pour réordonner">⠿</span>
+                <span
+                  className="reditrow__grip"
+                  title="Glisser pour réordonner"
+                >
+                  ⠿
+                </span>
                 <button
                   type="button"
                   className="rcatman__icon"
-                  onClick={() => setIconPickerFor(iconPickerFor === type.id ? null : type.id)}
+                  onClick={() =>
+                    setIconPickerFor(iconPickerFor === type.id ? null : type.id)
+                  }
                   title="Changer l'icône"
                 >
                   {type.icon || '🗂️'}
@@ -144,8 +173,22 @@ export default function MealTypesPanel() {
                 <span className="rcatman__count">{type.recipeCount ?? 0}</span>
               </div>
               <div className="ref-item__actions">
-                <button className="icon-btn" onClick={() => rename(type)} aria-label="Renommer" title="Renommer">✏️</button>
-                <button className="icon-btn" onClick={() => remove(type)} aria-label="Supprimer" title="Supprimer">🗑</button>
+                <button
+                  className="icon-btn"
+                  onClick={() => rename(type)}
+                  aria-label="Renommer"
+                  title="Renommer"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="icon-btn"
+                  onClick={() => remove(type)}
+                  aria-label="Supprimer"
+                  title="Supprimer"
+                >
+                  🗑
+                </button>
               </div>
               {iconPickerFor === type.id && (
                 <div className="rcatman__picker rcatman__picker--row">
@@ -153,10 +196,14 @@ export default function MealTypesPanel() {
                     <button
                       key={ic}
                       type="button"
-                      onClick={() => run(async () => {
-                        await alimentationApi.updateMealType(type.id, { icon: ic });
-                        setIconPickerFor(null);
-                      })}
+                      onClick={() =>
+                        run(async () => {
+                          await alimentationApi.updateMealType(type.id, {
+                            icon: ic,
+                          });
+                          setIconPickerFor(null);
+                        })
+                      }
                     >
                       {ic}
                     </button>

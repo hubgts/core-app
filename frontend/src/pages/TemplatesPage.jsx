@@ -5,7 +5,10 @@ import { TYPE_META, TYPES } from '../components/training/constants';
 import TemplateFormModal from '../components/training/TemplateFormModal';
 import './TrainingPage.css';
 
-const FILTERS = [{ id: '', label: 'Tous' }, ...TYPES.map((t) => ({ id: t, label: TYPE_META[t].label }))];
+const FILTERS = [
+  { id: '', label: 'Tous' },
+  ...TYPES.map((t) => ({ id: t, label: TYPE_META[t].label })),
+];
 
 function summarize(tpl) {
   if (tpl.type === 'musculation') {
@@ -50,7 +53,13 @@ export default function TemplatesPage() {
   }
 
   async function handleDelete(tpl) {
-    if (!(await confirmDialog({ message: `Supprimer le template « ${tpl.name} » ?`, danger: true }))) return;
+    if (
+      !(await confirmDialog({
+        message: `Supprimer le template « ${tpl.name} » ?`,
+        danger: true,
+      }))
+    )
+      return;
     await trainingApi.removeTemplate(tpl.id);
     setModal(null);
     await load();
@@ -62,14 +71,21 @@ export default function TemplatesPage() {
         <div>
           <h1 className="page-head__title">Templates d'entraînement</h1>
           <p className="page-head__subtitle">
-            Des modèles de séance réutilisables pour remplir le formulaire en un clic.
+            Des modèles de séance réutilisables pour remplir le formulaire en un
+            clic.
           </p>
         </div>
-        <button className="btn btn--primary" onClick={() => setModal({})}>+ Template</button>
+        <button className="btn btn--primary" onClick={() => setModal({})}>
+          + Template
+        </button>
       </header>
 
       <div className="control-bar">
-        <div className="segmented" role="radiogroup" aria-label="Filtrer par type">
+        <div
+          className="segmented"
+          role="radiogroup"
+          aria-label="Filtrer par type"
+        >
           {FILTERS.map((f) => (
             <button
               key={f.id || 'all'}
@@ -95,7 +111,9 @@ export default function TemplatesPage() {
       {loading ? (
         <p className="muted">Chargement…</p>
       ) : templates.length === 0 ? (
-        <p className="muted">Aucun template. Crée ton premier modèle de séance.</p>
+        <p className="muted">
+          Aucun template. Crée ton premier modèle de séance.
+        </p>
       ) : (
         <div className="tpl-grid">
           {templates.map((tpl) => {
@@ -116,7 +134,9 @@ export default function TemplatesPage() {
                 {tpl.tags.length > 0 && (
                   <div className="tpl-card__tags">
                     {tpl.tags.map((tag) => (
-                      <span key={tag} className="tpl-tag">{tag}</span>
+                      <span key={tag} className="tpl-tag">
+                        {tag}
+                      </span>
                     ))}
                   </div>
                 )}

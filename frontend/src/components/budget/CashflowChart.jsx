@@ -33,7 +33,14 @@ export default function CashflowChart({ data, current }) {
         aria-label="Entrées et sorties par mois"
       >
         {/* Ligne de base */}
-        <line x1="0" y1={baseY} x2={W} y2={baseY} stroke={GRID} strokeWidth="1" />
+        <line
+          x1="0"
+          y1={baseY}
+          x2={W}
+          y2={baseY}
+          stroke={GRID}
+          strokeWidth="1"
+        />
         {rows.map((d, i) => {
           const cx = i * slot + slot / 2;
           const isCur = d.month === current;
@@ -70,8 +77,12 @@ export default function CashflowChart({ data, current }) {
         })}
       </svg>
       <div className="bcf__legend">
-        <span><span className="bcf__dot" style={{ background: IN }} /> Entrées</span>
-        <span><span className="bcf__dot" style={{ background: OUT }} /> Sorties</span>
+        <span>
+          <span className="bcf__dot" style={{ background: IN }} /> Entrées
+        </span>
+        <span>
+          <span className="bcf__dot" style={{ background: OUT }} /> Sorties
+        </span>
       </div>
     </div>
   );

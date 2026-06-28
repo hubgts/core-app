@@ -11,7 +11,11 @@ export class FinancesSettingsEntity {
   id: string;
 
   /** Objectif de patrimoine net (€), optionnel. null = pas d'objectif. */
-  @Column({ name: 'net_worth_target', type: 'double precision', nullable: true })
+  @Column({
+    name: 'net_worth_target',
+    type: 'double precision',
+    nullable: true,
+  })
   netWorthTarget: number | null;
 
   /** Échéance de l'objectif net (YYYY-MM-DD), optionnelle. */

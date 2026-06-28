@@ -128,8 +128,21 @@ export default function Combobox({
         <span className={`combo__value${selected ? '' : ' combo__value--ph'}`}>
           {selected ? selected.label : placeholder}
         </span>
-        <svg className="combo__chev" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-          <path d="M3 5l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        <svg
+          className="combo__chev"
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          aria-hidden="true"
+        >
+          <path
+            d="M3 5l4 4 4-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </button>
 

@@ -47,7 +47,9 @@ export class ReferentialService {
 
     const existing = await this.items.findOne({ where: { kind: k, nameKey } });
     if (existing) {
-      throw new ConflictException('Cet élément existe déjà dans le référentiel.');
+      throw new ConflictException(
+        'Cet élément existe déjà dans le référentiel.',
+      );
     }
 
     const saved = await this.items.save(
@@ -68,7 +70,9 @@ export class ReferentialService {
 
     const clash = await this.items.findOne({ where: { kind: k, nameKey } });
     if (clash && clash.id !== id) {
-      throw new ConflictException('Cet élément existe déjà dans le référentiel.');
+      throw new ConflictException(
+        'Cet élément existe déjà dans le référentiel.',
+      );
     }
 
     item.name = name;
