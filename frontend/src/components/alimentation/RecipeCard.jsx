@@ -36,9 +36,7 @@ export default function RecipeCard({
   if (recipe.nutrition && recipe.nutrition.countedCount > 0) {
     const n = recipe.nutrition;
     metaBits.push(
-      n.perServing
-        ? `${n.perServing.kcal} kcal/portion`
-        : `${n.kcal} kcal`,
+      n.perServing ? `${n.perServing.kcal} kcal/portion` : `${n.kcal} kcal`,
     );
   }
 

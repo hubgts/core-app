@@ -216,7 +216,9 @@ export default function RecipeDrawer({
               <tbody>
                 <tr>
                   <th>
-                    {hasBase ? `${formatQuantity(portions)} portion(s)` : 'Total'}
+                    {hasBase
+                      ? `${formatQuantity(portions)} portion(s)`
+                      : 'Total'}
                     {!hasBase && scale !== 1
                       ? ` ×${formatQuantity(scale)}`
                       : ''}

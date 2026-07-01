@@ -18,6 +18,14 @@ import './HabitsPage.css';
 const MILESTONES_DAYS = [7, 30, 100, 365];
 const MILESTONES_WEEKS = [4, 12, 26, 52];
 
+// Streak en jours : une habitude « x/sem » compte en semaines côté backend,
+// on convertit alors en jours (× 7). Au-delà de 30 jours, on bascule en mois.
+function formatStreak(streak, unit) {
+  const jours = unit === 'weeks' ? streak * 7 : streak;
+  if (jours > 30) return `${Math.round(jours / 30)}m`;
+  return `${jours}j`;
+}
+
 // Petit anneau de progression générique (avancement fait/objectif).
 function ProgressRing({ done, target, color }) {
   const r = 8;
@@ -353,7 +361,6 @@ export default function HabitsPage() {
                   );
                 })}
                 <th className="grid__railhead">Sem.</th>
-                <th className="grid__railhead">Mois</th>
                 <th className="grid__railhead">🔥</th>
               </tr>
             </thead>
@@ -361,20 +368,6 @@ export default function HabitsPage() {
               {habits.map((h, idx) => {
                 const created = h.createdAt.slice(0, 10);
                 const createdFr = created.split('-').reverse().join('/');
-                // Avancement du mois affiché (même logique que la complétion :
-                // on ignore les jours antérieurs à la création de l'habitude).
-                let monthDone = 0;
-                let monthEligible = 0;
-                for (const d of days) {
-                  const ds = ymd(cursor.year, cursor.month, d);
-                  if (ds < created) continue;
-                  monthEligible += 1;
-                  if (checks.has(`${h.id}|${ds}`)) monthDone += 1;
-                }
-                const monthTarget = Math.max(
-                  1,
-                  Math.round((h.weeklyTarget * monthEligible) / 7),
-                );
                 return (
                   <tr
                     key={h.id}
@@ -465,24 +458,12 @@ export default function HabitsPage() {
                       </span>
                     </td>
                     <td className="grid__rail">
-                      <span
-                        className="prog-badge"
-                        title={`${monthLabel(cursor.year, cursor.month)} : ${monthDone}/${monthTarget}`}
-                      >
-                        <ProgressRing
-                          done={monthDone}
-                          target={monthTarget}
-                          color={h.color}
-                        />
-                        <span className="prog-badge__txt">
-                          {monthDone}/{monthTarget}
-                        </span>
-                      </span>
-                    </td>
-                    <td className="grid__rail">
                       <span className="streak-badge" title="Série en cours">
-                        🔥 {h.stats.currentStreak}
-                        {h.stats.streakUnit === 'weeks' ? ' sem' : ''}
+                        🔥{' '}
+                        {formatStreak(
+                          h.stats.currentStreak,
+                          h.stats.streakUnit,
+                        )}
                       </span>
                     </td>
                   </tr>

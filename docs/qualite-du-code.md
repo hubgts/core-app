@@ -15,17 +15,18 @@ outils PHP courants :
 ## Commande (depuis la racine)
 
 ```bash
-make check   # tout vérifier : typecheck back + ESLint & Prettier (back + front)
+make check   # corrige (ESLint --fix + Prettier --write) puis typecheck le backend
 ```
 
-`make check` est en **lecture seule** (ne modifie aucun fichier) et sort en
-erreur si quelque chose ne va pas — parfait pour la CI ou avant un commit.
+⚠️ `make check` **modifie les fichiers** (auto-correction du lint et du
+formatage). Le typecheck backend reste en lecture seule (`tsc` ne corrige rien)
+et fait **échouer** la commande s'il reste des problèmes non corrigeables
+automatiquement — à traiter à la main.
 
-Pour **corriger** automatiquement, utiliser les scripts npm dans `backend/` ou
-`frontend/` :
+Scripts npm sous-jacents, disponibles par sous-projet (`backend/` / `frontend/`) :
 
 ```bash
-npm run lint:fix    # ESLint + corrections auto (dont formatage)
+npm run lint:fix    # ESLint + corrections auto
 npm run format      # Prettier --write
 npm run lint        # ESLint (lecture seule)
 npm run format:check

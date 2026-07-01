@@ -182,7 +182,8 @@ export class AlimentationService implements OnModuleInit {
       }
     }
     if (input.unit !== undefined) food.unit = this.normalizeUnit(input.unit);
-    if (input.carbs !== undefined) food.carbs = this.normalizeMacro(input.carbs);
+    if (input.carbs !== undefined)
+      food.carbs = this.normalizeMacro(input.carbs);
     if (input.protein !== undefined) {
       food.protein = this.normalizeMacro(input.protein);
     }
@@ -376,10 +377,7 @@ export class AlimentationService implements OnModuleInit {
     return parts.reduce((a, b) => a + b, 0);
   }
 
-  private async toResponse(
-    r: RecipeEntity,
-    foodMap?: Map<string, FoodEntity>,
-  ) {
+  private async toResponse(r: RecipeEntity, foodMap?: Map<string, FoodEntity>) {
     const ingredients = r.ingredients ?? [];
     const map = foodMap ?? (await this.loadFoodMap(ingredients));
     return {

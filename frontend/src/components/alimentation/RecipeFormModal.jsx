@@ -137,7 +137,14 @@ export default function RecipeFormModal({
   function addIngredient() {
     setIngredients((rows) => [
       ...rows,
-      { key: nextKey(), foodId: '', quantity: '', unit: '', label: '', note: '' },
+      {
+        key: nextKey(),
+        foodId: '',
+        quantity: '',
+        unit: '',
+        label: '',
+        note: '',
+      },
     ]);
   }
   function removeIngredient(key) {
@@ -221,352 +228,360 @@ export default function RecipeFormModal({
 
   return (
     <>
-    <div className="modal-overlay" onMouseDown={onClose}>
-      <div className="modal modal--lg" onMouseDown={(e) => e.stopPropagation()}>
-        <h2 className="modal__title">
-          {isEdit ? 'Modifier la recette' : 'Nouvelle recette'}
-        </h2>
+      <div className="modal-overlay" onMouseDown={onClose}>
+        <div
+          className="modal modal--lg"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <h2 className="modal__title">
+            {isEdit ? 'Modifier la recette' : 'Nouvelle recette'}
+          </h2>
 
-        <form onSubmit={submit}>
-          <label className="alfield">
-            <span className="alfield__label">Titre</span>
-            <input
-              ref={titleRef}
-              className="alfield__input"
-              type="text"
-              maxLength={120}
-              value={title}
-              placeholder="Ex : Gâteau au yaourt, Curry de pois chiches…"
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </label>
-
-          <label className="alfield">
-            <span className="alfield__label">Description</span>
-            <input
-              className="alfield__input"
-              type="text"
-              value={description}
-              placeholder="Présentation courte (optionnel)"
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </label>
-
-          <div className="alfield-row">
+          <form onSubmit={submit}>
             <label className="alfield">
-              <span className="alfield__label">Type de repas</span>
-              <Combobox
-                className="alfield__input"
-                value={mealTypeId}
-                onChange={setMealTypeId}
-                placeholder="Sans type"
-                options={[
-                  { value: '', label: 'Sans type' },
-                  ...mealTypes.map((t) => ({
-                    value: t.id,
-                    label: `${t.icon} ${t.name}`,
-                  })),
-                ]}
-              />
-              <span className="alfield__hint">
-                Les types de repas se gèrent dans le Référentiel.
-              </span>
-            </label>
-            <label className="alfield alfield--narrow">
-              <span className="alfield__label">Difficulté</span>
-              <Combobox
-                className="alfield__input"
-                value={difficulty}
-                onChange={setDifficulty}
-                placeholder="—"
-                options={[
-                  { value: '', label: '—' },
-                  ...DIFFICULTIES.map((d) => ({
-                    value: d.value,
-                    label: d.label,
-                  })),
-                ]}
-              />
-            </label>
-          </div>
-
-          <div className="alfield">
-            <span className="alfield__label">Labels</span>
-            <div className="allabels-edit">
-              {labels.map((l) => (
-                <span key={l} className="alchip alchip--removable">
-                  {l}
-                  <button
-                    type="button"
-                    onClick={() => removeLabel(l)}
-                    aria-label={`Retirer ${l}`}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
+              <span className="alfield__label">Titre</span>
               <input
-                className="allabels-edit__input"
+                ref={titleRef}
+                className="alfield__input"
                 type="text"
-                value={labelDraft}
-                placeholder="Ajouter un label + Entrée"
-                onChange={(e) => setLabelDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addLabel();
-                  }
-                }}
-                onBlur={addLabel}
+                maxLength={120}
+                value={title}
+                placeholder="Ex : Gâteau au yaourt, Curry de pois chiches…"
+                onChange={(e) => setTitle(e.target.value)}
               />
-            </div>
-          </div>
+            </label>
 
-          <div className="alfield-row">
-            <label className="alfield alfield--narrow">
-              <span className="alfield__label">Portions</span>
+            <label className="alfield">
+              <span className="alfield__label">Description</span>
               <input
                 className="alfield__input"
                 type="text"
-                inputMode="numeric"
-                value={servings}
-                placeholder="Ex : 4"
-                onChange={(e) => setServings(e.target.value)}
+                value={description}
+                placeholder="Présentation courte (optionnel)"
+                onChange={(e) => setDescription(e.target.value)}
               />
             </label>
-            <label className="alfield alfield--narrow">
-              <span className="alfield__label">Prép. (min)</span>
-              <input
-                className="alfield__input"
-                type="text"
-                inputMode="numeric"
-                value={prepTime}
-                placeholder="Ex : 15"
-                onChange={(e) => setPrepTime(e.target.value)}
-              />
-            </label>
-            <label className="alfield alfield--narrow">
-              <span className="alfield__label">Cuisson (min)</span>
-              <input
-                className="alfield__input"
-                type="text"
-                inputMode="numeric"
-                value={cookTime}
-                placeholder="Ex : 35"
-                onChange={(e) => setCookTime(e.target.value)}
-              />
-            </label>
-            <label className="alfield alfield--narrow">
-              <span className="alfield__label">Repos (min)</span>
-              <input
-                className="alfield__input"
-                type="text"
-                inputMode="numeric"
-                value={restTime}
-                placeholder="Ex : 0"
-                onChange={(e) => setRestTime(e.target.value)}
-              />
-            </label>
-          </div>
-          {totalPreview != null && (
-            <p className="alfield__total">
-              Temps total : {formatDuration(totalPreview)}
-            </p>
-          )}
 
-          {/* Ingrédients */}
-          <div className="alfield">
-            <span className="alfield__label">Ingrédients</span>
-            <div className="aleditlist">
-              {ingredients.map((r) => (
-                <div
-                  key={r.key}
-                  className="aleditrow"
-                  draggable
-                  onDragStart={() => (dragRef.current = r.key)}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() =>
-                    reorder(ingredients, setIngredients, dragRef.current, r.key)
-                  }
-                >
-                  <span
-                    className="aleditrow__grip"
-                    title="Glisser pour réordonner"
-                  >
-                    ⠿
-                  </span>
-                  <input
-                    className="alfield__input aleditrow__qty"
-                    type="text"
-                    inputMode="decimal"
-                    value={r.quantity}
-                    placeholder="Qté"
-                    onChange={(e) =>
-                      updateIngredient(r.key, 'quantity', e.target.value)
-                    }
-                  />
-                  <input
-                    className="alfield__input aleditrow__unit"
-                    type="text"
-                    value={r.unit}
-                    placeholder="g / ml"
-                    onChange={(e) =>
-                      updateIngredient(r.key, 'unit', e.target.value)
-                    }
-                  />
-                  <Combobox
-                    className="alfield__input aleditrow__label"
-                    value={r.foodId}
-                    onChange={(v) => selectFood(r.key, v)}
-                    placeholder="Choisir un aliment…"
-                    searchable
-                    options={foods.map((f) => ({
-                      value: f.id,
-                      label: f.name,
-                    }))}
-                  />
-                  <button
-                    type="button"
-                    className="aleditrow__add"
-                    title="Créer un aliment"
-                    aria-label="Créer un aliment"
-                    onClick={() => setFoodModal({ rowKey: r.key })}
-                  >
-                    +
-                  </button>
-                  <button
-                    type="button"
-                    className="aleditrow__del"
-                    onClick={() => removeIngredient(r.key)}
-                    aria-label="Supprimer la ligne"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm"
-              onClick={addIngredient}
-            >
-              + Ingrédient
-            </button>
-            <span className="alfield__hint">
-              Les ingrédients liés à un aliment et quantifiés en g/ml comptent
-              dans les valeurs nutritionnelles. Le bouton « + » crée un aliment
-              à la volée.
-            </span>
-          </div>
-
-          {/* Étapes */}
-          <div className="alfield">
-            <span className="alfield__label">Étapes</span>
-            <div className="aleditlist">
-              {steps.map((r, i) => (
-                <div
-                  key={r.key}
-                  className="aleditrow aleditrow--step"
-                  draggable
-                  onDragStart={() => (dragRef.current = r.key)}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() =>
-                    reorder(steps, setSteps, dragRef.current, r.key)
-                  }
-                >
-                  <span className="aleditrow__num">{i + 1}</span>
-                  <textarea
-                    className="alfield__input aleditrow__steptext"
-                    rows={2}
-                    value={r.text}
-                    placeholder="Décris l'étape…"
-                    onChange={(e) => updateStep(r.key, e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="aleditrow__del"
-                    onClick={() => removeStep(r.key)}
-                    aria-label="Supprimer l'étape"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm"
-              onClick={addStep}
-            >
-              + Étape
-            </button>
-          </div>
-
-          {/* Couleur */}
-          <div className="alfield">
-            <span className="alfield__label">Couleur</span>
-            <div className="alcard__swatches alcard__swatches--inline">
-              {CARD_COLORS.map((c) => (
-                <button
-                  type="button"
-                  key={c || 'none'}
-                  className={`alswatch${color === c ? ' alswatch--on' : ''}${c ? '' : ' alswatch--none'}`}
-                  style={c ? { background: c } : undefined}
-                  title={c ? 'Couleur' : 'Sans couleur'}
-                  onClick={() => setColor(c)}
+            <div className="alfield-row">
+              <label className="alfield">
+                <span className="alfield__label">Type de repas</span>
+                <Combobox
+                  className="alfield__input"
+                  value={mealTypeId}
+                  onChange={setMealTypeId}
+                  placeholder="Sans type"
+                  options={[
+                    { value: '', label: 'Sans type' },
+                    ...mealTypes.map((t) => ({
+                      value: t.id,
+                      label: `${t.icon} ${t.name}`,
+                    })),
+                  ]}
                 />
-              ))}
+                <span className="alfield__hint">
+                  Les types de repas se gèrent dans le Référentiel.
+                </span>
+              </label>
+              <label className="alfield alfield--narrow">
+                <span className="alfield__label">Difficulté</span>
+                <Combobox
+                  className="alfield__input"
+                  value={difficulty}
+                  onChange={setDifficulty}
+                  placeholder="—"
+                  options={[
+                    { value: '', label: '—' },
+                    ...DIFFICULTIES.map((d) => ({
+                      value: d.value,
+                      label: d.label,
+                    })),
+                  ]}
+                />
+              </label>
             </div>
-          </div>
 
-          {error && <p className="modal__error">{error}</p>}
+            <div className="alfield">
+              <span className="alfield__label">Labels</span>
+              <div className="allabels-edit">
+                {labels.map((l) => (
+                  <span key={l} className="alchip alchip--removable">
+                    {l}
+                    <button
+                      type="button"
+                      onClick={() => removeLabel(l)}
+                      aria-label={`Retirer ${l}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <input
+                  className="allabels-edit__input"
+                  type="text"
+                  value={labelDraft}
+                  placeholder="Ajouter un label + Entrée"
+                  onChange={(e) => setLabelDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addLabel();
+                    }
+                  }}
+                  onBlur={addLabel}
+                />
+              </div>
+            </div>
 
-          <div className="modal__actions">
-            {isEdit && (
-              <div className="modal__actions-left">
+            <div className="alfield-row">
+              <label className="alfield alfield--narrow">
+                <span className="alfield__label">Portions</span>
+                <input
+                  className="alfield__input"
+                  type="text"
+                  inputMode="numeric"
+                  value={servings}
+                  placeholder="Ex : 4"
+                  onChange={(e) => setServings(e.target.value)}
+                />
+              </label>
+              <label className="alfield alfield--narrow">
+                <span className="alfield__label">Prép. (min)</span>
+                <input
+                  className="alfield__input"
+                  type="text"
+                  inputMode="numeric"
+                  value={prepTime}
+                  placeholder="Ex : 15"
+                  onChange={(e) => setPrepTime(e.target.value)}
+                />
+              </label>
+              <label className="alfield alfield--narrow">
+                <span className="alfield__label">Cuisson (min)</span>
+                <input
+                  className="alfield__input"
+                  type="text"
+                  inputMode="numeric"
+                  value={cookTime}
+                  placeholder="Ex : 35"
+                  onChange={(e) => setCookTime(e.target.value)}
+                />
+              </label>
+              <label className="alfield alfield--narrow">
+                <span className="alfield__label">Repos (min)</span>
+                <input
+                  className="alfield__input"
+                  type="text"
+                  inputMode="numeric"
+                  value={restTime}
+                  placeholder="Ex : 0"
+                  onChange={(e) => setRestTime(e.target.value)}
+                />
+              </label>
+            </div>
+            {totalPreview != null && (
+              <p className="alfield__total">
+                Temps total : {formatDuration(totalPreview)}
+              </p>
+            )}
+
+            {/* Ingrédients */}
+            <div className="alfield">
+              <span className="alfield__label">Ingrédients</span>
+              <div className="aleditlist">
+                {ingredients.map((r) => (
+                  <div
+                    key={r.key}
+                    className="aleditrow"
+                    draggable
+                    onDragStart={() => (dragRef.current = r.key)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() =>
+                      reorder(
+                        ingredients,
+                        setIngredients,
+                        dragRef.current,
+                        r.key,
+                      )
+                    }
+                  >
+                    <span
+                      className="aleditrow__grip"
+                      title="Glisser pour réordonner"
+                    >
+                      ⠿
+                    </span>
+                    <input
+                      className="alfield__input aleditrow__qty"
+                      type="text"
+                      inputMode="decimal"
+                      value={r.quantity}
+                      placeholder="Qté"
+                      onChange={(e) =>
+                        updateIngredient(r.key, 'quantity', e.target.value)
+                      }
+                    />
+                    <input
+                      className="alfield__input aleditrow__unit"
+                      type="text"
+                      value={r.unit}
+                      placeholder="g / ml"
+                      onChange={(e) =>
+                        updateIngredient(r.key, 'unit', e.target.value)
+                      }
+                    />
+                    <Combobox
+                      className="alfield__input aleditrow__label"
+                      value={r.foodId}
+                      onChange={(v) => selectFood(r.key, v)}
+                      placeholder="Choisir un aliment…"
+                      searchable
+                      options={foods.map((f) => ({
+                        value: f.id,
+                        label: f.name,
+                      }))}
+                    />
+                    <button
+                      type="button"
+                      className="aleditrow__add"
+                      title="Créer un aliment"
+                      aria-label="Créer un aliment"
+                      onClick={() => setFoodModal({ rowKey: r.key })}
+                    >
+                      +
+                    </button>
+                    <button
+                      type="button"
+                      className="aleditrow__del"
+                      onClick={() => removeIngredient(r.key)}
+                      aria-label="Supprimer la ligne"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={addIngredient}
+              >
+                + Ingrédient
+              </button>
+              <span className="alfield__hint">
+                Les ingrédients liés à un aliment et quantifiés en g/ml comptent
+                dans les valeurs nutritionnelles. Le bouton « + » crée un
+                aliment à la volée.
+              </span>
+            </div>
+
+            {/* Étapes */}
+            <div className="alfield">
+              <span className="alfield__label">Étapes</span>
+              <div className="aleditlist">
+                {steps.map((r, i) => (
+                  <div
+                    key={r.key}
+                    className="aleditrow aleditrow--step"
+                    draggable
+                    onDragStart={() => (dragRef.current = r.key)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() =>
+                      reorder(steps, setSteps, dragRef.current, r.key)
+                    }
+                  >
+                    <span className="aleditrow__num">{i + 1}</span>
+                    <textarea
+                      className="alfield__input aleditrow__steptext"
+                      rows={2}
+                      value={r.text}
+                      placeholder="Décris l'étape…"
+                      onChange={(e) => updateStep(r.key, e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="aleditrow__del"
+                      onClick={() => removeStep(r.key)}
+                      aria-label="Supprimer l'étape"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={addStep}
+              >
+                + Étape
+              </button>
+            </div>
+
+            {/* Couleur */}
+            <div className="alfield">
+              <span className="alfield__label">Couleur</span>
+              <div className="alcard__swatches alcard__swatches--inline">
+                {CARD_COLORS.map((c) => (
+                  <button
+                    type="button"
+                    key={c || 'none'}
+                    className={`alswatch${color === c ? ' alswatch--on' : ''}${c ? '' : ' alswatch--none'}`}
+                    style={c ? { background: c } : undefined}
+                    title={c ? 'Couleur' : 'Sans couleur'}
+                    onClick={() => setColor(c)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {error && <p className="modal__error">{error}</p>}
+
+            <div className="modal__actions">
+              {isEdit && (
+                <div className="modal__actions-left">
+                  <button
+                    type="button"
+                    className="btn btn--ghost"
+                    onClick={() => onArchive(recipe)}
+                  >
+                    Archiver
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--danger"
+                    onClick={() => onDelete(recipe)}
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              )}
+              <div className="modal__actions-right">
                 <button
                   type="button"
                   className="btn btn--ghost"
-                  onClick={() => onArchive(recipe)}
+                  onClick={onClose}
                 >
-                  Archiver
+                  Annuler
                 </button>
                 <button
-                  type="button"
-                  className="btn btn--danger"
-                  onClick={() => onDelete(recipe)}
+                  type="submit"
+                  className="btn btn--primary"
+                  disabled={saving}
                 >
-                  Supprimer
+                  {saving ? '…' : 'Enregistrer'}
                 </button>
               </div>
-            )}
-            <div className="modal__actions-right">
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={onClose}
-              >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                className="btn btn--primary"
-                disabled={saving}
-              >
-                {saving ? '…' : 'Enregistrer'}
-              </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
-    {foodModal && (
-      <FoodFormModal
-        defaultName=""
-        onSave={createFoodForRow}
-        onClose={() => setFoodModal(null)}
-      />
-    )}
+      {foodModal && (
+        <FoodFormModal
+          defaultName=""
+          onSave={createFoodForRow}
+          onClose={() => setFoodModal(null)}
+        />
+      )}
     </>
   );
 }

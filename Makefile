@@ -75,10 +75,12 @@ update-dev:
 # ================== QUALITÉ DU CODE ==================
 # Analyse statique + lint + formatage (analogue à PHPStan / PHP-CS-Fixer).
 
-## check : tout vérifier — typecheck back + ESLint & Prettier (back + front)
+## check : corrige (ESLint --fix + Prettier --write) puis typecheck le backend
+# ⚠️ MODIFIE les fichiers. Le typecheck reste en lecture seule (tsc ne corrige pas)
+# et sort en erreur s'il reste des problèmes non corrigeables automatiquement.
 check:
-	cd backend && npm run typecheck && npm run lint && npm run format:check
-	cd frontend && npm run lint && npm run format:check
+	cd backend && npm run lint:fix && npm run format && npm run typecheck
+	cd frontend && npm run lint:fix && npm run format
 
 # ================== PRODUCTION (VPS, sans Docker) ==================
 # Installation native : Node + PostgreSQL + nginx. Voir docs/deploiement/production.md.

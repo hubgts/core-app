@@ -25,7 +25,7 @@ quotidien. On constate, on ne culpabilise pas.
 | **Habitude** | Une routine à suivre (ex. « Méditer »). |
 | **Coche (check)** | Marque « habitude tenue » pour un jour donné. Binaire : cochée ou non. |
 | **Objectif hebdomadaire** | Nombre de fois par semaine visé (1 à 7). `7` = tous les jours. |
-| **Streak (série en cours)** | Régularité consécutive. En **jours** pour une habitude quotidienne, en **semaines** (objectif atteint) sinon. |
+| **Streak (série en cours)** | Régularité consécutive, affichée en **jours** (une série hebdo est convertie en jours × 7 ; au-delà de 30 jours, en mois). |
 | **Record** | La plus longue série jamais réalisée. |
 | **Taux de complétion** | % des coches réalisées par rapport aux coches attendues sur la période. |
 | **Palier** | Seuil de série remarquable (feu d'artifice de félicitations). |
@@ -88,12 +88,9 @@ C'est là que l'on coche au quotidien.
 - **Sem.** : un anneau de progression + un compteur `fait/objectif` (ex. `2/3`)
   pour la **semaine en cours**. Quand l'objectif est atteint, l'anneau se ferme
   et affiche un `✓`.
-- **Mois** : même système (anneau + compteur `fait/objectif`), mais pour le
-  **mois affiché**. L'objectif du mois est l'objectif hebdomadaire ramené au
-  nombre de semaines du mois (≈ `objectif × jours du mois / 7`). Les jours
-  antérieurs à la création de l'habitude sont exclus, comme pour les pourcentages.
-- **🔥** : la série en cours. Pour une habitude à objectif hebdo, l'unité est la
-  semaine (ex. `🔥 3 sem`).
+- **🔥** : la série en cours, toujours exprimée en **jours** (ex. `🔥 12j`). Pour
+  une habitude à objectif hebdo, la série (comptée en semaines) est convertie en
+  jours (× 7). Au-delà de 30 jours, l'affichage bascule en **mois** (ex. `🔥 2m`).
 
 ### En bas (pied de grille)
 - **Complétion du mois** (%).

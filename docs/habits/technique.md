@@ -212,8 +212,10 @@ aujourd'hui**, donc indépendant du mois affiché.
   pas finie ; elle ne la **prolonge** que si l'objectif y est **déjà** atteint.
 - `bestStreak` = plus longue suite de semaines consécutives ayant atteint l'objectif.
 
-`streakUnit` vaut `'days'` ou `'weeks'` selon le mode, pour que le frontend
-affiche la bonne unité (`🔥 12` vs `🔥 3 sem`).
+`streakUnit` vaut `'days'` ou `'weeks'` selon le mode. Le frontend
+(`formatStreak` dans `HabitsPage.jsx`) ramène **toujours** la série à des jours :
+en mode `'weeks'`, il multiplie par 7. Au-delà de 30 jours, il affiche des mois
+arrondis (`🔥 12j`, `🔥 2m`).
 
 ### 5.3 Paliers — `milestonesForStreak(streak, unit)`
 Renvoie les paliers franchis par la série en cours :
@@ -242,24 +244,13 @@ complétion %   = min(fait, attendu) / attendu        // plafonné à 100 %
   pré-calculée une seule fois par rendu dans une `Map` mémoïsée indexée par
   `habitId` (`YearHeatmap.jsx`, `yearPctById`).
 
-### 5.5 Anneaux de progression du rail (« Sem. » et « Mois »)
-Dans la grille mensuelle, chaque ligne affiche deux anneaux `fait/objectif`
-(composant générique `ProgressRing`), calculés **côté frontend** :
+### 5.5 Anneau de progression du rail (« Sem. »)
+Dans la grille mensuelle, chaque ligne affiche un anneau `fait/objectif`
+(composant générique `ProgressRing`), calculé **côté frontend** :
 - **Sem.** : `done = stats.weekDone` (renvoyé par le backend, **semaine réelle
   courante**), `target = weeklyTarget`.
-- **Mois** : calculé sur le **mois affiché** dans `HabitsPage.jsx`. On parcourt les
-  jours du mois en ignorant ceux antérieurs à `createdAt` :
-  ```
-  monthEligible = jours du mois où date >= createdAt
-  monthDone     = coches du mois (date >= createdAt)
-  monthTarget   = max(1, round(weeklyTarget * monthEligible / 7))
-  ```
-  Le `max(1, …)` évite une division par zéro / un objectif nul pour une habitude
-  créée en toute fin de mois.
 
-> À noter la nuance de référence temporelle : « Sem. » suit la **semaine réelle**
-> (donc indépendante du mois consulté), tandis que « Mois » suit le **mois
-> affiché** à l'écran.
+Le rail comporte ensuite la colonne **🔥** (série en cours en jours, cf. § 5.2).
 
 > Conséquence : si on coche un jour **avant la création** (autorisé, permissif),
 > cette coche n'entre pas dans les pourcentages — cohérent avec l'affichage grisé.
