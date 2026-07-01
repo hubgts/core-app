@@ -5,7 +5,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { addDays, daysBetween, isValidDateStr, todayStr } from './date.util';
+import {
+  addDays,
+  daysBetween,
+  isValidDateStr,
+  todayStr,
+} from '../common/date.util';
 import { round1 } from '../common/round.util';
 import { BodyMeasurementEntity } from './entities/body-measurement.entity';
 import { MeasurementValueEntity } from './entities/measurement-value.entity';

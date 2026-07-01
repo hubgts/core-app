@@ -22,13 +22,13 @@ import {
   todayStr,
 } from '../utils/date';
 import './HealthPage.css';
+import { toast } from '../components/toast';
 
 export default function HealthPage() {
   const today = todayStr();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState('');
 
   const [metric, setMetric] = useState('weight');
   const [period, setPeriod] = useState('3months');
@@ -51,11 +51,6 @@ export default function HealthPage() {
   useEffect(() => {
     load();
   }, [load]);
-
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2800);
-  }
 
   // Métriques disponibles dans la barre : poids + mensurations suivies.
   const availableMetrics = useMemo(
@@ -114,7 +109,7 @@ export default function HealthPage() {
     const next = await healthApi.setMeasurement(date, payload, today);
     setData(next);
     setMeasureModal(null);
-    flash('Mesure enregistrée.');
+    toast('Mesure enregistrée.');
     maybeCelebrate(next);
   }
 
@@ -129,34 +124,34 @@ export default function HealthPage() {
     const next = await healthApi.removeMeasurement(measurement.id, today);
     setData(next);
     setMeasureModal(null);
-    flash('Mesure supprimée.');
+    toast('Mesure supprimée.');
   }
 
   async function saveGoal(payload) {
     const next = await healthApi.setGoal(payload, today);
     setData(next);
     setGoalModal(false);
-    flash('Objectif enregistré.');
+    toast('Objectif enregistré.');
   }
 
   async function clearGoal() {
     const next = await healthApi.clearGoal(today);
     setData(next);
     setGoalModal(false);
-    flash('Objectif retiré.');
+    toast('Objectif retiré.');
   }
 
   async function saveProfile(payload) {
     const next = await healthApi.updateProfile(payload, today);
     setData(next);
     setProfileModal(false);
-    flash('Réglages enregistrés.');
+    toast('Réglages enregistrés.');
   }
 
   // Célébration au franchissement de l'objectif.
   function maybeCelebrate(next) {
     if (next.goal?.paceStatus === 'reached' && goal?.paceStatus !== 'reached') {
-      flash(
+      toast(
         `🎯 Objectif ${formatMetric(next.goal.targetWeightKg, 'weight')} atteint !`,
       );
     }
@@ -447,8 +442,6 @@ export default function HealthPage() {
           onClose={() => setProfileModal(false)}
         />
       )}
-
-      {toast && <div className="htoast">{toast}</div>}
     </div>
   );
 }

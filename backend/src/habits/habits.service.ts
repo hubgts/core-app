@@ -4,8 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { applyReorder } from '../common/reorder.util';
 import { Between, In, Repository } from 'typeorm';
-import { addDays, isValidDateStr, mondayOf, todayStr } from './date.util';
+import {
+  addDays,
+  isValidDateStr,
+  mondayOf,
+  todayStr,
+} from '../common/date.util';
 import { HabitEntity } from './entities/habit.entity';
 import { HabitCheckEntity } from './entities/habit-check.entity';
 import { HabitStats } from './types';
@@ -154,12 +160,7 @@ export class HabitsService {
   }
 
   async reorder(ids: string[]) {
-    if (!Array.isArray(ids)) {
-      throw new BadRequestException('Le corps doit contenir un tableau "ids".');
-    }
-    await Promise.all(
-      ids.map((id, index) => this.habits.update(id, { position: index })),
-    );
+    await applyReorder(this.habits, ids);
     return this.listActive();
   }
 

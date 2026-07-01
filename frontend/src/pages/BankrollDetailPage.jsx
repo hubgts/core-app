@@ -14,6 +14,7 @@ import {
   trendClass,
 } from '../components/betting/constants';
 import './BettingPage.css';
+import { toast } from '../components/toast';
 
 const TABS = [
   { id: 'overview', label: "Vue d'ensemble" },
@@ -28,7 +29,6 @@ export default function BankrollDetailPage() {
   const [bankroll, setBankroll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState('');
   const [tab, setTab] = useState('overview');
   const [betFilter, setBetFilter] = useState('all');
 
@@ -51,15 +51,10 @@ export default function BankrollDetailPage() {
     load();
   }, [load]);
 
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2600);
-  }
-
   async function saveBankroll(payload) {
     setBankroll(await bettingApi.updateBankroll(id, payload));
     setEditModal(false);
-    flash('Bankroll mise à jour.');
+    toast('Bankroll mise à jour.');
   }
   async function archiveBankroll() {
     await bettingApi.archiveBankroll(id);
@@ -80,7 +75,7 @@ export default function BankrollDetailPage() {
   async function createBet(payload) {
     setBankroll(await bettingApi.createBet(id, payload));
     setBetModal(false);
-    flash('Pari ajouté.');
+    toast('Pari ajouté.');
   }
   async function settleBet(betId, payload) {
     setBankroll(await bettingApi.settleBet(betId, payload));
@@ -94,7 +89,7 @@ export default function BankrollDetailPage() {
     )
       return;
     setBankroll(await bettingApi.removeBet(bet.id));
-    flash('Pari supprimé.');
+    toast('Pari supprimé.');
   }
 
   if (loading) {
@@ -223,8 +218,6 @@ export default function BankrollDetailPage() {
       {betModal && (
         <BetFormModal onSave={createBet} onClose={() => setBetModal(false)} />
       )}
-
-      {toast && <div className="btoast">{toast}</div>}
     </div>
   );
 }

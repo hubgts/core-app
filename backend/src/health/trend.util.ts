@@ -7,7 +7,7 @@
  *   décrite dans objectifs_epargne : pente + fallback < 3 points).
  */
 
-import { addDays, daysBetween } from './date.util';
+import { addDays, daysBetween } from '../common/date.util';
 import { round1 } from '../common/round.util';
 
 export interface DatedValue {

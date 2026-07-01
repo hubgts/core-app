@@ -10,6 +10,7 @@ import {
 import { todayStr } from '../utils/date';
 import './FinancesPage.css';
 import './BilanPage.css';
+import { toast } from '../components/toast';
 
 /**
  * « Bilan du mois » (#1) : met à jour le solde de toutes les enveloppes actives à une
@@ -23,7 +24,6 @@ export default function BilanPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState('');
 
   const load = useCallback(async () => {
     setError('');
@@ -69,11 +69,6 @@ export default function BilanPage() {
     setInputs((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
   }
 
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2600);
-  }
-
   async function submit() {
     setSaving(true);
     setError('');
@@ -95,7 +90,7 @@ export default function BilanPage() {
         return;
       }
       await financesApi.bulkSnapshots({ date, items });
-      flash(`Bilan enregistré (${items.length} enveloppe(s)).`);
+      toast(`Bilan enregistré (${items.length} enveloppe(s)).`);
       navigate('/finances');
     } catch (err) {
       setError(err.message);
@@ -212,8 +207,6 @@ export default function BilanPage() {
           </ul>
         </section>
       ))}
-
-      {toast && <div className="ftoast">{toast}</div>}
     </div>
   );
 }

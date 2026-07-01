@@ -16,6 +16,7 @@ import {
   ymd,
 } from '../utils/date';
 import './TrainingPage.css';
+import { toast } from '../components/toast';
 
 const VIEWS = [
   { id: 'week', label: 'Semaine' },
@@ -32,7 +33,6 @@ export default function TrainingPage() {
   const [loading, setLoading] = useState(true);
   const [drawer, setDrawer] = useState(null); // évènement consulté
   const [modal, setModal] = useState(null); // { event?, presetDate?, presetTime? }
-  const [toast, setToast] = useState('');
 
   const { year, month } = monthYear(cursor);
 
@@ -73,12 +73,6 @@ export default function TrainingPage() {
     return map;
   }, [events]);
 
-  function showToast(msg) {
-    setToast(msg);
-    window.clearTimeout(showToast._t);
-    showToast._t = window.setTimeout(() => setToast(''), 3000);
-  }
-
   // --- Navigation ---
   function go(delta) {
     setCursor((c) => {
@@ -116,7 +110,7 @@ export default function TrainingPage() {
     const prs = res?.prs ?? [];
     if (prs.length) {
       const pr = prs[0];
-      showToast(`🏋️ Nouveau record : ${pr.exerciseName} ${pr.weight} kg !`);
+      toast(`🏋️ Nouveau record : ${pr.exerciseName} ${pr.weight} kg !`);
     }
   }
 
@@ -238,8 +232,6 @@ export default function TrainingPage() {
           onClose={() => setModal(null)}
         />
       )}
-
-      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { round2, round3 } from '../common/round.util';
-import { isValidDateStr, todayStr } from './date.util';
+import { isValidDateStr, todayStr } from '../common/date.util';
 import { BankrollEntity } from './entities/bankroll.entity';
 import { BetEntity } from './entities/bet.entity';
 import { SelectionEntity } from './entities/selection.entity';

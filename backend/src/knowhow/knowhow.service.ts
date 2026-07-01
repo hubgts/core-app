@@ -6,6 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { applyReorder } from '../common/reorder.util';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import {
@@ -122,12 +123,7 @@ export class KnowHowService implements OnModuleInit {
   }
 
   async reorderCategories(ids: string[]) {
-    if (!Array.isArray(ids)) {
-      throw new BadRequestException('Le corps doit contenir un tableau "ids".');
-    }
-    await Promise.all(
-      ids.map((id, index) => this.categories.update(id, { position: index })),
-    );
+    await applyReorder(this.categories, ids);
     return this.listCategories();
   }
 
@@ -260,12 +256,7 @@ export class KnowHowService implements OnModuleInit {
   }
 
   async reorder(ids: string[]) {
-    if (!Array.isArray(ids)) {
-      throw new BadRequestException('Le corps doit contenir un tableau "ids".');
-    }
-    await Promise.all(
-      ids.map((id, index) => this.knowhow.update(id, { position: index })),
-    );
+    await applyReorder(this.knowhow, ids);
     return this.list();
   }
 

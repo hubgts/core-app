@@ -6,6 +6,7 @@ import ProgramEditor from '../components/training/ProgramEditor';
 import StartProgramModal from '../components/training/StartProgramModal';
 import './TrainingPage.css';
 import './ProgramsPage.css';
+import { toast } from '../components/toast';
 
 export default function ProgramsPage() {
   const [programs, setPrograms] = useState([]);
@@ -13,7 +14,6 @@ export default function ProgramsPage() {
   const [error, setError] = useState('');
   const [editing, setEditing] = useState(null); // null | { program? }  (objet = mode édition)
   const [starting, setStarting] = useState(null); // programme à démarrer
-  const [toast, setToast] = useState('');
 
   const load = useCallback(async () => {
     setError('');
@@ -29,12 +29,6 @@ export default function ProgramsPage() {
   useEffect(() => {
     load();
   }, [load]);
-
-  function flash(msg) {
-    setToast(msg);
-    window.clearTimeout(flash._t);
-    flash._t = window.setTimeout(() => setToast(''), 3200);
-  }
 
   async function openEdit(p) {
     // Charge le détail complet (phases / semaines / séances) avant édition.
@@ -52,7 +46,7 @@ export default function ProgramsPage() {
       return;
     await trainingApi.removeProgram(p.id);
     await load();
-    flash('Programme supprimé.');
+    toast('Programme supprimé.');
   }
 
   // --- Mode édition ---
@@ -65,10 +59,9 @@ export default function ProgramsPage() {
           onSaved={async () => {
             setEditing(null);
             await load();
-            flash('Programme enregistré.');
+            toast('Programme enregistré.');
           }}
         />
-        {toast && <div className="toast">{toast}</div>}
       </div>
     );
   }
@@ -167,14 +160,12 @@ export default function ProgramsPage() {
           onClose={() => setStarting(null)}
           onStarted={(res) => {
             setStarting(null);
-            flash(
+            toast(
               `Programme démarré : ${res.created} séance${res.created > 1 ? 's' : ''} ajoutée${res.created > 1 ? 's' : ''} au planning.`,
             );
           }}
         />
       )}
-
-      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }

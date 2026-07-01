@@ -4,9 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { applyReorder } from '../common/reorder.util';
 import { Between, LessThanOrEqual, Repository } from 'typeorm';
 import { round2 } from '../common/round.util';
-import { addMonthsYM, isValidDateStr, todayStr } from '../finances/date.util';
+import { addMonthsYM, isValidDateStr, todayStr } from '../common/date.util';
 import {
   BudgetCategoryEntity,
   BudgetCategoryKind,
@@ -116,12 +117,7 @@ export class BudgetService {
   }
 
   async reorderCategories(ids: string[]) {
-    if (!Array.isArray(ids)) {
-      throw new BadRequestException('Le corps doit contenir un tableau "ids".');
-    }
-    await Promise.all(
-      ids.map((id, index) => this.categories.update(id, { position: index })),
-    );
+    await applyReorder(this.categories, ids);
     return this.listCategories();
   }
 

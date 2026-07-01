@@ -18,13 +18,13 @@ import {
 } from '../components/budget/constants';
 import './FinancesPage.css';
 import './BudgetPage.css';
+import { toast } from '../components/toast';
 
 export default function BudgetPage() {
   const [month, setMonth] = useState(currentMonth());
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState('');
   const [txModal, setTxModal] = useState(null); // { kind?, categoryId?, transaction? } | null
   const [showCategories, setShowCategories] = useState(false);
   const toastTimer = useRef(null);
@@ -47,19 +47,13 @@ export default function BudgetPage() {
 
   useEffect(() => () => clearTimeout(toastTimer.current), []);
 
-  function flash(msg) {
-    setToast(msg);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(''), 2600);
-  }
-
   async function saveTransaction(payload) {
     if (txModal?.transaction) {
       await budgetApi.updateTransaction(txModal.transaction.id, payload);
-      flash('Transaction mise à jour.');
+      toast('Transaction mise à jour.');
     } else {
       await budgetApi.createTransaction(payload);
-      flash(payload.kind === 'entree' ? 'Revenu ajouté.' : 'Dépense ajoutée.');
+      toast(payload.kind === 'entree' ? 'Revenu ajouté.' : 'Dépense ajoutée.');
     }
     setTxModal(null);
     await load(month);
@@ -74,7 +68,7 @@ export default function BudgetPage() {
     )
       return;
     await budgetApi.removeTransaction(id);
-    flash('Transaction supprimée.');
+    toast('Transaction supprimée.');
     await load(month);
   }
 
@@ -106,7 +100,7 @@ export default function BudgetPage() {
       });
       await load(month);
     } catch (e) {
-      flash(e.message);
+      toast(e.message);
     }
   }
 
@@ -440,8 +434,6 @@ export default function BudgetPage() {
           onChanged={() => load(month)}
         />
       )}
-
-      {toast && <div className="ftoast">{toast}</div>}
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   NO_MEAL_TYPE,
 } from '../components/alimentation/constants';
 import './AlimentationPage.css';
+import { toast } from '../components/toast';
 
 // Normalisation pour la recherche : minuscule, sans accents.
 const norm = (s) =>
@@ -21,7 +22,6 @@ export default function AlimentationPage() {
   const [mealTypes, setMealTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState('');
 
   const [query, setQuery] = useState('');
   const [activeTypes, setActiveTypes] = useState(() => new Set());
@@ -52,11 +52,6 @@ export default function AlimentationPage() {
   useEffect(() => {
     load();
   }, [load]);
-
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2600);
-  }
 
   const typeOf = useMemo(() => indexMealTypes(mealTypes), [mealTypes]);
 
@@ -120,7 +115,7 @@ export default function AlimentationPage() {
       const detail = await alimentationApi.get(id);
       setDrawer(detail);
     } catch (e) {
-      flash(e.message);
+      toast(e.message);
     }
   }
 
@@ -137,14 +132,14 @@ export default function AlimentationPage() {
   }
   async function duplicate(recipe) {
     await alimentationApi.duplicate(recipe.id);
-    flash('Recette dupliquée.');
+    toast('Recette dupliquée.');
     await load();
   }
   async function archive(recipe) {
     await alimentationApi.archive(recipe.id);
     setModal(null);
     setDrawer(null);
-    flash('Recette archivée.');
+    toast('Recette archivée.');
     await load();
   }
   async function deleteRecipe(recipe) {
@@ -158,16 +153,16 @@ export default function AlimentationPage() {
     await alimentationApi.remove(recipe.id);
     setModal(null);
     setDrawer(null);
-    flash('Recette supprimée.');
+    toast('Recette supprimée.');
     await load();
   }
   async function saveRecipe(payload) {
     if (modal?.recipe) {
       await alimentationApi.update(modal.recipe.id, payload);
-      flash('Recette mise à jour.');
+      toast('Recette mise à jour.');
     } else {
       await alimentationApi.create(payload);
-      flash('Recette créée.');
+      toast('Recette créée.');
     }
     setModal(null);
     await load();
@@ -188,7 +183,7 @@ export default function AlimentationPage() {
     alimentationApi
       .reorder(ids)
       .then(load)
-      .catch((e) => flash(e.message));
+      .catch((e) => toast(e.message));
   }
 
   function renderCard(r) {
@@ -351,8 +346,6 @@ export default function AlimentationPage() {
           onClose={() => setCook(null)}
         />
       )}
-
-      {toast && <div className="altoast">{toast}</div>}
     </div>
   );
 }

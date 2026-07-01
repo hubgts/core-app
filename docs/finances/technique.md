@@ -192,7 +192,7 @@ haussière/baissière par enveloppe.
 - **`getSettings`/`updateSettings`** : singleton (création paresseuse), valident via
   `validateTargetAmount`/`validateTargetDate`.
 - Helpers de projection : `slopePerDay` (régression linéaire €/jour sur une fenêtre) et
-  `projectTarget` (eta + `paceStatus` + `requiredMonthly`) ; `daysBetween` dans `date.util.ts`.
+  `projectTarget` (eta + `paceStatus` + `requiredMonthly`) ; `daysBetween` dans `common/date.util.ts`.
 
 ---
 

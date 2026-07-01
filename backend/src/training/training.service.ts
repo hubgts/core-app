@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
-import { isValidDateStr, isValidTimeStr } from './date.util';
+import { isValidDateStr, isValidTimeStr } from '../common/date.util';
 import { TrainingEventEntity } from './entities/training-event.entity';
 import { ExerciseEntity } from './entities/exercise.entity';
 import { ExerciseSetEntity } from './entities/exercise-set.entity';

@@ -22,12 +22,14 @@ import BankrollDetailPage from './pages/BankrollDetailPage.jsx';
 import HealthPage from './pages/HealthPage.jsx';
 import ReferentialPage from './pages/ReferentialPage.jsx';
 import { DialogHost } from './components/dialogs.jsx';
+import { ToastHost } from './components/toast.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <DialogHost />
+      <ToastHost />
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

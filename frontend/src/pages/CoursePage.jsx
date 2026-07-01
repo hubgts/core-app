@@ -8,6 +8,7 @@ import ImportRecipeModal from '../components/course/ImportRecipeModal';
 import KebabMenu from '../components/KebabMenu';
 import '../pages/AlimentationPage.css';
 import './CoursePage.css';
+import { toast } from '../components/toast';
 
 const norm = (s) =>
   (s ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -19,7 +20,6 @@ export default function CoursePage() {
   const [query, setQuery] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState('');
 
   const [modal, setModal] = useState(null); // { list? } | null
   const [importing, setImporting] = useState(false);
@@ -46,11 +46,6 @@ export default function CoursePage() {
     load();
   }, [load]);
 
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2600);
-  }
-
   async function run(fn) {
     setError('');
     try {
@@ -71,7 +66,7 @@ export default function CoursePage() {
     if (id) {
       await courseApi.updateList(id, payload);
       setModal(null);
-      flash('Liste mise à jour.');
+      toast('Liste mise à jour.');
       await load();
     } else {
       const created = await courseApi.createList(payload);
@@ -83,7 +78,7 @@ export default function CoursePage() {
   function duplicate(list) {
     run(async () => {
       await courseApi.duplicateList(list.id);
-      flash('Liste dupliquée.');
+      toast('Liste dupliquée.');
     });
   }
 
@@ -97,7 +92,7 @@ export default function CoursePage() {
       return;
     run(async () => {
       await courseApi.removeList(list.id);
-      flash('Liste supprimée.');
+      toast('Liste supprimée.');
     });
   }
 
@@ -142,7 +137,7 @@ export default function CoursePage() {
     courseApi
       .reorderLists(ids)
       .then(load)
-      .catch((e) => flash(e.message));
+      .catch((e) => toast(e.message));
   }
 
   return (
@@ -307,8 +302,6 @@ export default function CoursePage() {
           }}
         />
       )}
-
-      {toast && <div className="altoast">{toast}</div>}
     </div>
   );
 }

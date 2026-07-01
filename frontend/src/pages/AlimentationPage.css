@@ -397,22 +397,6 @@
   margin: 0;
 }
 
-/* --- Toast --- */
-.altoast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--brand-nuit);
-  color: #fff;
-  padding: 11px 18px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  z-index: 80;
-}
-
 /* ===== Formulaire ===== */
 .alfield {
   display: flex;

@@ -4,7 +4,7 @@
 import { BankrollEntity } from './entities/bankroll.entity';
 import { BetEntity } from './entities/bet.entity';
 import { betProfit, hasAction, isSettled } from './types';
-import { dateOf, daysBetween, todayStr } from './date.util';
+import { dateOf, daysBetween, todayStr } from '../common/date.util';
 import { round2, round3 } from '../common/round.util';
 
 export interface BankrollStats {

@@ -14,6 +14,7 @@ import {
   ymd,
 } from '../utils/date';
 import './HabitsPage.css';
+import { toast } from '../components/toast';
 
 const MILESTONES_DAYS = [7, 30, 100, 365];
 const MILESTONES_WEEKS = [4, 12, 26, 52];
@@ -73,7 +74,6 @@ export default function HabitsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [modal, setModal] = useState({ open: false, habit: null });
-  const [toast, setToast] = useState('');
   const dragIndex = useRef(null);
 
   const nbDays = daysInMonth(cursor.year, cursor.month);
@@ -118,12 +118,6 @@ export default function HabitsPage() {
     load();
   }, [load]);
 
-  function showToast(msg) {
-    setToast(msg);
-    window.clearTimeout(showToast._t);
-    showToast._t = window.setTimeout(() => setToast(''), 2600);
-  }
-
   // --- Toggle d'une cellule (optimiste) -------------------------------------
   // Volontairement permissif : on peut cocher n'importe quel jour, passé comme
   // futur (la date de création reste un simple repère visuel, voir grille).
@@ -148,7 +142,7 @@ export default function HabitsPage() {
         res.stats.streakUnit === 'weeks' ? MILESTONES_WEEKS : MILESTONES_DAYS;
       if (willCheck && reached > prevStreak && milestones.includes(reached)) {
         const unit = res.stats.streakUnit === 'weeks' ? 'semaines' : 'jours';
-        showToast(`🔥 ${reached} ${unit} d’affilée sur « ${habit.name} » !`);
+        toast(`🔥 ${reached} ${unit} d’affilée sur « ${habit.name} » !`);
       }
     } catch (e) {
       setChecks((prev) => {
@@ -156,7 +150,7 @@ export default function HabitsPage() {
         willCheck ? next.delete(key) : next.add(key);
         return next;
       });
-      showToast(`Erreur : ${e.message}`);
+      toast(`Erreur : ${e.message}`);
     }
   }
 
@@ -199,7 +193,7 @@ export default function HabitsPage() {
     setHabits(next);
     habitsApi
       .reorder(next.map((h) => h.id))
-      .catch((e) => showToast(`Erreur : ${e.message}`));
+      .catch((e) => toast(`Erreur : ${e.message}`));
   }
 
   // --- KPIs (complétion du mois, RG-10/12) ----------------------------------
@@ -496,8 +490,6 @@ export default function HabitsPage() {
           onClose={() => setModal({ open: false, habit: null })}
         />
       )}
-
-      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }

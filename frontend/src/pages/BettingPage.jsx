@@ -9,13 +9,13 @@ import {
   trendClass,
 } from '../components/betting/constants';
 import './BettingPage.css';
+import { toast } from '../components/toast';
 
 export default function BettingPage() {
   const navigate = useNavigate();
   const [bankrolls, setBankrolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState('');
   const [modal, setModal] = useState(false);
 
   const load = useCallback(async () => {
@@ -34,15 +34,10 @@ export default function BettingPage() {
     load();
   }, [load]);
 
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2600);
-  }
-
   async function createBankroll(payload) {
     const detail = await bettingApi.createBankroll(payload);
     setModal(false);
-    flash('Bankroll créée.');
+    toast('Bankroll créée.');
     navigate(`/paris/${detail.id}`);
   }
 
@@ -114,8 +109,6 @@ export default function BettingPage() {
           onClose={() => setModal(false)}
         />
       )}
-
-      {toast && <div className="btoast">{toast}</div>}
     </div>
   );
 }

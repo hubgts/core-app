@@ -37,9 +37,9 @@ make dc-clean    # arrêt + suppression volumes/images (efface la base !)
 Backend hors Docker : `npm run start:dev` (watch). Frontend : `npm run dev`.
 
 **À chaque fin de développement, lancer `make check`** (depuis la racine) :
-typecheck backend + ESLint + Prettier (back & front), en lecture seule. Le code
-doit rester **0 erreur** avant de conclure. Pour corriger automatiquement :
-`npm run lint:fix` / `npm run format` dans `backend/` ou `frontend/`. Voir
+auto-correction ESLint + Prettier (back & front, **modifie les fichiers**) puis
+typecheck backend. La commande doit finir **sans erreur** avant de conclure ;
+ce qui reste après l'auto-fix se corrige à la main. Voir
 `docs/qualite-du-code.md`.
 
 > ⚠️ **Pas de bind-mount.** Les Dockerfiles font `COPY . .` : le code est figé
@@ -49,8 +49,8 @@ doit rester **0 erreur** avant de conclure. Pour corriger automatiquement :
 ## Arborescence
 
 ```
-backend/src/<module>/        # *.controller.ts, *.service.ts, types.ts, entities/, date.util.ts
-backend/src/common/          # helpers partagés (round.util.ts : round1/2/3)
+backend/src/<module>/        # *.controller.ts, *.service.ts, types.ts, entities/
+backend/src/common/          # helpers partagés (date.util.ts, round.util.ts, reorder.util.ts)
 frontend/src/api/            # un fichier par module + client.js (helper request() partagé)
 frontend/src/pages/          # une page par route
 frontend/src/components/<module>/
@@ -75,6 +75,11 @@ specs/                       # spécifications fonctionnelles de référence
   `await alertDialog(message)`. Le `<DialogHost />` est monté une fois dans
   `main.jsx` ; les fonctions sont impératives (pas besoin de hook). Les
   suppressions passent `danger: true`. Rendre le handler `async` au besoin.
+- **Toast global** : pour un message éphémère de confirmation/erreur, appeler
+  `toast('Enregistré.')` de `frontend/src/components/toast.jsx` (impératif,
+  comme les dialogues ; `<ToastHost />` est monté une fois dans `main.jsx`, le
+  style `.toast` vit dans `index.css`). Ne pas recréer d'état `toast` local
+  dans les pages.
 - **Pas de `<select>` natif** : utiliser `<Combobox>`
   (`frontend/src/components/Combobox.jsx`) — liste déroulante avec recherche
   intégrée (autocomplete), navigable au clavier. Props : `options` (`[{ value,
@@ -99,8 +104,8 @@ specs/                       # spécifications fonctionnelles de référence
   placé en haut à droite de la page, **à droite du bouton principal s'il existe**,
   dans un conteneur `.page__headactions`. Le clic ouvre un dropdown listant les
   actions ; chaque action est `{ icon?, label, to? | onClick? }`.
-- Style code : 2 espaces, guillemets simples, pas d'ESLint/Prettier configuré —
-  aligne-toi sur le code existant.
+- Style code : 2 espaces, guillemets simples — imposés par ESLint + Prettier
+  (`.prettierrc.json` à la racine, `.eslintrc.cjs` par sous-projet).
 - Ordre des routes NestJS : les routes fixes (`/reorder`) avant les paramétrées
   (`/:id`).
 

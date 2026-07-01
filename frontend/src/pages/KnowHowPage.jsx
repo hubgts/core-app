@@ -8,6 +8,7 @@ import KebabMenu from '../components/KebabMenu';
 import RealizationMode from '../components/knowhow/RealizationMode';
 import { indexCategories, NO_CATEGORY } from '../components/knowhow/constants';
 import './KnowHowPage.css';
+import { toast } from '../components/toast';
 
 // Normalisation pour la recherche : minuscule, sans accents.
 const norm = (s) =>
@@ -18,7 +19,6 @@ export default function KnowHowPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState('');
 
   const [query, setQuery] = useState('');
   const [activeCats, setActiveCats] = useState(() => new Set());
@@ -49,11 +49,6 @@ export default function KnowHowPage() {
   useEffect(() => {
     load();
   }, [load]);
-
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2600);
-  }
 
   const catOf = useMemo(() => indexCategories(categories), [categories]);
 
@@ -117,7 +112,7 @@ export default function KnowHowPage() {
       const detail = await knowhowApi.get(id);
       setDrawer(detail);
     } catch (e) {
-      flash(e.message);
+      toast(e.message);
     }
   }
 
@@ -134,14 +129,14 @@ export default function KnowHowPage() {
   }
   async function duplicate(recipe) {
     await knowhowApi.duplicate(recipe.id);
-    flash('Savoir-faire dupliqué.');
+    toast('Savoir-faire dupliqué.');
     await load();
   }
   async function archive(recipe) {
     await knowhowApi.archive(recipe.id);
     setModal(null);
     setDrawer(null);
-    flash('Savoir-faire archivé.');
+    toast('Savoir-faire archivé.');
     await load();
   }
   async function deleteRecipe(recipe) {
@@ -155,16 +150,16 @@ export default function KnowHowPage() {
     await knowhowApi.remove(recipe.id);
     setModal(null);
     setDrawer(null);
-    flash('Savoir-faire supprimé.');
+    toast('Savoir-faire supprimé.');
     await load();
   }
   async function saveRecipe(payload) {
     if (modal?.recipe) {
       await knowhowApi.update(modal.recipe.id, payload);
-      flash('Savoir-faire mis à jour.');
+      toast('Savoir-faire mis à jour.');
     } else {
       await knowhowApi.create(payload);
-      flash('Savoir-faire créé.');
+      toast('Savoir-faire créé.');
     }
     setModal(null);
     await load();
@@ -185,7 +180,7 @@ export default function KnowHowPage() {
     knowhowApi
       .reorder(ids)
       .then(load)
-      .catch((e) => flash(e.message));
+      .catch((e) => toast(e.message));
   }
 
   function renderCard(r) {
@@ -351,8 +346,6 @@ export default function KnowHowPage() {
           onClose={() => setRealize(null)}
         />
       )}
-
-      {toast && <div className="rtoast">{toast}</div>}
     </div>
   );
 }

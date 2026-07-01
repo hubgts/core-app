@@ -188,7 +188,7 @@ préfixées par `/habits`.
 ## 5. Calculs (le cœur métier)
 
 Fichier : `backend/src/habits/habits.service.ts`. Dates manipulées en **UTC minuit**
-(`date.util.ts`) pour éviter les décalages de fuseau / changement d'heure.
+(`common/date.util.ts`) pour éviter les décalages de fuseau / changement d'heure.
 
 ### 5.1 Avancement de la semaine — `weekDone`
 Commun à toutes les habitudes. On compte les coches de la **semaine ISO courante**

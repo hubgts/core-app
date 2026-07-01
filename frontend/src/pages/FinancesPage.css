@@ -732,22 +732,6 @@
   background: var(--surface-3);
 }
 
-/* --- Toast --- */
-.ftoast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--text);
-  color: var(--surface);
-  padding: 11px 20px;
-  border-radius: 11px;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  z-index: 60;
-}
-
 /* --- Responsive --- */
 @media (max-width: 860px) {
   .fhero {

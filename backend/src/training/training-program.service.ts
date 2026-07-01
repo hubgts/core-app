@@ -6,11 +6,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import {
-  addDaysStr,
+  addDays,
   isValidDateStr,
   isValidTimeStr,
   mondayOf,
-} from './date.util';
+} from '../common/date.util';
 import { TrainingProgramEntity } from './entities/training-program.entity';
 import { TrainingProgramPhaseEntity } from './entities/training-program-phase.entity';
 import { TrainingProgramWeekEntity } from './entities/training-program-week.entity';
@@ -192,7 +192,7 @@ export class TrainingProgramService {
     const out: PlacedSession[] = [];
     orderedWeeks.forEach((week, ordinal) => {
       // n-ième semaine du programme (1-based) → lundi de référence.
-      const weekMonday = addDaysStr(monday, ordinal * 7);
+      const weekMonday = addDays(monday, ordinal * 7);
       const objective =
         week.objective ??
         (week.phaseId ? (phaseObjectiveById.get(week.phaseId) ?? null) : null);
@@ -200,7 +200,7 @@ export class TrainingProgramService {
         (a, b) => a.dayOfWeek - b.dayOfWeek || a.position - b.position,
       );
       for (const s of orderedSessions) {
-        const date = addDaysStr(weekMonday, s.dayOfWeek - 1);
+        const date = addDays(weekMonday, s.dayOfWeek - 1);
         // Semaine partielle : on n'ignore que des séances de la 1re semaine.
         const skipped = ordinal === 0 && date < startDate;
         out.push({

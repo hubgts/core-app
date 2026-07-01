@@ -128,8 +128,10 @@
   z-index: 2;
   background: var(--surface);
   text-align: left;
-  min-width: 240px;
-  max-width: 240px;
+  /* Colonne flexible : la table étant en largeur 100 %, elle absorbe tout
+     l'espace libre pour afficher un maximum du nom, qui revient à la ligne
+     au besoin (line-clamp sur .grid__hname). */
+  min-width: 180px;
 }
 
 .grid__corner {
@@ -192,7 +194,9 @@
 
 .grid__name {
   display: flex;
-  align-items: center;
+  /* flex-start (et non center) : le nom peut occuper jusqu'à 3 lignes,
+     l'icône et la poignée restent alignées sur la première. */
+  align-items: flex-start;
   gap: 8px;
   padding: 8px 12px;
   cursor: pointer;
@@ -233,9 +237,12 @@
 
 .grid__hname {
   font-weight: 500;
-  white-space: nowrap;
+  /* Retour à la ligne : le nom complet reste lisible (plafonné à 3 lignes). */
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .grid__cell {
@@ -417,31 +424,4 @@
   background: rgba(248, 113, 113, 0.12);
   color: var(--danger);
   border: 1px solid rgba(248, 113, 113, 0.35);
-}
-
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--text);
-  color: var(--surface);
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  z-index: 60;
-  animation: toast-in 0.2s ease;
-}
-
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 8px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
 }

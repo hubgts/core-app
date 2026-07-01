@@ -4,15 +4,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { applyReorder } from '../common/reorder.util';
 import { In, Repository } from 'typeorm';
 import {
-  addDaysStr,
+  addDays,
   addMonthsYM,
   daysBetween,
   isValidDateStr,
   lastDayOfMonth,
   todayStr,
-} from './date.util';
+} from '../common/date.util';
 import { round2 } from '../common/round.util';
 import { EnvelopeEntity } from './entities/envelope.entity';
 import { SnapshotEntity } from './entities/snapshot.entity';
@@ -52,7 +53,7 @@ function slopePerDay(
   ref: string,
   windowDays = 365,
 ): number | null {
-  const since = addDaysStr(ref, -windowDays);
+  const since = addDays(ref, -windowDays);
   const pts = points
     .filter((p) => p.date >= since)
     .map((p) => ({ x: daysBetween(since, p.date), y: p.value }));
@@ -89,7 +90,7 @@ function projectTarget(
   if (slope == null || slope <= 0) {
     return { eta: null, paceStatus: 'no_pace', requiredMonthly: null };
   }
-  const eta = addDaysStr(ref, Math.ceil(remaining / slope));
+  const eta = addDays(ref, Math.ceil(remaining / slope));
   if (!targetDate) {
     return { eta, paceStatus: 'on_track', requiredMonthly: null };
   }
@@ -309,7 +310,7 @@ export class FinancesService {
 
     // #8 — KPIs temporels : YTD, 12 mois glissants, plus haut historique.
     const ytdNet = netAt(`${y - 1}-12-31`);
-    const oneYearNet = netAt(addDaysStr(ref, -365));
+    const oneYearNet = netAt(addDays(ref, -365));
     let allTimeHigh: { amount: number; date: string } | null = null;
     let earliest: string | null = null;
     for (const s of series) {
@@ -330,7 +331,7 @@ export class FinancesService {
     const kpis = {
       ytd: { fromDate: `${y - 1}-12-31`, amount: round2(netWorth - ytdNet) },
       oneYear: {
-        fromDate: addDaysStr(ref, -365),
+        fromDate: addDays(ref, -365),
         amount: round2(netWorth - oneYearNet),
       },
       allTimeHigh,
@@ -508,12 +509,7 @@ export class FinancesService {
   }
 
   async reorder(ids: string[]) {
-    if (!Array.isArray(ids)) {
-      throw new BadRequestException('Le corps doit contenir un tableau "ids".');
-    }
-    await Promise.all(
-      ids.map((id, index) => this.envelopes.update(id, { position: index })),
-    );
+    await applyReorder(this.envelopes, ids);
     return this.listEnvelopes();
   }
 
@@ -679,7 +675,7 @@ export class FinancesService {
 
     // Tendance sur ~30 jours : solde courant vs dernier relevé daté <= ref-30j
     // (report du dernier solde connu). `null` si pas assez d'historique.
-    const ref30 = addDaysStr(ref, -30);
+    const ref30 = addDays(ref, -30);
     const snap30 = snapsDesc.find((s) => s.date <= ref30) ?? null;
     const balance30 = snap30 ? round2(snap30.amount) : null;
     let trend30: { amount: number; pct: number | null } | null = null;

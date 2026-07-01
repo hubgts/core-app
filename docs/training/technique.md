@@ -183,7 +183,7 @@ Fichier `backend/src/training/training-program.service.ts`.
 - **Ancrage des jours** : `J1 = lundi … J7 = dimanche`. Pour la **n-ième semaine**
   (ordre des semaines, 1-based), le lundi de référence = `mondayOf(startDate) +
   (n−1)×7` ; la date d'une séance de jour `Jd` = `lundiRéf + (Jd−1)` (helpers
-  `mondayOf` / `addDaysStr` de `date.util.ts`, calcul en UTC).
+  `mondayOf` / `addDays` de `common/date.util.ts`, calcul en UTC).
 - **Semaine partielle** : en **1re semaine uniquement**, une séance dont la date <
   `startDate` est **ignorée** (jamais placée).
 - **Objectif résolu** : `semaine.objective ?? phase.objective ?? null`, figé dans

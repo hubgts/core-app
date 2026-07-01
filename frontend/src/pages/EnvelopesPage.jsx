@@ -12,6 +12,7 @@ import {
 } from '../components/finances/constants';
 import './FinancesPage.css';
 import './EnvelopesPage.css';
+import { toast } from '../components/toast';
 
 /**
  * Page de gestion des enveloppes : grille de cartes par type (réordonnables par
@@ -22,7 +23,6 @@ export default function EnvelopesPage() {
   const [archived, setArchived] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState('');
   const [showArchived, setShowArchived] = useState(false);
 
   const [modal, setModal] = useState(null); // { envelope? } | null
@@ -47,11 +47,6 @@ export default function EnvelopesPage() {
     setLoading(true);
     load();
   }, [load]);
-
-  function flash(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2600);
-  }
 
   const groups = useMemo(() => {
     const byType = new Map();
@@ -86,7 +81,7 @@ export default function EnvelopesPage() {
     setActive(next);
     financesApi
       .reorder(next.map((e) => e.id))
-      .catch((e) => flash(`Erreur : ${e.message}`));
+      .catch((e) => toast(`Erreur : ${e.message}`));
   }
 
   async function openDrawer(id, adding = false) {
@@ -95,17 +90,17 @@ export default function EnvelopesPage() {
       setDrawerAdding(adding);
       setDrawer(detail);
     } catch (e) {
-      flash(e.message);
+      toast(e.message);
     }
   }
 
   async function saveEnvelope(payload) {
     if (modal?.envelope) {
       await financesApi.update(modal.envelope.id, payload);
-      flash('Enveloppe mise à jour.');
+      toast('Enveloppe mise à jour.');
     } else {
       await financesApi.create(payload);
-      flash('Enveloppe créée.');
+      toast('Enveloppe créée.');
     }
     setModal(null);
     await load();
@@ -115,14 +110,14 @@ export default function EnvelopesPage() {
     await financesApi.archive(envelope.id);
     setModal(null);
     setDrawer(null);
-    flash('Enveloppe archivée.');
+    toast('Enveloppe archivée.');
     await load();
   }
 
   async function unarchiveEnvelope(envelope) {
     await financesApi.unarchive(envelope.id);
     setDrawer(null);
-    flash('Enveloppe réactivée.');
+    toast('Enveloppe réactivée.');
     await load();
   }
 
@@ -136,14 +131,14 @@ export default function EnvelopesPage() {
     await financesApi.remove(envelope.id);
     setModal(null);
     setDrawer(null);
-    flash('Enveloppe supprimée.');
+    toast('Enveloppe supprimée.');
     await load();
   }
 
   async function updateSnapshot(date, data) {
     const detail = await financesApi.setSnapshot(drawer.id, date, data);
     setDrawer(detail);
-    flash('Solde mis à jour.');
+    toast('Solde mis à jour.');
     await load();
   }
 
@@ -154,7 +149,7 @@ export default function EnvelopesPage() {
       return;
     const detail = await financesApi.removeSnapshot(snapshotId);
     setDrawer(detail);
-    flash('Relevé supprimé.');
+    toast('Relevé supprimé.');
     await load();
   }
 
@@ -280,8 +275,6 @@ export default function EnvelopesPage() {
           onClose={() => setDrawer(null)}
         />
       )}
-
-      {toast && <div className="ftoast">{toast}</div>}
     </div>
   );
 }
