@@ -35,8 +35,12 @@ make dc-clean    # arrêt + suppression volumes/images (efface la base !)
 ```
 
 Backend hors Docker : `npm run start:dev` (watch). Frontend : `npm run dev`.
-Vérifs avant de conclure : `cd backend && npx tsc --noEmit` et
-`cd frontend && npx vite build`.
+
+**À chaque fin de développement, lancer `make check`** (depuis la racine) :
+typecheck backend + ESLint + Prettier (back & front), en lecture seule. Le code
+doit rester **0 erreur** avant de conclure. Pour corriger automatiquement :
+`npm run lint:fix` / `npm run format` dans `backend/` ou `frontend/`. Voir
+`docs/qualite-du-code.md`.
 
 > ⚠️ **Pas de bind-mount.** Les Dockerfiles font `COPY . .` : le code est figé
 > dans l'image au build. Après une modif de code, **reconstruire** l'image

@@ -14,6 +14,7 @@ import BudgetPage from './pages/BudgetPage.jsx';
 import CashflowPage from './pages/CashflowPage.jsx';
 import KnowHowPage from './pages/KnowHowPage.jsx';
 import AlimentationPage from './pages/AlimentationPage.jsx';
+import FoodsPage from './pages/FoodsPage.jsx';
 import CoursePage from './pages/CoursePage.jsx';
 import ShoppingListPage from './pages/ShoppingListPage.jsx';
 import BettingPage from './pages/BettingPage.jsx';
@@ -47,6 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           />
           <Route path="/savoir-faire" element={<KnowHowPage />} />
           <Route path="/alimentation" element={<AlimentationPage />} />
+          <Route path="/alimentation/aliments" element={<FoodsPage />} />
           <Route path="/course" element={<CoursePage />} />
           <Route path="/course/:id" element={<ShoppingListPage />} />
           <Route path="/paris" element={<BettingPage />} />

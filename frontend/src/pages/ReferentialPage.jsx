@@ -4,6 +4,7 @@ import { referentialApi } from '../api/referential';
 import { confirmDialog, promptDialog } from '../components/dialogs';
 import KnowHowCategoriesPanel from '../components/knowhow/KnowHowCategoriesPanel';
 import MealTypesPanel from '../components/alimentation/MealTypesPanel';
+import FoodsPanel from '../components/alimentation/FoodsPanel';
 import AislesPanel from '../components/course/AislesPanel';
 import ArticlesPanel from '../components/course/ArticlesPanel';
 import './ReferentialPage.css';
@@ -34,6 +35,12 @@ const REFERENTIALS = [
     kind: 'meal_type',
     label: 'Types de repas',
     icon: '🍽️',
+    custom: true,
+  },
+  {
+    kind: 'food',
+    label: 'Aliments (macros)',
+    icon: '🥑',
     custom: true,
   },
   {
@@ -168,6 +175,8 @@ export default function ReferentialPage() {
           {ref?.custom ? (
             kind === 'meal_type' ? (
               <MealTypesPanel />
+            ) : kind === 'food' ? (
+              <FoodsPanel />
             ) : kind === 'course_article' ? (
               <ArticlesPanel />
             ) : kind === 'course_aisle' ? (

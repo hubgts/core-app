@@ -70,14 +70,20 @@ en haut, puis **Autres**.
    cuisson, repos), **ingrédients**, **étapes**, **couleur**.
 3. **Enregistrer**.
 
-> Les **ingrédients** et **étapes** s'ajoutent ligne à ligne (la touche Entrée crée
-> une nouvelle ligne d'ingrédient) et se **réordonnent par glisser-déposer**
+> Les **étapes** s'ajoutent ligne à ligne et se **réordonnent par glisser-déposer**
 > (poignée `⠿`). Les lignes laissées vides sont ignorées à l'enregistrement.
 >
 > Le **temps total** s'affiche automatiquement dès qu'un temps est saisi.
->
-> Astuce : une ligne d'ingrédient « — Pour la garniture — » (sans quantité) sert de
-> **titre de section**.
+
+#### Ingrédients (liste d'aliments)
+Chaque ligne d'ingrédient (**+ Ingrédient**) se choisit dans la **liste des
+aliments** du référentiel (champ déroulant avec recherche), accompagnée d'une
+**quantité** et d'une **unité (g / ml)**. Le bouton **`+`** à côté du champ
+permet de **créer un aliment à la volée** (nom + macros) sans quitter la recette :
+il est aussitôt ajouté à la liste et sélectionné.
+
+> Seuls les ingrédients **liés à un aliment**, **quantifiés** et en **g/ml**
+> comptent dans les valeurs nutritionnelles (voir §5).
 
 ### Type de repas
 Le sélecteur ne propose que les **types existants** (ou « Sans type »).
@@ -108,6 +114,16 @@ ingrédients : les boutons **− / +** recalculent les quantités affichées. Le
 ingrédients **sans quantité** restent inchangés. C'est **purement de l'affichage** :
 la recette n'est pas modifiée, et l'échelle revient à sa valeur de départ à la
 réouverture.
+
+### Valeurs nutritionnelles
+Dès qu'au moins un ingrédient est **lié à un aliment** et **quantifié en g/ml**,
+un tableau **Valeurs nutritionnelles** affiche les **glucides / protéines /
+lipides / calories** : pour la quantité affichée (suit la mise à l'échelle) et,
+si une portion de référence est définie, **par portion**. Les calories de la
+carte du board reprennent la valeur **par portion** (sinon le total).
+
+> Si certains ingrédients ne sont pas comptés (pas d'aliment lié, pas de quantité,
+> ou unité autre que g/ml), une mention **« Calcul partiel »** l'indique.
 
 ---
 
@@ -151,12 +167,32 @@ on peut :
 
 ---
 
-## 9. Bon à savoir
+## 9. Gérer les aliments (macros & calories)
+
+Les **aliments** (ingrédients du référentiel nutritionnel) se gèrent sur la
+sous-page **🥑 Aliments** du module Alimentation : la navigation latérale propose
+**Recettes** et **Aliments** une fois dans le module (accès aussi via l'onglet
+**« Aliments (macros) »** du Référentiel, ou directement `/alimentation/aliments`).
+Cette liste est **indépendante du module Course**.
+
+Pour chaque aliment, on renseigne, **pour 100 g ou 100 ml** :
+- les **macronutriments** : glucides, protéines, lipides (en grammes) ;
+- la **base** (g ou ml).
+
+Les **calories sont calculées automatiquement** à partir des macros
+(`4·glucides + 4·protéines + 9·lipides`) et affichées en direct.
+
+> Un aliment **utilisé dans une recette ne peut pas être supprimé** : il faut
+> d'abord le retirer des recettes concernées.
+
+---
+
+## 10. Bon à savoir
 
 - **Aucun compte / connexion** : application mono-utilisateur, données stockées
   côté serveur (PostgreSQL — voir [`technique.md`](./technique.md)).
-- **Pas de suivi nutritionnel, pas de planification, pas de photo** : choix assumé
-  de ce premier socle (voir le backlog de la spec).
+- **Pas de planification, pas de photo** : choix assumé de ce socle (voir le
+  backlog de la spec).
 - Le module est accessible via **Alimentation** (`/alimentation`) dans la navigation.
 
 ---

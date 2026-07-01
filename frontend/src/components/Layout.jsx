@@ -39,7 +39,15 @@ const NAV_ITEMS = [
     ],
   },
   { to: '/savoir-faire', label: 'Savoir-faire', icon: '🛠️' },
-  { to: '/alimentation', label: 'Alimentation', icon: '🍽️' },
+  {
+    to: '/alimentation',
+    label: 'Alimentation',
+    icon: '🍽️',
+    children: [
+      { to: '/alimentation', label: 'Recettes', end: true },
+      { to: '/alimentation/aliments', label: 'Aliments' },
+    ],
+  },
   { to: '/course', label: 'Course', icon: '🛒' },
   { to: '/paris', label: 'Paris sportifs', icon: '🎰' },
   { to: '/referentiel', label: 'Référentiel', icon: '📚' },

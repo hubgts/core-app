@@ -7,24 +7,30 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   RecipeEntity,
   RecipeIngredient,
   RecipeStep,
 } from './entities/recipe.entity';
 import { MealTypeEntity } from './entities/meal-type.entity';
+import { FoodEntity, FoodUnit } from './entities/food.entity';
 import {
   DEFAULT_MEAL_TYPES,
+  FoodInput,
   IngredientInput,
   MealTypeInput,
   RecipeDifficulty,
   RecipeInput,
   StepInput,
 } from './types';
+import { round1, round2 } from '../common/round.util';
 
 const TITLE_MAX = 120;
 const MEAL_TYPE_NAME_MAX = 40;
+const FOOD_NAME_MAX = 80;
+const MACRO_MAX = 100; // g pour 100 g/ml
+const FOOD_UNITS: FoodUnit[] = ['g', 'ml'];
 const DIFFICULTIES: RecipeDifficulty[] = ['facile', 'moyen', 'difficile'];
 
 @Injectable()
@@ -34,6 +40,8 @@ export class AlimentationService implements OnModuleInit {
     private readonly recipes: Repository<RecipeEntity>,
     @InjectRepository(MealTypeEntity)
     private readonly mealTypes: Repository<MealTypeEntity>,
+    @InjectRepository(FoodEntity)
+    private readonly foods: Repository<FoodEntity>,
   ) {}
 
   /** Amorce le référentiel de types de repas par défaut au premier démarrage. */
@@ -135,6 +143,77 @@ export class AlimentationService implements OnModuleInit {
   }
 
   // ---------------------------------------------------------------------------
+  // Aliments (référentiel nutritionnel)
+  // ---------------------------------------------------------------------------
+
+  /** Liste les aliments, filtrés par `q` (recherche libre sur le nom). */
+  async listFoods(q?: string) {
+    const qb = this.foods
+      .createQueryBuilder('f')
+      .orderBy('f.name', 'ASC')
+      .limit(200);
+    if (q && q.trim()) {
+      qb.where('f.name_key LIKE :q', { q: `%${this.normalizeKey(q)}%` });
+    }
+    const rows = await qb.getMany();
+    return rows.map((f) => this.foodResponse(f));
+  }
+
+  async createFood(input: FoodInput) {
+    const name = this.validateFoodName(input.name);
+    const nameKey = this.normalizeKey(name);
+    const existing = await this.foods.findOne({ where: { nameKey } });
+    if (existing) throw new ConflictException('Un aliment porte déjà ce nom.');
+
+    const food = this.foods.create(this.foodFromInput(input, name, nameKey));
+    return this.foodResponse(await this.foods.save(food));
+  }
+
+  async updateFood(id: string, input: FoodInput) {
+    const food = await this.getFoodOrThrow(id);
+    let name = food.name;
+    let nameKey = food.nameKey;
+    if (input.name !== undefined) {
+      name = this.validateFoodName(input.name);
+      nameKey = this.normalizeKey(name);
+      const clash = await this.foods.findOne({ where: { nameKey } });
+      if (clash && clash.id !== id) {
+        throw new ConflictException('Un aliment porte déjà ce nom.');
+      }
+    }
+    if (input.unit !== undefined) food.unit = this.normalizeUnit(input.unit);
+    if (input.carbs !== undefined) food.carbs = this.normalizeMacro(input.carbs);
+    if (input.protein !== undefined) {
+      food.protein = this.normalizeMacro(input.protein);
+    }
+    if (input.fat !== undefined) food.fat = this.normalizeMacro(input.fat);
+    food.name = name;
+    food.nameKey = nameKey;
+    food.kcal = this.computeKcal(food.carbs, food.protein, food.fat);
+    return this.foodResponse(await this.foods.save(food));
+  }
+
+  /** Supprime un aliment, sauf s'il est utilisé dans au moins une recette. */
+  async removeFood(id: string): Promise<void> {
+    await this.getFoodOrThrow(id);
+    const used = await this.recipes
+      .createQueryBuilder('r')
+      .where(
+        `EXISTS (SELECT 1 FROM jsonb_array_elements(r.ingredients) ing
+                 WHERE ing->>'foodId' = :id)`,
+        { id },
+      )
+      .getCount();
+    if (used > 0) {
+      throw new ConflictException(
+        `Cet aliment est utilisé dans ${used} recette${used > 1 ? 's' : ''}. ` +
+          'Retire-le de ces recettes avant de le supprimer.',
+      );
+    }
+    await this.foods.delete(id);
+  }
+
+  // ---------------------------------------------------------------------------
   // Recettes — lecture
   // ---------------------------------------------------------------------------
 
@@ -145,7 +224,8 @@ export class AlimentationService implements OnModuleInit {
       where,
       order: { pinned: 'DESC', position: 'ASC', updatedAt: 'DESC' },
     });
-    return items.map((r) => this.toResponse(r));
+    const foodMap = await this.loadFoodMap(items.flatMap((r) => r.ingredients));
+    return items.map((r) => this.toResponse(r, foodMap));
   }
 
   async get(id: string) {
@@ -296,14 +376,19 @@ export class AlimentationService implements OnModuleInit {
     return parts.reduce((a, b) => a + b, 0);
   }
 
-  private toResponse(r: RecipeEntity) {
+  private async toResponse(
+    r: RecipeEntity,
+    foodMap?: Map<string, FoodEntity>,
+  ) {
+    const ingredients = r.ingredients ?? [];
+    const map = foodMap ?? (await this.loadFoodMap(ingredients));
     return {
       id: r.id,
       title: r.title,
       description: r.description,
       mealTypeId: r.mealTypeId,
       labels: r.labels ?? [],
-      ingredients: r.ingredients ?? [],
+      ingredients,
       steps: r.steps ?? [],
       servings: r.servings,
       prepTimeMin: r.prepTimeMin,
@@ -315,9 +400,85 @@ export class AlimentationService implements OnModuleInit {
       pinned: r.pinned,
       position: r.position,
       status: r.status,
+      nutrition: this.computeNutrition(r, map),
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
     };
+  }
+
+  /**
+   * Apport nutritionnel d'une recette (RG-nutri). Pour chaque ingrédient lié à
+   * un aliment et quantifié en g/ml, agrège quantité × (macro/100). Les lignes
+   * sans aliment, sans quantité ou en unité non massique sont ignorées et
+   * comptées dans `incompleteCount`. `perServing` est null si `servings` absent.
+   */
+  private computeNutrition(r: RecipeEntity, foodMap: Map<string, FoodEntity>) {
+    let carbs = 0;
+    let protein = 0;
+    let fat = 0;
+    let kcal = 0;
+    let counted = 0;
+    let incompleteCount = 0;
+
+    for (const ing of r.ingredients ?? []) {
+      const food = ing.foodId ? foodMap.get(ing.foodId) : undefined;
+      const usable =
+        food &&
+        ing.quantity != null &&
+        ing.quantity > 0 &&
+        this.unitMatches(ing.unit, food.unit);
+      if (!usable) {
+        // Les lignes de section (sans aliment ni quantité) ne comptent pas.
+        if (ing.foodId || ing.quantity != null) incompleteCount += 1;
+        continue;
+      }
+      const factor = (ing.quantity as number) / 100;
+      carbs += Number(food.carbs) * factor;
+      protein += Number(food.protein) * factor;
+      fat += Number(food.fat) * factor;
+      kcal += Number(food.kcal) * factor;
+      counted += 1;
+    }
+
+    const total = {
+      carbs: round1(carbs),
+      protein: round1(protein),
+      fat: round1(fat),
+      kcal: Math.round(kcal),
+    };
+    const servings = r.servings;
+    const perServing =
+      servings != null && servings > 0
+        ? {
+            carbs: round1(carbs / servings),
+            protein: round1(protein / servings),
+            fat: round1(fat / servings),
+            kcal: Math.round(kcal / servings),
+          }
+        : null;
+
+    return { ...total, perServing, countedCount: counted, incompleteCount };
+  }
+
+  /** L'ingrédient entre dans le calcul si son unité correspond à celle de
+   *  l'aliment (g↔g, ml↔ml), comparaison insensible casse/espaces. */
+  private unitMatches(ingUnit: string | null, foodUnit: FoodUnit): boolean {
+    const u = (ingUnit ?? '').trim().toLowerCase();
+    return u === foodUnit;
+  }
+
+  /** Charge en une requête les aliments référencés par un lot d'ingrédients. */
+  private async loadFoodMap(
+    ingredients: RecipeIngredient[],
+  ): Promise<Map<string, FoodEntity>> {
+    const ids = [
+      ...new Set(
+        ingredients.map((i) => i.foodId).filter((v): v is string => !!v),
+      ),
+    ];
+    if (ids.length === 0) return new Map();
+    const rows = await this.foods.find({ where: { id: In(ids) } });
+    return new Map(rows.map((f) => [f.id, f]));
   }
 
   private typeResponse(t: MealTypeEntity) {
@@ -371,6 +532,72 @@ export class AlimentationService implements OnModuleInit {
     return trimmed;
   }
 
+  // --- Aliments ---
+
+  private foodResponse(f: FoodEntity) {
+    return {
+      id: f.id,
+      name: f.name,
+      unit: f.unit,
+      carbs: Number(f.carbs),
+      protein: Number(f.protein),
+      fat: Number(f.fat),
+      kcal: Number(f.kcal),
+      createdAt: f.createdAt,
+    };
+  }
+
+  private foodFromInput(input: FoodInput, name: string, nameKey: string) {
+    const carbs = this.normalizeMacro(input.carbs);
+    const protein = this.normalizeMacro(input.protein);
+    const fat = this.normalizeMacro(input.fat);
+    return {
+      name,
+      nameKey,
+      unit: this.normalizeUnit(input.unit),
+      carbs,
+      protein,
+      fat,
+      kcal: this.computeKcal(carbs, protein, fat),
+    };
+  }
+
+  private async getFoodOrThrow(id: string): Promise<FoodEntity> {
+    const food = await this.foods.findOne({ where: { id } });
+    if (!food) throw new NotFoundException('Aliment introuvable.');
+    return food;
+  }
+
+  private validateFoodName(name?: string): string {
+    const trimmed = (name ?? '').trim();
+    if (!trimmed) throw new BadRequestException('Le nom est obligatoire.');
+    if (trimmed.length > FOOD_NAME_MAX) {
+      throw new BadRequestException(
+        `Le nom ne peut dépasser ${FOOD_NAME_MAX} caractères.`,
+      );
+    }
+    return trimmed;
+  }
+
+  private normalizeUnit(unit?: FoodUnit): FoodUnit {
+    return unit && FOOD_UNITS.includes(unit) ? unit : 'g';
+  }
+
+  /** Macro pour 100 g/ml : nombre fini dans [0, MACRO_MAX], arrondi à 0,01. */
+  private normalizeMacro(value?: number | null): number {
+    if (value === null || value === undefined || (value as unknown) === '') {
+      return 0;
+    }
+    const n = Number(value);
+    if (!Number.isFinite(n) || n < 0) return 0;
+    return round2(Math.min(n, MACRO_MAX));
+  }
+
+  /** Calories d'Atwater : 4·glucides + 4·protéines + 9·lipides (pour 100 g/ml). */
+  private computeKcal(carbs: number, protein: number, fat: number): number {
+    return round1(4 * carbs + 4 * protein + 9 * fat);
+  }
+
   private normalizeDifficulty(
     value?: RecipeDifficulty | null,
   ): RecipeDifficulty | null {
@@ -407,6 +634,7 @@ export class AlimentationService implements OnModuleInit {
       if (!label) continue;
       out.push({
         id: i?.id || randomUUID(),
+        foodId: i?.foodId ?? null,
         quantity: this.normalizeNumber(i?.quantity),
         unit: this.normalizeText(i?.unit, 24),
         label,

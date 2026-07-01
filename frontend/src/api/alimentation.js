@@ -64,4 +64,23 @@ export const alimentationApi = {
       method: 'PUT',
       body: JSON.stringify({ ids }),
     }),
+
+  // --- Aliments (référentiel nutritionnel) ---
+  foods: (q = '') =>
+    request(`/alimentation/foods${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+
+  createFood: (data) =>
+    request('/alimentation/foods', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateFood: (id, data) =>
+    request(`/alimentation/foods/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  removeFood: (id) =>
+    request(`/alimentation/foods/${id}`, { method: 'DELETE' }),
 };

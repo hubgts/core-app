@@ -32,6 +32,15 @@ export default function RecipeCard({
   if (recipe.servings != null) metaBits.push(formatServings(recipe.servings));
   if (recipe.totalTimeMin != null)
     metaBits.push(formatDuration(recipe.totalTimeMin));
+  // Calories : par portion si dispo, sinon total de la recette.
+  if (recipe.nutrition && recipe.nutrition.countedCount > 0) {
+    const n = recipe.nutrition;
+    metaBits.push(
+      n.perServing
+        ? `${n.perServing.kcal} kcal/portion`
+        : `${n.kcal} kcal`,
+    );
+  }
 
   function act(fn) {
     return (e) => {

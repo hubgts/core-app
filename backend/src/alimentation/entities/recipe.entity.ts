@@ -12,6 +12,9 @@ export type RecipeStatus = 'active' | 'archived';
 /** Ingrédient embarqué (ordre = position dans le tableau). */
 export interface RecipeIngredient {
   id: string;
+  /** Aliment du référentiel (liste stricte) ; null pour les lignes de section
+   *  ou les ingrédients legacy en texte libre (ignorés du calcul nutritionnel). */
+  foodId: string | null;
   quantity: number | null;
   unit: string | null;
   label: string;

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { CARD_COLORS, DIFFICULTIES, formatDuration } from './constants';
+import { alimentationApi } from '../../api/alimentation';
 import Combobox from '../Combobox';
+import FoodFormModal from './FoodFormModal';
 
 let keySeq = 0;
 const nextKey = () => `k${keySeq++}`;
@@ -8,6 +10,7 @@ const nextKey = () => `k${keySeq++}`;
 function toIngredientRows(ingredients = []) {
   return ingredients.map((i) => ({
     key: nextKey(),
+    foodId: i.foodId ?? '',
     quantity: i.quantity != null ? String(i.quantity).replace('.', ',') : '',
     unit: i.unit ?? '',
     label: i.label ?? '',
@@ -67,12 +70,21 @@ export default function RecipeFormModal({
     toIngredientRows(recipe?.ingredients),
   );
   const [steps, setSteps] = useState(toStepRows(recipe?.steps));
+  const [foods, setFoods] = useState([]);
+  // Quick-add d'un aliment : { rowKey } pendant la création depuis une ligne.
+  const [foodModal, setFoodModal] = useState(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const dragRef = useRef(null);
   const titleRef = useRef(null);
 
   useEffect(() => titleRef.current?.focus(), []);
+  useEffect(() => {
+    alimentationApi
+      .foods()
+      .then(setFoods)
+      .catch(() => setFoods([]));
+  }, []);
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
@@ -106,14 +118,40 @@ export default function RecipeFormModal({
       rows.map((r) => (r.key === key ? { ...r, [field]: value } : r)),
     );
   }
+  // Sélection d'un aliment : renseigne le libellé (nom) et l'unité par défaut.
+  function selectFood(key, foodId) {
+    const food = foods.find((f) => f.id === foodId);
+    setIngredients((rows) =>
+      rows.map((r) =>
+        r.key === key
+          ? {
+              ...r,
+              foodId,
+              label: food ? food.name : r.label,
+              unit: food && !r.unit ? food.unit : r.unit,
+            }
+          : r,
+      ),
+    );
+  }
   function addIngredient() {
     setIngredients((rows) => [
       ...rows,
-      { key: nextKey(), quantity: '', unit: '', label: '', note: '' },
+      { key: nextKey(), foodId: '', quantity: '', unit: '', label: '', note: '' },
     ]);
   }
   function removeIngredient(key) {
     setIngredients((rows) => rows.filter((r) => r.key !== key));
+  }
+
+  // Quick-add : crée l'aliment, l'ajoute à la liste et le sélectionne.
+  async function createFoodForRow(data) {
+    const created = await alimentationApi.createFood(data);
+    setFoods((list) =>
+      [...list, created].sort((a, b) => a.name.localeCompare(b.name)),
+    );
+    if (foodModal?.rowKey) selectFood(foodModal.rowKey, created.id);
+    setFoodModal(null);
   }
 
   // --- Étapes ---
@@ -157,6 +195,7 @@ export default function RecipeFormModal({
       ingredients: ingredients
         .filter((r) => r.label.trim())
         .map((r) => ({
+          foodId: r.foodId || null,
           quantity: parseQty(r.quantity),
           unit: r.unit.trim() || null,
           label: r.label.trim(),
@@ -181,6 +220,7 @@ export default function RecipeFormModal({
   }
 
   return (
+    <>
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal modal--lg" onMouseDown={(e) => e.stopPropagation()}>
         <h2 className="modal__title">
@@ -369,26 +409,31 @@ export default function RecipeFormModal({
                     className="alfield__input aleditrow__unit"
                     type="text"
                     value={r.unit}
-                    placeholder="Unité"
+                    placeholder="g / ml"
                     onChange={(e) =>
                       updateIngredient(r.key, 'unit', e.target.value)
                     }
                   />
-                  <input
+                  <Combobox
                     className="alfield__input aleditrow__label"
-                    type="text"
-                    value={r.label}
-                    placeholder="Ingrédient (ex : farine)"
-                    onChange={(e) =>
-                      updateIngredient(r.key, 'label', e.target.value)
-                    }
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addIngredient();
-                      }
-                    }}
+                    value={r.foodId}
+                    onChange={(v) => selectFood(r.key, v)}
+                    placeholder="Choisir un aliment…"
+                    searchable
+                    options={foods.map((f) => ({
+                      value: f.id,
+                      label: f.name,
+                    }))}
                   />
+                  <button
+                    type="button"
+                    className="aleditrow__add"
+                    title="Créer un aliment"
+                    aria-label="Créer un aliment"
+                    onClick={() => setFoodModal({ rowKey: r.key })}
+                  >
+                    +
+                  </button>
                   <button
                     type="button"
                     className="aleditrow__del"
@@ -408,8 +453,9 @@ export default function RecipeFormModal({
               + Ingrédient
             </button>
             <span className="alfield__hint">
-              Astuce : une ligne « — Pour la garniture — » (sans quantité) sert
-              de titre de section.
+              Les ingrédients liés à un aliment et quantifiés en g/ml comptent
+              dans les valeurs nutritionnelles. Le bouton « + » crée un aliment
+              à la volée.
             </span>
           </div>
 
@@ -514,5 +560,13 @@ export default function RecipeFormModal({
         </form>
       </div>
     </div>
+    {foodModal && (
+      <FoodFormModal
+        defaultName=""
+        onSave={createFoodForRow}
+        onClose={() => setFoodModal(null)}
+      />
+    )}
+    </>
   );
 }

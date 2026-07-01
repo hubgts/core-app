@@ -3,8 +3,10 @@
 
 /* Les dialogues peuvent être déclenchés depuis l'intérieur d'une autre modale
    ou d'un overlay plein écran (mode Cuisine/Réalisation, z-index 90) : ils
-   doivent toujours passer au-dessus de tout. */
-.modal-overlay--top {
+   doivent toujours passer au-dessus de tout.
+   Le double sélecteur force une spécificité supérieure à `.modal-overlay`
+   (z-index: 50, index.css) quel que soit l'ordre de chargement des feuilles. */
+.modal-overlay.modal-overlay--top {
   z-index: 200;
 }
 

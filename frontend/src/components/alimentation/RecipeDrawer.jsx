@@ -200,6 +200,57 @@ export default function RecipeDrawer({
           </section>
         )}
 
+        {recipe.nutrition && recipe.nutrition.countedCount > 0 && (
+          <section className="aldrawer__section">
+            <h3>Valeurs nutritionnelles</h3>
+            <table className="alnutri">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Glucides</th>
+                  <th>Protéines</th>
+                  <th>Lipides</th>
+                  <th>Calories</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>
+                    {hasBase ? `${formatQuantity(portions)} portion(s)` : 'Total'}
+                    {!hasBase && scale !== 1
+                      ? ` ×${formatQuantity(scale)}`
+                      : ''}
+                  </th>
+                  <td>{formatQuantity(recipe.nutrition.carbs * scale)} g</td>
+                  <td>{formatQuantity(recipe.nutrition.protein * scale)} g</td>
+                  <td>{formatQuantity(recipe.nutrition.fat * scale)} g</td>
+                  <td className="alnutri__kcal">
+                    {Math.round(recipe.nutrition.kcal * scale)} kcal
+                  </td>
+                </tr>
+                {recipe.nutrition.perServing && (
+                  <tr>
+                    <th>Par portion</th>
+                    <td>{recipe.nutrition.perServing.carbs} g</td>
+                    <td>{recipe.nutrition.perServing.protein} g</td>
+                    <td>{recipe.nutrition.perServing.fat} g</td>
+                    <td className="alnutri__kcal">
+                      {recipe.nutrition.perServing.kcal} kcal
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            {recipe.nutrition.incompleteCount > 0 && (
+              <p className="alnutri__note">
+                Calcul partiel : {recipe.nutrition.incompleteCount} ingrédient
+                {recipe.nutrition.incompleteCount > 1 ? 's' : ''} sans aliment
+                lié ou sans quantité en g/ml ne sont pas comptés.
+              </p>
+            )}
+          </section>
+        )}
+
         {recipe.steps.length > 0 && (
           <section className="aldrawer__section">
             <h3>Étapes</h3>

@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { AlimentationService } from './alimentation.service';
-import { MealTypeInput, RecipeInput } from './types';
+import { FoodInput, MealTypeInput, RecipeInput } from './types';
 
 @Controller('alimentation')
 export class AlimentationController {
@@ -41,6 +41,29 @@ export class AlimentationController {
   @Delete('meal-types/:id')
   async removeMealType(@Param('id') id: string) {
     await this.alimentation.removeMealType(id);
+    return { ok: true };
+  }
+
+  // --- Aliments (référentiel nutritionnel) ---
+
+  @Get('foods')
+  listFoods(@Query('q') q?: string) {
+    return this.alimentation.listFoods(q);
+  }
+
+  @Post('foods')
+  createFood(@Body() body: FoodInput) {
+    return this.alimentation.createFood(body ?? {});
+  }
+
+  @Patch('foods/:id')
+  updateFood(@Param('id') id: string, @Body() body: FoodInput) {
+    return this.alimentation.updateFood(id, body ?? {});
+  }
+
+  @Delete('foods/:id')
+  async removeFood(@Param('id') id: string) {
+    await this.alimentation.removeFood(id);
     return { ok: true };
   }
 

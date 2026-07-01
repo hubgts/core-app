@@ -2,7 +2,7 @@ COMPOSE = docker compose -f docker/docker-compose.yml
 WEB_ROOT ?= /var/www/core-app
 
 .PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean \
-        update-dev update-prod check
+        update-dev update-prod check import-foods
 
 ## init : construit les images, démarre les conteneurs et attend qu'ils soient prêts
 init: dc-build dc-up
@@ -42,6 +42,13 @@ dc-ps:
 ## dc-clean : arrête tout et supprime les volumes + images locales
 dc-clean:
 	$(COMPOSE) down -v --rmi local
+
+## import-foods : importe data/foods.json dans la base (idempotent, rejouable)
+# Copie le JSON dans le conteneur backend (le dossier data/ n'est pas dans
+# l'image) puis lance le script TypeScript via ts-node.
+import-foods:
+	$(COMPOSE) cp data/foods.json backend:/tmp/foods.json
+	$(COMPOSE) exec -e FOODS_FILE=/tmp/foods.json backend npx ts-node src/scripts/import-foods.ts
 
 ## update-dev : met à jour le dev (git pull + rebuild images + redémarrage)
 update-dev:

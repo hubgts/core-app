@@ -35,6 +35,7 @@ import { HealthGoalEntity } from './health/entities/health-goal.entity';
 import { AlimentationModule } from './alimentation/alimentation.module';
 import { RecipeEntity } from './alimentation/entities/recipe.entity';
 import { MealTypeEntity } from './alimentation/entities/meal-type.entity';
+import { FoodEntity } from './alimentation/entities/food.entity';
 import { CourseModule } from './course/course.module';
 import { AisleEntity } from './course/entities/aisle.entity';
 import { ArticleEntity } from './course/entities/article.entity';
@@ -81,6 +82,7 @@ import { BudgetMonthPlanEntity } from './budget/entities/budget-month-plan.entit
         HealthGoalEntity,
         RecipeEntity,
         MealTypeEntity,
+        FoodEntity,
         AisleEntity,
         ArticleEntity,
         ShoppingListEntity,

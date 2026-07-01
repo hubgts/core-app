@@ -59,7 +59,7 @@ elle, toujours chargées avec elle) — pas de tables séparées.
 | `description` | `description` | `text \| null` | Présentation courte. |
 | `mealTypeId` | `meal_type_id` | `uuid \| null` (indexée) | Type de repas, ou `null` = « sans type ». |
 | `labels` | `labels` | `jsonb` (`string[]`) | Étiquettes, dédoublonnées (insensible à la casse). |
-| `ingredients` | `ingredients` | `jsonb` (`RecipeIngredient[]`) | `{ id, quantity, unit, label, note }`. |
+| `ingredients` | `ingredients` | `jsonb` (`RecipeIngredient[]`) | `{ id, foodId, quantity, unit, label, note }`. `foodId` lie la ligne à un aliment (liste stricte) ; `null` pour les lignes libres / titres de section (legacy compris). |
 | `steps` | `steps` | `jsonb` (`RecipeStep[]`) | `{ id, text }`. |
 | `servings` | `servings` | `int \| null` | Portions de référence, base de la mise à l'échelle. |
 | `prepTimeMin` | `prep_time_min` | `int \| null` | Temps de préparation (min). |
@@ -75,6 +75,39 @@ elle, toujours chargées avec elle) — pas de tables séparées.
 
 > **`totalTimeMin` n'est pas une colonne** : il est **calculé à la lecture**
 > (somme des temps renseignés, `null` si aucun) et ajouté à la réponse JSON (RG-17).
+
+> **`nutrition` n'est pas une colonne** : l'apport nutritionnel de la recette est
+> **calculé à la lecture** à partir des aliments liés (voir §2 `FoodEntity` et le
+> calcul ci-dessous) et ajouté à la réponse JSON.
+
+### `FoodEntity` → table `foods`
+Référentiel nutritionnel **dissocié du module Course**. Un aliment porte ses
+macronutriments **pour 100 g/ml** ; les calories en sont dérivées.
+
+| Propriété | Colonne | Type SQL | Détails |
+|---|---|---|---|
+| `id` | `id` | `uuid` (PK) | Généré. |
+| `name` | `name` | `varchar(80)` | Nom affiché. |
+| `nameKey` | `name_key` | `varchar(80)` | Nom normalisé, **unique** (`uq_foods_name`). |
+| `unit` | `unit` | `varchar(2)` (`'g' \| 'ml'`) | Base des macros (pour 100 g ou 100 ml). |
+| `carbs` | `carbs` | `numeric(7,2)` | Glucides pour 100 g/ml. |
+| `protein` | `protein` | `numeric(7,2)` | Protéines pour 100 g/ml. |
+| `fat` | `fat` | `numeric(7,2)` | Lipides pour 100 g/ml. |
+| `kcal` | `kcal` | `numeric(7,1)` | Calories pour 100 g/ml, **dérivées des macros au save**. |
+| `createdAt` | `created_at` | `timestamptz` | Auto. |
+
+> **Calories d'un aliment** (formule d'Atwater simplifiée) :
+> `kcal = 4·glucides + 4·protéines + 9·lipides` (pour 100 g/ml). Recalculées à
+> chaque création/édition d'aliment ; les macros sont bornées à `[0, 100]`.
+
+> **Nutrition d'une recette** (`computeNutrition`) : pour chaque ingrédient lié à
+> un aliment (`foodId`), **quantifié (> 0)** et dont l'**unité ∈ {g, ml}** correspond
+> à celle de l'aliment, on agrège `quantité × (macro / 100)`. La réponse expose
+> `nutrition = { carbs, protein, fat, kcal, perServing | null, countedCount,
+> incompleteCount }` : `perServing` divise le total par `servings` (si > 0) ;
+> `incompleteCount` compte les lignes liées/quantifiées **non comptées** (unité
+> non massique). Les lignes libres/sections (sans `foodId` ni quantité) sont
+> ignorées sans incrémenter `incompleteCount`.
 
 ### `MealTypeEntity` → table `meal_types`
 | Propriété | Colonne | Type SQL | Détails |
@@ -121,6 +154,22 @@ docker exec progression-db psql -U progression -d progression -c "\d recipes"
 docker exec progression-db psql -U progression -d progression -c "SELECT title, servings, jsonb_array_length(ingredients) AS nb_ing FROM recipes;"
 ```
 
+### Import d'aliments (`data/foods.json`)
+Un jeu d'aliments courants (orienté musculation, macros pour 100 g/ml) vit dans
+**`data/foods.json`** à la racine du dépôt. Le script
+`backend/src/scripts/import-foods.ts` l'importe dans la table `foods` :
+
+```bash
+make import-foods
+```
+
+La cible copie le JSON dans le conteneur backend (le dossier `data/` n'est pas
+dans l'image) puis lance le script via `ts-node`. L'import est **idempotent /
+rejouable** : rapprochement par `nameKey` (nom normalisé) ; aliment **absent →
+créé** ; **présent → mis à jour seulement si une macro (ou l'unité) diffère**
+(kcal recalculé) ; **identique → laissé intact**. Le script affiche un récap
+`créé(s) / mis à jour / inchangé(s)`.
+
 ---
 
 ## 4. API REST
@@ -137,6 +186,14 @@ Base URL : `http://localhost:3000`. Contrôleur :
 | `PUT` | `/alimentation/meal-types/reorder` | `{ ids: string[] }` | Réordonne. |
 | `PATCH` | `/alimentation/meal-types/:id` | `{ name?, icon?, color? }` | Modifie. |
 | `DELETE` | `/alimentation/meal-types/:id` | — | Supprime → recettes rattachées remises à `null`. |
+
+### Aliments (référentiel nutritionnel)
+| Méthode | Route | Body | Rôle |
+|---|---|---|---|
+| `GET` | `/alimentation/foods` | `?q=` | Liste (recherche libre sur le nom, triée A→Z). |
+| `POST` | `/alimentation/foods` | `{ name, unit?, carbs?, protein?, fat? }` | Crée (nom unique ; `kcal` dérivé). |
+| `PATCH` | `/alimentation/foods/:id` | idem (partiel) | Modifie (`kcal` recalculé). |
+| `DELETE` | `/alimentation/foods/:id` | — | Supprime — **refusé (409)** si l'aliment est utilisé dans une recette. |
 
 ### Recettes
 | Méthode | Route | Body / Query | Rôle |
@@ -159,7 +216,7 @@ Base URL : `http://localhost:3000`. Contrôleur :
 {
   title?: string; description?: string | null; mealTypeId?: string | null;
   labels?: string[];
-  ingredients?: { id?, quantity?, unit?, label?, note? }[];
+  ingredients?: { id?, foodId?, quantity?, unit?, label?, note? }[];
   steps?: { id?, text? }[];
   servings?: number | null;
   prepTimeMin?: number | null; cookTimeMin?: number | null; restTimeMin?: number | null;
@@ -210,16 +267,19 @@ Ce qui n'existe **que** côté frontend (rien n'est persisté) :
 Arborescence (`frontend/src/`) :
 
 ```
-api/alimentation.js                    # endpoints recettes + types de repas (s'appuie sur api/client.js)
+api/alimentation.js                    # endpoints recettes + types de repas + aliments (s'appuie sur api/client.js)
 api/client.js                          # helper `request()` fetch partagé
 pages/AlimentationPage.jsx / .css      # board, filtres, orchestration des vues
+pages/FoodsPage.jsx / .css             # page dédiée « Aliments » (tableau macros + kcal, modale)
 components/alimentation/
   constants.js                         # palette couleurs, icônes, helpers (scale, format durée/portions)
-  RecipeCard.jsx                       # carte du board (couleur, épingle, menu ⋮)
-  RecipeFormModal.jsx                  # modale créer/éditer (ingrédients/étapes drag&drop, temps total live)
-  RecipeDrawer.jsx                     # détail off-canvas + mise à l'échelle
+  RecipeCard.jsx                       # carte du board (couleur, épingle, menu ⋮ ; badge kcal/portion)
+  RecipeFormModal.jsx                  # modale créer/éditer (Combobox aliments + quick-add, étapes drag&drop)
+  RecipeDrawer.jsx                     # détail off-canvas + mise à l'échelle + valeurs nutritionnelles
   CookMode.jsx                         # checklist plein écran (éphémère, wake lock)
+  FoodFormModal.jsx                    # modale créer/éditer un aliment (kcal live), réutilisée par le quick-add
   MealTypesPanel.jsx                   # gestion des types de repas, monté dans la page Référentiel
+  FoodsPanel.jsx                       # onglet « Aliments » du Référentiel → renvoie vers la page dédiée
 ```
 
 - La gestion des types de repas est rendue **dans la page Référentiel**
@@ -227,6 +287,15 @@ components/alimentation/
   appelle l'API types de repas de `alimentationApi`. Le board y renvoie par un lien
   `/referentiel?kind=meal_type`. Le panneau **réutilise les classes** du panneau
   catégories de savoir-faire (`.ref-*`, `.rcatman__*`).
+- Le module **Alimentation a deux sous-pages** déclarées dans la nav latérale
+  (`components/Layout.jsx`, `children`) : **Recettes** (`/alimentation`, le board)
+  et **Aliments** (`/alimentation/aliments`, `FoodsPage`). L'onglet `food` du
+  Référentiel (`FoodsPanel`) renvoie aussi vers la page Aliments. Dans la
+  modale de recette, le champ ingrédient est un **`<Combobox>` strict** alimenté
+  par la liste d'aliments, avec un bouton **`+`** ouvrant `FoodFormModal` pour
+  créer un aliment à la volée (puis le sélectionner). Chaque ligne d'ingrédient
+  est donc un aliment quantifié ; les lignes sans `foodId` ne subsistent que pour
+  d'éventuelles recettes **legacy** et restent hors calcul.
 - Le **board** utilise un masonry CSS (`column-count`), bloc épinglées puis autres ;
   classes préfixées `al*` (`AlimentationPage.css`).
 - Les modales réutilisent les classes communes `.modal*`, `.btn*` de `index.css`.
@@ -245,8 +314,7 @@ de doute sur une règle métier, c'est la référence ; ce document-ci décrit l
 ## 8. Pour aller plus loin (non implémenté)
 
 Ne sont **pas** dans le code actuel : liste de courses agrégée (futur module
-**Course**), référentiel d'ingrédients normalisés, planification des repas / vue
-calendrier, suivi nutritionnel (calories/macros), journal de ce qui a été cuisiné,
+**Course**), planification des repas / vue calendrier, journal de ce qui a été cuisiné,
 photos, import depuis une URL / OCR, partage / export, conversion d'unités,
 minuteurs, sous-recettes, recherche côté serveur (aujourd'hui côté client). Voir le
 backlog de la spec.

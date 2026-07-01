@@ -1,0 +1,107 @@
+.foodspage {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.foodspage__search {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.foodtable {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.foodtable__head,
+.foodtable__row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.foodtable__head {
+  padding: 0 14px 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #8a98a8);
+}
+
+.foodtable__head span:not(:first-child),
+.foodtable__row span:not(.foodtable__name) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.foodtable__row {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface-2, #1b2330);
+  border: 1px solid var(--border, #2a3442);
+  border-radius: 12px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.foodtable__row:hover {
+  border-color: var(--m-alimentation, #f59e0b);
+  background: var(--surface-3, #222c3b);
+}
+
+.foodtable__name {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+
+.foodtable__base {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted, #8a98a8);
+}
+
+.foodtable__kcal {
+  font-weight: 700;
+  color: var(--m-alimentation, #f59e0b);
+}
+
+@media (max-width: 640px) {
+  .foodtable__head {
+    display: none;
+  }
+  /* Une carte par aliment : nom + kcal en tête, macros en ligne dessous. */
+  .foodtable__row {
+    grid-template-columns: 1fr auto;
+  }
+  .foodtable__name {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .foodtable__kcal {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+  .foodtable__row > span:not(.foodtable__name):not(.foodtable__kcal) {
+    grid-row: 2;
+    text-align: left;
+    font-size: 13px;
+    color: var(--text-muted, #8a98a8);
+  }
+  .foodtable__row > span:nth-child(2) {
+    grid-column: 1;
+  }
+  .foodtable__row > span:nth-child(3) {
+    grid-column: 2;
+  }
+  .foodtable__row > span:nth-child(4) {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}

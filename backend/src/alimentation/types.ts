@@ -2,9 +2,21 @@
 
 export type RecipeDifficulty = 'facile' | 'moyen' | 'difficile';
 
+export type FoodUnit = 'g' | 'ml';
+
+/** DTO d'entrée d'un aliment (macros pour 100 g/ml ; kcal dérivé côté service). */
+export interface FoodInput {
+  name?: string;
+  unit?: FoodUnit;
+  carbs?: number | null;
+  protein?: number | null;
+  fat?: number | null;
+}
+
 /** Une ligne d'ingrédient. */
 export interface IngredientInput {
   id?: string;
+  foodId?: string | null;
   quantity?: number | null;
   unit?: string | null;
   label?: string;
