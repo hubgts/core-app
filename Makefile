@@ -1,8 +1,12 @@
 COMPOSE = docker compose -f docker/docker-compose.yml
 WEB_ROOT ?= /var/www/core-app
 
+# Serveur de production (pour `make deploy-prod` depuis un poste local).
+PROD_SSH ?= egantois@137.74.112.112
+PROD_DIR ?= ~/projects/core-app
+
 .PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean \
-        update-dev update-prod check import-foods
+        update-dev update-prod deploy-prod check import-foods
 
 ## init : construit les images, démarre les conteneurs et attend qu'ils soient prêts
 init: dc-build dc-up
@@ -43,12 +47,24 @@ dc-ps:
 dc-clean:
 	$(COMPOSE) down -v --rmi local
 
-## import-foods : importe data/foods.json dans la base (idempotent, rejouable)
-# Copie le JSON dans le conteneur backend (le dossier data/ n'est pas dans
-# l'image) puis lance le script TypeScript via ts-node.
+## import-foods : importe data/foods.sql dans la base (idempotent, rejouable)
+# Import purement SQL (aucun code applicatif, aucun rebuild, aucun impact prod).
+# - LOCAL : si le conteneur `db` tourne, on joue le SQL dedans via psql.
+# - PROD  : sinon, psql natif en chargeant les identifiants de backend.env.
+# Le SQL fait INSERT ... ON CONFLICT (name_key) : crée l'aliment absent, met à
+# jour seulement si une macro (ou l'unité) diffère, laisse le reste intact.
+PROD_ENV_FILE ?= /etc/core-app/backend.env
 import-foods:
-	$(COMPOSE) cp data/foods.json backend:/tmp/foods.json
-	$(COMPOSE) exec -e FOODS_FILE=/tmp/foods.json backend npx ts-node src/scripts/import-foods.ts
+	@if $(COMPOSE) ps --status running --services 2>/dev/null | grep -qx db; then \
+	  echo "→ Import via le conteneur Docker (db)"; \
+	  $(COMPOSE) exec -T db psql -U progression -d progression < data/foods.sql; \
+	else \
+	  echo "→ Import via psql natif (prod), env : $(PROD_ENV_FILE)"; \
+	  set -a; . $(PROD_ENV_FILE); set +a; \
+	  PGPASSWORD="$$DB_PASSWORD" psql -h "$${DB_HOST:-localhost}" -p "$${DB_PORT:-5432}" \
+	    -U "$$DB_USER" -d "$$DB_NAME" -v ON_ERROR_STOP=1 -f data/foods.sql; \
+	fi
+	@echo "✅ Aliments importés (idempotent)."
 
 ## update-dev : met à jour le dev (git pull + rebuild images + redémarrage)
 update-dev:
@@ -78,3 +94,9 @@ update-prod:
 	sudo mkdir -p $(WEB_ROOT)
 	sudo rsync -a --delete frontend/dist/ $(WEB_ROOT)/
 	@echo "✅ Prod à jour : backend (systemd) redémarré, front déployé dans $(WEB_ROOT)"
+
+## deploy-prod : depuis un poste local — SSH vers la prod et y lance `make update-prod`
+# -t : alloue un pseudo-terminal pour que les prompts sudo (systemctl, rsync)
+# de update-prod restent interactifs à distance.
+deploy-prod:
+	ssh -t $(PROD_SSH) 'cd $(PROD_DIR) && make update-prod'

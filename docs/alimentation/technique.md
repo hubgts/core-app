@@ -154,21 +154,30 @@ docker exec progression-db psql -U progression -d progression -c "\d recipes"
 docker exec progression-db psql -U progression -d progression -c "SELECT title, servings, jsonb_array_length(ingredients) AS nb_ing FROM recipes;"
 ```
 
-### Import d'aliments (`data/foods.json`)
+### Import d'aliments (`data/foods.json` → `data/foods.sql`)
 Un jeu d'aliments courants (orienté musculation, macros pour 100 g/ml) vit dans
-**`data/foods.json`** à la racine du dépôt. Le script
-`backend/src/scripts/import-foods.ts` l'importe dans la table `foods` :
+**`data/foods.json`** à la racine du dépôt. L'import est **purement SQL** — aucun
+code applicatif, aucun rebuild backend, donc **aucun impact sur la prod** :
 
 ```bash
 make import-foods
 ```
 
-La cible copie le JSON dans le conteneur backend (le dossier `data/` n'est pas
-dans l'image) puis lance le script via `ts-node`. L'import est **idempotent /
-rejouable** : rapprochement par `nameKey` (nom normalisé) ; aliment **absent →
-créé** ; **présent → mis à jour seulement si une macro (ou l'unité) diffère**
-(kcal recalculé) ; **identique → laissé intact**. Le script affiche un récap
-`créé(s) / mis à jour / inchangé(s)`.
+La cible détecte l'environnement : si le conteneur Docker `db` tourne (dev), elle
+joue le SQL dedans via `psql` ; sinon (prod native) elle utilise le `psql` local
+en chargeant les identifiants de `/etc/core-app/backend.env`
+(surchargeable via `PROD_ENV_FILE`).
+
+Le fichier **`data/foods.sql`** (versionné) est **généré depuis `foods.json`** :
+il calcule `name_key` (nom normalisé) et `kcal` (`4·G + 4·P + 9·L`), puis fait un
+`INSERT ... ON CONFLICT (name_key) DO UPDATE ... WHERE`. L'import est donc
+**idempotent / rejouable** : aliment **absent → créé** ; **présent → mis à jour
+seulement si une macro (ou l'unité) diffère** ; **identique → laissé intact**
+(`INSERT 0 0`). `gen_random_uuid()` est natif en PostgreSQL 16 (aucune extension).
+
+> **Régénérer le SQL** si `foods.json` change : rejouer le petit script de
+> génération (calcul `name_key`/`kcal` + `ON CONFLICT`) qui réécrit
+> `data/foods.sql`. Ne pas éditer `foods.sql` à la main.
 
 ---
 
