@@ -12,10 +12,11 @@ Module **autonome** côté backend (`backend/src/budget/`), exposé sous le pré
 données. Le **cœur des calculs est côté backend** (`BudgetService`) ; le front affiche et
 trace (camembert SVG réutilisé du module Finances).
 
-Frontend : **menu dédié « Budget »** dans `Layout.jsx` (icône 🎯), avec deux onglets :
+Frontend : **menu dédié « Budget »** dans `Layout.jsx` (icône 🎯), avec trois onglets :
 - **Vue d'ensemble** — `pages/CashflowPage.jsx`, route **`/budget`** (cash-flow du mois) ;
 - **Plan & dépenses** — `pages/BudgetPage.jsx`, route **`/budget/plan`** (plan vs réel,
-  saisie).
+  saisie) ;
+- **Import** — `pages/ImportPage.jsx`, route **`/budget/import`** (import bancaire, cf. §7).
 
 L'ancienne route `/finances/budget` **redirige** vers `/budget/plan`. TypeORM
 `synchronize: true` → tables créées au démarrage.
@@ -61,6 +62,7 @@ La part cible (%) d'une catégorie **pour un mois** (le « plan » du mois).
 | `amount` | `amount` | `double` | **> 0**. |
 | `categoryId` | `category_id` | `uuid \| null` (FK, indexée) | Obligatoire si `sortie`. **`ON DELETE RESTRICT`**. |
 | `label` | `label` | `varchar(120) \| null` | Libellé optionnel. |
+| `dedupKey` | `dedup_key` | `varchar(64) \| null` | Empreinte anti-doublon des imports (§7). **Index unique partiel** (`WHERE dedup_key IS NOT NULL`). `null` pour la saisie manuelle. |
 | `createdAt` | `created_at` | `timestamptz` | Auto. |
 
 ### `BudgetSettingsEntity` → `budget_settings`
@@ -168,9 +170,98 @@ components/budget/
 
 ---
 
-## 6. Hors périmètre (cf. spec §10)
+## 7. Import bancaire
+
+Sous-fonction du module (`backend/src/budget/import/` + `import.service.ts`), exposée
+sous **`/finances/budget/imports`**. Objectif : extraire les transactions d'un relevé
+bancaire vers les `budget_transactions`, avec vérification manuelle et idempotence.
+
+### `BudgetImportEntity` → `budget_imports`
+Un **lot** = un fichier déposé. Les lignes détectées sont stockées en **`jsonb`** tant
+que l'import est `pending` (permet de rouvrir la vérification sans perte, §3).
+| Propriété | Colonne | Type | Détails |
+|---|---|---|---|
+| `id` | `id` | `uuid` (PK) | Généré. |
+| `fileName` | `file_name` | `varchar(260)` | Nom du fichier. |
+| `formatKey` / `formatLabel` | idem | `varchar` | Format détecté (ex. `societe-generale-csv` / « Société Générale CSV »). |
+| `status` | `status` | `varchar(12)` (indexé) | `'pending' \| 'validated' \| 'error'`. |
+| `errorMessage` | `error_message` | `text \| null` | Erreur globale (fichier non lisible, §8). |
+| `rows` | `rows` | `jsonb` | Lignes détectées (`BudgetImportRow[]`, éditables). |
+| `createdAt` / `updatedAt` | idem | `timestamptz` | Auto. |
+
+Une `BudgetImportRow` porte : `id`, `sourceLine`, `raw` (ligne brute), `kind`, `date`,
+`amount`, `categoryId`, `label`, `dedupKey`, `error`, `ignored`, `duplicate`.
+
+### Architecture de parsing (extensible)
+`import/parser.types.ts` définit l'interface **`BankParser`** (`key`, `label`,
+`canParse()`, `parse()`) ; `import/parsers.ts` en tient le **registre** et détecte le
+bon parser (`detectParser`). Premier format : **`SocieteGeneraleCsvParser`**
+(`import/societe-generale.parser.ts`) — CSV `;`, montant FR (`-76,85`), **négatif =
+`sortie`, positif = `entree`**. Ajouter une banque = implémenter `BankParser` + l'ajouter
+au registre. Une `ImportFormatError` (format global illisible) → import `error` sans lignes.
+
+### Catégorisation (best effort)
+`import/categorizer.ts` : `categorize(label, index)` mappe des **mots-clés** du
+libellé vers un **nom de catégorie canonique**, puis rapproche ce nom d'une catégorie
+**active** du plan (égalité, puis inclusion souple, insensible casse/accents — via
+`common/text.util.ts` : `normalizeText`). L'index des catégories est pré-normalisé une
+fois par import (`buildCategoryIndex`), les règles une fois au chargement. Échec →
+`null` (jamais bloquant, §2). Ne s'applique qu'aux **sorties**.
+
+### Idempotence (`dedupKey`)
+`sha256(date | montant signé | libellé brut)` tronqué (64). Calculé au parsing (`null`
+si la date ou le montant sont illisibles) ; les lignes dont la clé existe déjà en base
+sont marquées `duplicate` et **exclues** de la validation. L'insertion finale utilise
+`INSERT … ON CONFLICT DO NOTHING` (`orIgnore`) sur l'**index unique partiel**
+`dedup_key` → aucun doublon même en ré-import total ou partiel.
+
+### Validation (`ImportService.validate`)
+Matérialise les lignes **ni ignorées, ni en erreur, ni doublons** en `budget_transactions`
+(mois dérivé de la date). **Bloque** (`400`) si une ligne active manque d'un champ
+obligatoire (type, montant, date, + catégorie pour une sortie). L'import passe à
+`validated` (figé). `patch` enregistre la progression sans valider.
+
+### API (préfixe `/finances/budget/imports`)
+| Méthode | Route | Body | Rôle |
+|---|---|---|---|
+| `GET` | `/imports` | — | Historique (résumé par lot : statut, mois, compteurs, résumé avec noms de catégories). |
+| `POST` | `/imports` | `{ fileName, content }` | Dépose + analyse (le front envoie le **texte** du fichier). Renvoie le détail. |
+| `GET` | `/imports/:id` | — | Détail (lignes + résumé). |
+| `PATCH` | `/imports/:id` | `{ rows:[…] }` | Enregistre la progression (import `pending`). |
+| `POST` | `/imports/:id/validate` | `{ rows:[…] }` | Applique les éditions puis **valide**. |
+| `DELETE` | `/imports/:id` | — | Supprime le lot (transactions validées conservées). |
+
+### Regroupement par marchand (`merchantKey`)
+`import/merchant.ts` extrait une **signature de marchand** stable d'un libellé (retrait
+des refs/dates/n° de carte/IDs, isolation du nom après `DE:`/`POUR:`). Calculée au parsing
+et stockée par ligne (`BudgetImportRow.merchantKey`). Toutes les opérations du même
+commerçant partagent la même clé → l'écran de vérification les **regroupe** et les
+catégorise **en un seul geste** par groupe.
+
+### Frontend (structure)
+```
+pages/ImportPage.jsx / .css           # /budget/import : dépôt + historique
+pages/ImportReviewPage.jsx / .css     # /budget/import/:id : vérification (groupée par marchand)
+components/budget/
+  ImportResultModal.jsx               # lecture seule : résumé (validé) ou détail des erreurs (en erreur)
+```
+`ImportPage` lit `GET /imports`. Cliquer un import **`pending`** (ou en déposer un) **navigue**
+vers `ImportReviewPage` (`/budget/import/:id`) ; un import `validated`/`error` ouvre
+`ImportResultModal` (lecture seule). `ImportReviewPage` — pensée pour la **saisie de masse** —
+**regroupe les opérations par marchand** (accordéon replié : nom, nombre d'op., total, **une
+catégorie par groupe** appliquée à toutes ses lignes) ; déplier un groupe donne une **liste
+compacte** (libellé tronqué + complet au survol) pour ajuster une ligne. Des **filtres**
+(À traiter / Tout / En erreur / Doublons) trient les groupes « à traiter d'abord ». Une
+**barre d'action collante** porte la validation. La progression est **auto-sauvegardée**
+(PATCH différé) ; « Valider » reste bloqué tant qu'une dépense active n'a pas de catégorie.
+Le front lit le fichier via `readFileText()` (décodage **UTF-8 avec repli windows-1252**,
+cf. encodage SG) et poste son contenu ; **aucun parsing côté front**.
+
+---
+
+## 8. Hors périmètre (cf. spec §10)
 
 Sous-catégories, transactions récurrentes, rapprochement avec les enveloppes de
-patrimoine, import bancaire. (Le **plan par mois** et le **report de trésorerie** —
-solde cumulé inter-mois affiché par la vue d'ensemble, §4 bis — sont désormais
-implémentés.) Voir [`specs/module_budget.md`](../../specs/module_budget.md).
+patrimoine. (Le **plan par mois**, le **report de trésorerie** — §4 bis — et l'**import
+bancaire** — §7 — sont désormais implémentés.) Voir
+[`specs/module_budget.md`](../../specs/module_budget.md).

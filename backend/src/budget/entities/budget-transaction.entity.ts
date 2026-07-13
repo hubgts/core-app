@@ -11,6 +11,9 @@ import { BudgetCategoryEntity } from './budget-category.entity';
 
 export type BudgetTransactionKind = 'entree' | 'sortie';
 
+/** Longueur max d'un libellé de transaction (colonne `label`). */
+export const LABEL_MAX = 120;
+
 /**
  * Mouvement daté : entrée (revenu) ou sortie (dépense / versement d'épargne).
  * Une sortie est rattachée à une catégorie ; une entrée n'en a pas.
@@ -44,8 +47,18 @@ export class BudgetTransactionEntity {
   @JoinColumn({ name: 'category_id' })
   category?: BudgetCategoryEntity | null;
 
-  @Column({ type: 'varchar', length: 120, nullable: true })
+  @Column({ type: 'varchar', length: LABEL_MAX, nullable: true })
   label: string | null;
+
+  /**
+   * Empreinte anti-doublon des transactions issues d'un import bancaire
+   * (`hash(date + montant signé + libellé brut de la ligne)`, cf. module Import).
+   * `null` pour les saisies manuelles. Unique quand renseignée (garantit
+   * l'idempotence des ré-imports).
+   */
+  @Index({ unique: true, where: '"dedup_key" IS NOT NULL' })
+  @Column({ name: 'dedup_key', type: 'varchar', length: 64, nullable: true })
+  dedupKey: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

@@ -4,11 +4,13 @@
 > interne, voir [`technique.md`](./technique.md).
 > Spécification de référence : [`specs/module_budget.md`](../../specs/module_budget.md).
 
-Le menu **Budget** (sidebar) a deux onglets :
+Le menu **Budget** (sidebar) a trois onglets :
 - **Vue d'ensemble** (`/budget`) — le **cash-flow** du mois (entrées vs sorties, taux
   d'épargne, report de trésorerie), cf. §6 ;
 - **Plan & dépenses** (`/budget/plan`) — le plan, les catégories et la saisie des
   transactions, décrits ci-dessous.
+- **Import** (`/budget/import`) — importe un relevé bancaire et en extrait les
+  transactions vers Plan & dépenses (cf. §7).
 
 ---
 
@@ -100,6 +102,42 @@ de la vue d'ensemble pour y aller).
   donné. Un mois non encore défini **hérite** du dernier plan jusqu'à ce que tu l'édites.
 - Aucun impact sur le **patrimoine** : un versement d'épargne ici **ne crée pas** de
   relevé d'enveloppe.
+
+---
+
+## 7bis. Onglet « Import » (relevé bancaire)
+
+L'onglet **Import** (`/budget/import`) évite la ressaisie : dépose un export bancaire,
+vérifie les transactions détectées, puis valide pour les ajouter à **Plan & dépenses**.
+
+**Marche à suivre**
+1. **Déposer** le fichier (clic ou glisser-déposer). Format supporté aujourd'hui :
+   **Société Générale CSV** (export « Tableau », séparateur point-virgule).
+2. Un **écran de vérification dédié** s'ouvre (plein écran, pensé pour la saisie de masse) :
+   les opérations sont **regroupées par marchand** (repliées). Chaque groupe montre le nom
+   du commerçant, le nombre d'opérations et le total.
+3. **Catégorisation par groupe** : choisis **une catégorie sur la ligne du marchand** → elle
+   s'applique à **toutes ses opérations** d'un coup. C'est la manière la plus rapide de
+   traiter des centaines de lignes.
+4. Besoin d'ajuster une ligne précise ? **Déplie** le groupe (clic) : liste compacte avec
+   date, montant, **libellé complet au survol**, et une catégorie/`ignorer` par ligne.
+5. Des **filtres** (À traiter / Tout / En erreur / Doublons) trient les groupes ; les
+   marchands **à catégoriser remontent en premier**.
+6. Le bouton **Valider** reste **désactivé** tant qu'une dépense à importer n'a pas de
+   catégorie. Une opération (ou un groupe entier) peut être **ignorée** (✕) puis
+   **réintégrée** (↩).
+7. **Valider** ajoute les transactions au mois correspondant à **leur date** (un import
+   peut couvrir plusieurs mois).
+
+**Statuts** (historique) :
+- **À vérifier** : clic → rouvre l'écran de vérification **là où tu t'étais arrêté** (la
+  progression est **auto-sauvegardée**).
+- **Validé** : clic → **résumé en lecture seule** (totaux dépenses/revenus, répartition par
+  catégorie, nombre de transactions par mois). Pas de retour à l'édition.
+- **En erreur** : clic → **détail des erreurs** (fichier non reconnu, lignes illisibles…).
+
+**Anti-doublon** : réimporter le même fichier (ou un fichier qui chevauche un précédent)
+**ne crée pas de doublons** — les lignes déjà importées sont détectées et ignorées.
 
 ---
 

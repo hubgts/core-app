@@ -36,6 +36,7 @@ const NAV_ITEMS = [
     children: [
       { to: '/budget', label: "Vue d'ensemble", end: true },
       { to: '/budget/plan', label: 'Plan & dépenses' },
+      { to: '/budget/import', label: 'Import' },
     ],
   },
   { to: '/savoir-faire', label: 'Savoir-faire', icon: '🛠️' },

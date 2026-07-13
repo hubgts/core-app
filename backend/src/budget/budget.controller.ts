@@ -10,16 +10,54 @@ import {
   Query,
 } from '@nestjs/common';
 import { BudgetService } from './budget.service';
+import { ImportService } from './import.service';
 import {
   BudgetSettingsInput,
   CategoryInput,
+  ImportPatchInput,
+  ImportUploadInput,
   PlanInput,
   TransactionInput,
 } from './types';
 
 @Controller('finances/budget')
 export class BudgetController {
-  constructor(private readonly budget: BudgetService) {}
+  constructor(
+    private readonly budget: BudgetService,
+    private readonly imports: ImportService,
+  ) {}
+
+  // --- Import bancaire (routes fixes avant les paramétrées) ---
+  @Get('imports')
+  listImports() {
+    return this.imports.list();
+  }
+
+  @Post('imports')
+  upload(@Body() body: ImportUploadInput) {
+    return this.imports.upload(body?.fileName, body?.content);
+  }
+
+  @Get('imports/:id')
+  getImport(@Param('id') id: string) {
+    return this.imports.detail(id);
+  }
+
+  @Patch('imports/:id')
+  patchImport(@Param('id') id: string, @Body() body: ImportPatchInput) {
+    return this.imports.patch(id, body ?? {});
+  }
+
+  @Post('imports/:id/validate')
+  validateImport(@Param('id') id: string, @Body() body: ImportPatchInput) {
+    return this.imports.validate(id, body ?? {});
+  }
+
+  @Delete('imports/:id')
+  async removeImport(@Param('id') id: string) {
+    await this.imports.remove(id);
+    return { ok: true };
+  }
 
   /** Vue d'ensemble d'un mois : plan vs réel, camembert, reste à allouer. */
   @Get('overview')

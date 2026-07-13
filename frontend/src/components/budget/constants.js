@@ -5,6 +5,15 @@ export { formatEur, formatSignedEur, trendClass } from '../finances/constants';
 // Borne une valeur dans [0, 100] (largeurs de barres en %).
 export const clampPct = (v) => Math.min(Math.max(v ?? 0, 0), 100);
 
+// Libellé d'une catégorie avec son icône (« 🏠 Logement »).
+export const categoryLabel = (c) => `${c.icon ? `${c.icon} ` : ''}${c.name}`;
+
+// Options <Combobox> depuis les catégories (option « vide » optionnelle).
+export const categoryOptions = (categories, emptyLabel) => [
+  ...(emptyLabel ? [{ value: '', label: emptyLabel }] : []),
+  ...categories.map((c) => ({ value: c.id, label: categoryLabel(c) })),
+];
+
 export const BUDGET_COLORS = [
   '#38bdf8',
   '#a78bfa',

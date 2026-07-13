@@ -12,6 +12,8 @@ import EnvelopesPage from './pages/EnvelopesPage.jsx';
 import BilanPage from './pages/BilanPage.jsx';
 import BudgetPage from './pages/BudgetPage.jsx';
 import CashflowPage from './pages/CashflowPage.jsx';
+import ImportPage from './pages/ImportPage.jsx';
+import ImportReviewPage from './pages/ImportReviewPage.jsx';
 import KnowHowPage from './pages/KnowHowPage.jsx';
 import AlimentationPage from './pages/AlimentationPage.jsx';
 import FoodsPage from './pages/FoodsPage.jsx';
@@ -44,6 +46,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/finances/bilan" element={<BilanPage />} />
           <Route path="/budget" element={<CashflowPage />} />
           <Route path="/budget/plan" element={<BudgetPage />} />
+          <Route path="/budget/import" element={<ImportPage />} />
+          <Route path="/budget/import/:id" element={<ImportReviewPage />} />
           <Route
             path="/finances/budget"
             element={<Navigate to="/budget/plan" replace />}

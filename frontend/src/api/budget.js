@@ -64,4 +64,25 @@ export const budgetApi = {
     }),
   removeTransaction: (id) =>
     request(`/finances/budget/transactions/${id}`, { method: 'DELETE' }),
+
+  // Import bancaire
+  imports: () => request('/finances/budget/imports'),
+  getImport: (id) => request(`/finances/budget/imports/${id}`),
+  uploadImport: (fileName, content) =>
+    request('/finances/budget/imports', {
+      method: 'POST',
+      body: JSON.stringify({ fileName, content }),
+    }),
+  patchImport: (id, rows) =>
+    request(`/finances/budget/imports/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ rows }),
+    }),
+  validateImport: (id, rows) =>
+    request(`/finances/budget/imports/${id}/validate`, {
+      method: 'POST',
+      body: JSON.stringify({ rows }),
+    }),
+  removeImport: (id) =>
+    request(`/finances/budget/imports/${id}`, { method: 'DELETE' }),
 };

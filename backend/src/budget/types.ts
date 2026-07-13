@@ -31,3 +31,31 @@ export interface TransactionInput {
 export interface BudgetSettingsInput {
   plannedIncome?: number | null;
 }
+
+// ---------------------------------------------------------------------------
+// Import bancaire
+// ---------------------------------------------------------------------------
+
+/** Dépôt d'un fichier à importer. */
+export interface ImportUploadInput {
+  fileName?: string;
+  /** Contenu texte du fichier (le front lit le fichier et envoie son texte). */
+  content?: string;
+}
+
+/** Une ligne éditée dans la modale de récapitulatif (§3). */
+export interface ImportRowInput {
+  id: string;
+  kind?: BudgetTransactionKind | null;
+  date?: string | null;
+  amount?: number | null;
+  categoryId?: string | null;
+  label?: string | null;
+  /** L'utilisateur exclut cette ligne de l'import (§8). */
+  ignored?: boolean;
+}
+
+/** Enregistrement de la progression de vérification (sans valider). */
+export interface ImportPatchInput {
+  rows?: ImportRowInput[];
+}

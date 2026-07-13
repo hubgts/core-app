@@ -46,6 +46,7 @@ import { BudgetCategoryEntity } from './budget/entities/budget-category.entity';
 import { BudgetTransactionEntity } from './budget/entities/budget-transaction.entity';
 import { BudgetSettingsEntity } from './budget/entities/budget-settings.entity';
 import { BudgetMonthPlanEntity } from './budget/entities/budget-month-plan.entity';
+import { BudgetImportEntity } from './budget/entities/budget-import.entity';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { BudgetMonthPlanEntity } from './budget/entities/budget-month-plan.entit
         BudgetTransactionEntity,
         BudgetSettingsEntity,
         BudgetMonthPlanEntity,
+        BudgetImportEntity,
       ],
       // MVP : le schéma est créé/maintenu automatiquement par TypeORM.
       // À remplacer par des migrations dès qu'on a des données à préserver en prod.

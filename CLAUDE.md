@@ -50,7 +50,7 @@ ce qui reste après l'auto-fix se corrige à la main. Voir
 
 ```
 backend/src/<module>/        # *.controller.ts, *.service.ts, types.ts, entities/
-backend/src/common/          # helpers partagés (date.util.ts, round.util.ts, reorder.util.ts)
+backend/src/common/          # helpers partagés (date.util.ts, round.util.ts, reorder.util.ts, text.util.ts)
 frontend/src/api/            # un fichier par module + client.js (helper request() partagé)
 frontend/src/pages/          # une page par route
 frontend/src/components/<module>/

@@ -55,6 +55,9 @@
 .t-flat {
   color: var(--text-muted);
 }
+.t-warn {
+  color: var(--brand-ambre);
+}
 
 .fpage__headactions {
   display: flex;
@@ -264,6 +267,10 @@
   background: var(--surface);
   color: var(--text);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.fseg__btn:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 /* --- Courbe SVG --- */
