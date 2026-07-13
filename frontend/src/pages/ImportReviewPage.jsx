@@ -503,41 +503,26 @@ function LineRow({ row, catOptions, onPatch }) {
 
   return (
     <li className={cls}>
-      <button
-        className={`irev__kind ${row.kind === 'entree' ? 'is-in' : 'is-out'}`}
-        onClick={() =>
-          onPatch({ kind: row.kind === 'entree' ? 'sortie' : 'entree' })
-        }
-        disabled={row.ignored}
-        title="Basculer dépense / revenu"
-      >
-        {row.kind === 'entree' ? 'Rev.' : 'Dép.'}
-      </button>
-
-      <input
-        className="ffield__input irev__ldate"
-        type="date"
-        value={row.date || ''}
-        disabled={row.ignored}
-        onChange={(e) => onPatch({ date: e.target.value || null })}
-      />
-
-      <input
-        className={`ffield__input irev__lamount ${row.kind === 'entree' ? 't-up' : ''}`}
-        type="text"
-        inputMode="decimal"
-        value={row.amount ?? ''}
-        placeholder="0,00"
-        disabled={row.ignored}
-        onChange={(e) => onPatch({ amount: e.target.value.replace(',', '.') })}
-      />
-
+      {/* Libellé complet (tronqué, complet au survol) — l'info qui guide le choix */}
       <span className="irev__llabel" title={row.label || ''}>
-        {row.label || <em>Sans libellé</em>}
+        <button
+          className={`irev__kind ${row.kind === 'entree' ? 'is-in' : 'is-out'}`}
+          onClick={() =>
+            onPatch({ kind: row.kind === 'entree' ? 'sortie' : 'entree' })
+          }
+          disabled={row.ignored}
+          title="Basculer dépense / revenu"
+        >
+          {row.kind === 'entree' ? 'Rev.' : 'Dép.'}
+        </button>
+        <span className="irev__ltext">
+          {row.label || <em>Sans libellé</em>}
+        </span>
         {row.duplicate && <span className="irev__ltag">déjà importé</span>}
         {row.error && <span className="irev__ltag is-err">{row.error}</span>}
       </span>
 
+      {/* Catégorie */}
       {row.kind === 'sortie' && !row.ignored ? (
         <Combobox
           className="ffield__input irev__lcat"
@@ -549,6 +534,26 @@ function LineRow({ row, catOptions, onPatch }) {
       ) : (
         <span className="irev__lcat irev__lna">—</span>
       )}
+
+      {/* Montant */}
+      <input
+        className={`ffield__input irev__lamount ${row.kind === 'entree' ? 't-up' : ''}`}
+        type="text"
+        inputMode="decimal"
+        value={row.amount ?? ''}
+        placeholder="0,00"
+        disabled={row.ignored}
+        onChange={(e) => onPatch({ amount: e.target.value.replace(',', '.') })}
+      />
+
+      {/* Date */}
+      <input
+        className="ffield__input irev__ldate"
+        type="date"
+        value={row.date || ''}
+        disabled={row.ignored}
+        onChange={(e) => onPatch({ date: e.target.value || null })}
+      />
 
       <button
         className="irev__ignore irev__ignore--sm"

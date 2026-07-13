@@ -192,10 +192,15 @@
   border-top: 1px solid var(--border);
 }
 .irev__line {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 5px 0;
+}
+/* La ligne dont le menu catégorie est ouvert passe au-dessus des suivantes. */
+.irev__line:has(.combo.is-open) {
+  z-index: 25;
 }
 .irev__line + .irev__line {
   border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
@@ -209,6 +214,31 @@
 }
 .irev__line.is-dup {
   opacity: 0.6;
+}
+
+/* Tous les champs de ligne : jamais de débordement du cadre. */
+.irev__line .ffield__input {
+  box-sizing: border-box;
+}
+
+/* Ordre : [libellé (flex)] · catégorie · montant · date · ignorer */
+.irev__llabel {
+  flex: 1 1 auto;
+  min-width: 0; /* autorise l'ellipsis dans un conteneur flex */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.irev__ltext {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.irev__llabel em {
+  color: var(--text-faint);
 }
 
 .irev__kind {
@@ -228,35 +258,7 @@
 .irev__kind.is-in {
   color: #34d399;
 }
-.irev__ldate {
-  flex-shrink: 0;
-  width: 130px;
-  padding: 5px 8px;
-  font-size: 12px;
-}
-.irev__lamount {
-  flex-shrink: 0;
-  width: 84px;
-  padding: 5px 8px;
-  text-align: right;
-  font-size: 13px;
-  font-weight: 600;
-}
-.irev__llabel {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.irev__llabel em {
-  color: var(--text-faint);
-}
+
 .irev__ltag {
   flex-shrink: 0;
   padding: 1px 7px;
@@ -268,11 +270,26 @@
   background: rgba(248, 113, 113, 0.15);
   color: var(--danger);
 }
+
 .irev__lcat {
-  flex-shrink: 0;
-  width: 190px;
+  flex: 0 1 190px;
+  min-width: 120px;
   padding: 5px 8px !important;
   font-size: 12.5px;
+}
+.irev__lamount {
+  flex: 0 0 92px;
+  min-width: 0;
+  padding: 5px 8px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+}
+.irev__ldate {
+  flex: 0 0 138px;
+  min-width: 0; /* le date-picker natif ne force pas le débordement */
+  padding: 5px 6px;
+  font-size: 12px;
 }
 .irev__lna {
   color: var(--text-faint);
@@ -345,18 +362,22 @@
     flex: 1;
     width: auto;
   }
-  /* Lignes : le libellé passe sur sa propre ligne */
+  /* Lignes : le libellé occupe toute la 1re ligne, puis catégorie/montant/date */
   .irev__line {
     flex-wrap: wrap;
   }
   .irev__llabel {
-    order: 5;
     flex: 1 1 100%;
-    white-space: normal;
   }
   .irev__lcat {
-    flex: 1;
-    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .irev__lamount {
+    flex: 0 0 88px;
+  }
+  .irev__ldate {
+    flex: 0 0 130px;
   }
 }
 @media (max-width: 640px) {
