@@ -102,6 +102,25 @@ export class CourseController {
     return { ok: true };
   }
 
+  @Post('templates/:id/items')
+  addTemplateItem(@Param('id') id: string, @Body() body: ShoppingItemInput) {
+    return this.course.addTemplateItem(id, body ?? {});
+  }
+
+  @Patch('templates/:id/items/:itemId')
+  updateTemplateItem(
+    @Param('id') id: string,
+    @Param('itemId') itemId: string,
+    @Body() body: ShoppingItemInput,
+  ) {
+    return this.course.updateTemplateItem(id, itemId, body ?? {});
+  }
+
+  @Delete('templates/:id/items/:itemId')
+  removeTemplateItem(@Param('id') id: string, @Param('itemId') itemId: string) {
+    return this.course.removeTemplateItem(id, itemId);
+  }
+
   // --- Import recette (aperçu + création depuis recette) ---
 
   @Get('recipes/:id/preview')

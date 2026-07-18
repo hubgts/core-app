@@ -5,6 +5,7 @@ import { confirmDialog, promptDialog } from '../components/dialogs';
 import ListCard from '../components/course/ListCard';
 import CourseListFormModal from '../components/course/CourseListFormModal';
 import ImportRecipeModal from '../components/course/ImportRecipeModal';
+import TemplatePickerModal from '../components/course/TemplatePickerModal';
 import KebabMenu from '../components/KebabMenu';
 import '../pages/AlimentationPage.css';
 import './CoursePage.css';
@@ -24,6 +25,7 @@ export default function CoursePage() {
   const [modal, setModal] = useState(null); // { list? } | null
   const [importing, setImporting] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [picking, setPicking] = useState(false);
   const dragRef = useRef(null);
 
   const load = useCallback(async () => {
@@ -93,13 +95,6 @@ export default function CoursePage() {
     run(async () => {
       await courseApi.removeList(list.id);
       toast('Liste supprimée.');
-    });
-  }
-
-  function instantiate(t) {
-    run(async () => {
-      const created = await courseApi.instantiateTemplate(t.id, {});
-      navigate(`/course/${created.id}`);
     });
   }
 
@@ -173,6 +168,18 @@ export default function CoursePage() {
                 >
                   À partir d'une recette…
                 </button>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setPicking(true);
+                  }}
+                  disabled={templates.length === 0}
+                  title={
+                    templates.length === 0 ? 'Aucun modèle disponible' : ''
+                  }
+                >
+                  Créer à partir d'un modèle…
+                </button>
               </div>
             )}
           </div>
@@ -207,41 +214,48 @@ export default function CoursePage() {
 
       {loading ? (
         <div className="alpage__loading">Chargement…</div>
-      ) : lists.length === 0 ? (
-        <div className="alempty">
-          <div className="alempty__icon">🛒</div>
-          <p>Crée ta première liste : vide, ou à partir d'une recette.</p>
-          <button className="btn btn--primary" onClick={() => setModal({})}>
-            + Liste
-          </button>
-        </div>
       ) : (
         <>
           <section className="alboard-section">
-            <div className="alboard">
-              {filtered.map((l) => (
-                <div
-                  key={l.id}
-                  className="alcard-wrap"
-                  draggable={!isFiltering}
-                  onDragStart={() => (dragRef.current = l.id)}
-                  onDragOver={(e) => !isFiltering && e.preventDefault()}
-                  onDrop={() => onCardDrop(l.id)}
+            {lists.length === 0 ? (
+              <div className="alempty">
+                <div className="alempty__icon">🛒</div>
+                <p>Crée ta première liste : vide, ou à partir d'une recette.</p>
+                <button
+                  className="btn btn--primary"
+                  onClick={() => setModal({})}
                 >
-                  <ListCard
-                    list={l}
-                    onOpen={(id) => navigate(`/course/${id}`)}
-                    onEdit={(list) => setModal({ list })}
-                    onDuplicate={duplicate}
-                    onDelete={removeList}
-                  />
+                  + Liste
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="alboard">
+                  {filtered.map((l) => (
+                    <div
+                      key={l.id}
+                      className="alcard-wrap"
+                      draggable={!isFiltering}
+                      onDragStart={() => (dragRef.current = l.id)}
+                      onDragOver={(e) => !isFiltering && e.preventDefault()}
+                      onDrop={() => onCardDrop(l.id)}
+                    >
+                      <ListCard
+                        list={l}
+                        onOpen={(id) => navigate(`/course/${id}`)}
+                        onEdit={(list) => setModal({ list })}
+                        onDuplicate={duplicate}
+                        onDelete={removeList}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            {filtered.length === 0 && (
-              <p className="course-empty">
-                Aucune liste ne correspond à ta recherche.
-              </p>
+                {filtered.length === 0 && (
+                  <p className="course-empty">
+                    Aucune liste ne correspond à ta recherche.
+                  </p>
+                )}
+              </>
             )}
           </section>
 
@@ -260,9 +274,9 @@ export default function CoursePage() {
                   <div className="course-card__actions">
                     <button
                       className="btn btn--sm btn--primary"
-                      onClick={() => instantiate(t)}
+                      onClick={() => navigate(`/course/template/${t.id}`)}
                     >
-                      Instancier
+                      Modifier
                     </button>
                     <button
                       className="btn btn--sm btn--ghost"
@@ -299,6 +313,18 @@ export default function CoursePage() {
           onDone={(list) => {
             setImporting(false);
             navigate(`/course/${list.id}`);
+          }}
+        />
+      )}
+
+      {picking && (
+        <TemplatePickerModal
+          templates={templates}
+          onClose={() => setPicking(false)}
+          onConfirm={async (templateId) => {
+            const created = await courseApi.instantiateTemplate(templateId, {});
+            setPicking(false);
+            navigate(`/course/${created.id}`);
           }}
         />
       )}

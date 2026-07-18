@@ -61,6 +61,18 @@ specs/                       # spécifications fonctionnelles de référence
 
 ## Conventions
 
+- **Cohérence de design et d'usage entre toutes les pages** — priorité absolue.
+  L'app doit se comporter et se ressembler d'un module à l'autre : mêmes patterns
+  d'interaction pour les mêmes intentions. Avant d'ajouter une UI, **regarde
+  comment un cas similaire est déjà résolu ailleurs et réutilise-le** au lieu
+  d'inventer une variante. Concrètement : un choix parmi des éléments = une
+  **modale** avec `<Combobox>` (jamais un menu déroulant maison ni un
+  `promptDialog` numéroté) ; les modales suivent le même gabarit
+  (`.modal` / `.field` / `.modal__actions`, bouton principal à droite, `Annuler`
+  à sa gauche, `Supprimer` en `danger` à gauche) ; les actions secondaires vont
+  dans le `<KebabMenu>` ; confirmations/saisies via `dialogs.jsx`, messages
+  éphémères via `toast()`. Une divergence visuelle ou comportementale entre deux
+  pages pour une même action est un défaut à corriger, pas un choix local.
 - **Langue : français** partout (UI, commentaires, messages d'erreur, docs).
 - **Réutilise les helpers partagés** plutôt que de redupliquer :
   `api/client.js` (`request()`), `backend/src/common/round.util.ts`,

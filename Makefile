@@ -1,12 +1,13 @@
 COMPOSE = docker compose -f docker/docker-compose.yml
 WEB_ROOT ?= /var/www/core-app
 
-# Serveur de production (pour `make deploy-prod` depuis un poste local).
+# Serveur de production (pour `make deploy-prod` / `make sync-bdd` depuis un poste local).
 PROD_SSH ?= egantois@137.74.112.112
 PROD_DIR ?= ~/projects/core-app
+PROD_DB_NAME ?= core
 
 .PHONY: init dc-build dc-up dc-down dc-restart dc-logs dc-ps dc-clean \
-        update-dev update-prod deploy-prod check import-foods
+        update-dev update-prod deploy-prod sync-bdd check import-foods
 
 ## init : construit les images, démarre les conteneurs et attend qu'ils soient prêts
 init: dc-build dc-up
@@ -102,3 +103,20 @@ update-prod:
 # de update-prod restent interactifs à distance.
 deploy-prod:
 	ssh -t $(PROD_SSH) 'cd $(PROD_DIR) && make update-prod'
+
+## sync-bdd : rapatrie la base de PROD et la restaure en LOCAL (⚠️ ÉCRASE le local)
+# 1. Dump distant (peer auth postgres via sudo, pas de mot de passe DB) écrit
+#    dans un fichier SUR le serveur -> le pseudo-terminal ne porte que le prompt
+#    sudo, jamais le flux SQL (sinon CRLF le corromprait).
+# 2. Rapatriement par scp (transfert binaire sûr), puis nettoyage du serveur.
+# 3. Restauration dans le conteneur Docker local `db` (user/base progression).
+sync-bdd:
+	@$(COMPOSE) ps --status running --services 2>/dev/null | grep -qx db \
+	  || { echo "❌ Le conteneur local 'db' ne tourne pas — lance 'make dc-up' d'abord."; exit 1; }
+	@echo "⚠️  La base locale (progression) va être ÉCRASÉE par la prod ($(PROD_DB_NAME))."
+	ssh -t $(PROD_SSH) 'sudo -u postgres pg_dump --clean --if-exists --no-owner --no-privileges $(PROD_DB_NAME) > /tmp/core-sync.sql'
+	scp $(PROD_SSH):/tmp/core-sync.sql /tmp/core-sync.sql
+	ssh $(PROD_SSH) 'rm -f /tmp/core-sync.sql'
+	$(COMPOSE) exec -T db psql -U progression -d progression < /tmp/core-sync.sql
+	@rm -f /tmp/core-sync.sql
+	@echo "✅ Base locale synchronisée depuis la prod."

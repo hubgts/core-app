@@ -6,6 +6,7 @@ import {
   confirmDialog,
   promptDialog,
 } from '../components/dialogs';
+import { toast } from '../components/toast';
 import ArticlePicker from '../components/course/ArticlePicker';
 import ImportRecipeModal from '../components/course/ImportRecipeModal';
 import {
@@ -16,7 +17,13 @@ import {
 import { frenchFullDate } from '../utils/date';
 import './CoursePage.css';
 
-export default function ShoppingListPage() {
+/**
+ * Page de détail d'une liste de courses OU d'un modèle (prop `template`).
+ * Un modèle est éditable comme une liste (mêmes items groupés par rayon,
+ * barre d'ajout flottante), mais sans cochage ni actions propres aux listes
+ * (recette, appliquer/enregistrer un modèle, décocher, vider les pris).
+ */
+export default function ShoppingListPage({ template = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [list, setList] = useState(null);
@@ -24,6 +31,9 @@ export default function ShoppingListPage() {
   const [loading, setLoading] = useState(true);
   const [hidePicked, setHidePicked] = useState(false);
   const [importing, setImporting] = useState(false);
+
+  // Ligne en cours d'édition (id d'item) ou null.
+  const [editingId, setEditingId] = useState(null);
 
   // Brouillon d'ajout d'item.
   const [draft, setDraft] = useState({
@@ -36,16 +46,35 @@ export default function ShoppingListPage() {
   const [unit, setUnit] = useState('');
   const pickerKey = useRef(0);
 
+  const api = template
+    ? {
+        get: courseApi.getTemplate,
+        add: courseApi.addTemplateItem,
+        update: courseApi.updateTemplateItem,
+        remove: courseApi.removeTemplateItem,
+        rename: (data) => courseApi.updateTemplate(id, data),
+        del: () => courseApi.removeTemplate(id),
+      }
+    : {
+        get: courseApi.getList,
+        add: courseApi.addItem,
+        update: courseApi.updateItem,
+        remove: courseApi.removeItem,
+        rename: (data) => courseApi.updateList(id, data),
+        del: () => courseApi.removeList(id),
+      };
+
   const load = useCallback(async () => {
     setError('');
     try {
-      setList(await courseApi.getList(id));
+      setList(await api.get(id));
     } catch (e) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }, [id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, template]);
 
   useEffect(() => {
     load();
@@ -76,7 +105,7 @@ export default function ShoppingListPage() {
       quantity: qty === '' ? null : Number(qty),
       unit: unit || null,
     };
-    await run(() => courseApi.addItem(id, payload));
+    await run(() => api.add(id, payload));
     setDraft({ articleId: null, articleName: '', name: '', unit: '' });
     setQty('');
     setUnit('');
@@ -85,11 +114,11 @@ export default function ShoppingListPage() {
 
   async function rename() {
     const next = await promptDialog({
-      title: 'Renommer la liste',
+      title: template ? 'Renommer le modèle' : 'Renommer la liste',
       defaultValue: list.title,
     });
     if (next == null || !next.trim() || next.trim() === list.title) return;
-    run(() => courseApi.updateList(id, { title: next.trim() }));
+    run(() => api.rename({ title: next.trim() }));
   }
 
   async function saveAsTemplate() {
@@ -136,8 +165,9 @@ export default function ShoppingListPage() {
     )
       return;
     run(async () => {
-      await courseApi.removeList(id);
+      await api.del();
       navigate('/course');
+      toast(template ? 'Modèle supprimé.' : 'Liste supprimée.');
     });
   }
 
@@ -150,13 +180,14 @@ export default function ShoppingListPage() {
   if (!list)
     return (
       <div className="course-page">
-        <p className="modal__error">{error || 'Liste introuvable.'}</p>
+        <p className="modal__error">
+          {error || (template ? 'Modèle introuvable.' : 'Liste introuvable.')}
+        </p>
       </div>
     );
 
-  const visibleItems = hidePicked
-    ? list.items.filter((i) => !i.checked)
-    : list.items;
+  const visibleItems =
+    !template && hidePicked ? list.items.filter((i) => !i.checked) : list.items;
   const groups = groupByAisle(visibleItems);
 
   return (
@@ -174,52 +205,62 @@ export default function ShoppingListPage() {
             onClick={rename}
             title="Renommer"
           >
-            🛒 {list.title}
+            {template ? '📋' : '🛒'} {list.title}
           </h1>
-          {list.date && (
+          {!template && list.date && (
             <span className="course-detailhead__date">
               {frenchFullDate(list.date)}
             </span>
           )}
         </div>
-        <div className="course-detail__counts">
-          {list.checkedCount} / {list.itemCount} pris
-        </div>
+        {template ? (
+          <div className="course-detail__counts">
+            {list.itemCount} article{list.itemCount > 1 ? 's' : ''}
+          </div>
+        ) : (
+          <div className="course-detail__counts">
+            {list.checkedCount} / {list.itemCount} pris
+          </div>
+        )}
       </header>
 
       <div className="course-detail__toolbar">
-        <button
-          className="btn btn--sm btn--ghost"
-          onClick={() => setImporting(true)}
-        >
-          + Recette
-        </button>
-        <button className="btn btn--sm btn--ghost" onClick={applyTemplate}>
-          Appliquer un modèle
-        </button>
-        <button className="btn btn--sm btn--ghost" onClick={saveAsTemplate}>
-          Enregistrer comme modèle
-        </button>
-        <button
-          className="btn btn--sm btn--ghost"
-          onClick={() => run(() => courseApi.uncheckAll(id))}
-        >
-          Tout décocher
-        </button>
-        <button
-          className="btn btn--sm btn--ghost"
-          onClick={() => run(() => courseApi.clearChecked(id))}
-        >
-          Vider les pris
-        </button>
-        <label className="course-detail__hide">
-          <input
-            type="checkbox"
-            checked={hidePicked}
-            onChange={(e) => setHidePicked(e.target.checked)}
-          />
-          Masquer les pris
-        </label>
+        {!template && (
+          <>
+            <button
+              className="btn btn--sm btn--ghost"
+              onClick={() => setImporting(true)}
+            >
+              + Recette
+            </button>
+            <button className="btn btn--sm btn--ghost" onClick={applyTemplate}>
+              Appliquer un modèle
+            </button>
+            <button className="btn btn--sm btn--ghost" onClick={saveAsTemplate}>
+              Enregistrer comme modèle
+            </button>
+            <button
+              className="btn btn--sm btn--ghost"
+              onClick={() => run(() => courseApi.uncheckAll(id))}
+            >
+              Tout décocher
+            </button>
+            <button
+              className="btn btn--sm btn--ghost"
+              onClick={() => run(() => courseApi.clearChecked(id))}
+            >
+              Vider les pris
+            </button>
+            <label className="course-detail__hide">
+              <input
+                type="checkbox"
+                checked={hidePicked}
+                onChange={(e) => setHidePicked(e.target.checked)}
+              />
+              Masquer les pris
+            </label>
+          </>
+        )}
         <button
           className="btn btn--sm btn--ghost course-detail__del"
           onClick={removeList}
@@ -228,59 +269,8 @@ export default function ShoppingListPage() {
         </button>
       </div>
 
-      {error && <p className="modal__error">{error}</p>}
-
-      {list.items.length === 0 ? (
-        <p className="course-empty">
-          Liste vide. Ajoute un article ci-dessous ou importe une recette.
-        </p>
-      ) : (
-        <div className="course-sections">
-          {groups.map((g) => (
-            <section key={g.aisleId ?? 'none'} className="course-section">
-              <h2 className="course-section__head">
-                <span>{g.icon}</span> {g.name}
-              </h2>
-              <ul className="course-items">
-                {g.items.map((it) => (
-                  <li
-                    key={it.id}
-                    className={`course-item${it.checked ? ' is-checked' : ''}`}
-                  >
-                    <label className="course-item__main">
-                      <input
-                        type="checkbox"
-                        checked={it.checked}
-                        onChange={() =>
-                          run(() => courseApi.toggleItem(id, it.id))
-                        }
-                      />
-                      <span className="course-item__qty">
-                        {formatMeasure(it.quantity, it.unit)}
-                      </span>
-                      <span className="course-item__label">{it.label}</span>
-                      {it.note && (
-                        <span className="course-item__note">{it.note}</span>
-                      )}
-                    </label>
-                    <button
-                      className="icon-btn"
-                      onClick={() => run(() => courseApi.removeItem(id, it.id))}
-                      aria-label="Supprimer"
-                      title="Supprimer"
-                    >
-                      🗑
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
-      )}
-
-      {/* Barre d'ajout */}
-      <div className="course-addbar">
+      {/* Barre d'ajout — flottante en haut, toujours visible */}
+      <div className="course-addbar course-addbar--top">
         <ArticlePicker
           key={pickerKey.current}
           placeholder="Article (désignation)…"
@@ -317,6 +307,85 @@ export default function ShoppingListPage() {
         </button>
       </div>
 
+      {error && <p className="modal__error">{error}</p>}
+
+      {list.items.length === 0 ? (
+        <p className="course-empty">
+          {template
+            ? 'Modèle vide. Ajoute des articles ci-dessus.'
+            : 'Liste vide. Ajoute un article ci-dessus ou importe une recette.'}
+        </p>
+      ) : (
+        <div className="course-sections">
+          {groups.map((g) => (
+            <section key={g.aisleId ?? 'none'} className="course-section">
+              <h2 className="course-section__head">
+                <span>{g.icon}</span> {g.name}
+              </h2>
+              <ul className="course-items">
+                {g.items.map((it) =>
+                  editingId === it.id ? (
+                    <ItemEditRow
+                      key={it.id}
+                      item={it}
+                      onCancel={() => setEditingId(null)}
+                      onSave={async (payload) => {
+                        await run(() => api.update(id, it.id, payload));
+                        setEditingId(null);
+                      }}
+                    />
+                  ) : (
+                    <li
+                      key={it.id}
+                      className={`course-item${
+                        !template && it.checked ? ' is-checked' : ''
+                      }`}
+                    >
+                      <label className="course-item__main">
+                        {template ? (
+                          <span className="course-item__bullet">•</span>
+                        ) : (
+                          <input
+                            type="checkbox"
+                            checked={it.checked}
+                            onChange={() =>
+                              run(() => courseApi.toggleItem(id, it.id))
+                            }
+                          />
+                        )}
+                        <span className="course-item__qty">
+                          {formatMeasure(it.quantity, it.unit)}
+                        </span>
+                        <span className="course-item__label">{it.label}</span>
+                        {it.note && (
+                          <span className="course-item__note">{it.note}</span>
+                        )}
+                      </label>
+                      <button
+                        className="icon-btn"
+                        onClick={() => setEditingId(it.id)}
+                        aria-label="Modifier"
+                        title="Modifier"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        className="icon-btn"
+                        onClick={() => run(() => api.remove(id, it.id))}
+                        aria-label="Supprimer"
+                        title="Supprimer"
+                      >
+                        🗑
+                      </button>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
+
       {importing && (
         <ImportRecipeModal
           listId={id}
@@ -328,5 +397,69 @@ export default function ShoppingListPage() {
         />
       )}
     </div>
+  );
+}
+
+/**
+ * Ligne d'édition inline d'un item (mêmes champs qu'à l'ajout : désignation,
+ * quantité, mesure). Le picker est pré-rempli avec l'article courant.
+ */
+function ItemEditRow({ item, onSave, onCancel }) {
+  const [draft, setDraft] = useState({
+    articleId: item.articleId,
+    articleName: item.label,
+  });
+  const [qty, setQty] = useState(
+    item.quantity == null ? '' : String(item.quantity),
+  );
+  const [unit, setUnit] = useState(item.unit ?? '');
+
+  function pickArticle(picked) {
+    setDraft(picked);
+    if (picked.unit) setUnit(picked.unit);
+  }
+
+  function save() {
+    onSave({
+      articleId: draft.articleId ?? undefined,
+      articleName: draft.articleId ? undefined : draft.articleName,
+      quantity: qty === '' ? null : Number(qty),
+      unit: unit || null,
+    });
+  }
+
+  return (
+    <li className="course-item course-item--edit">
+      <div className="course-addbar course-addbar--inline">
+        <ArticlePicker
+          value={item.label}
+          placeholder="Article (désignation)…"
+          onPick={pickArticle}
+        />
+        <input
+          className="field__input course-addbar__qty"
+          type="number"
+          min="0"
+          step="0.1"
+          placeholder="Qté"
+          value={qty}
+          onChange={(e) => setQty(e.target.value)}
+        />
+        <input
+          className="field__input course-addbar__unit"
+          list="course-units"
+          placeholder="Mesure"
+          value={unit}
+          onChange={(e) => setUnit(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && save()}
+        />
+        <button className="btn btn--sm btn--primary" onClick={save}>
+          OK
+        </button>
+        <button className="btn btn--sm btn--ghost" onClick={onCancel}>
+          Annuler
+        </button>
+      </div>
+    </li>
   );
 }

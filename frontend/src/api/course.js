@@ -82,6 +82,20 @@ export const courseApi = {
       method: 'POST',
       ...body(data),
     }),
+  addTemplateItem: (templateId, data) =>
+    request(`/course/templates/${templateId}/items`, {
+      method: 'POST',
+      ...body(data),
+    }),
+  updateTemplateItem: (templateId, itemId, data) =>
+    request(`/course/templates/${templateId}/items/${itemId}`, {
+      method: 'PATCH',
+      ...body(data),
+    }),
+  removeTemplateItem: (templateId, itemId) =>
+    request(`/course/templates/${templateId}/items/${itemId}`, {
+      method: 'DELETE',
+    }),
 
   // --- Import recette ---
   previewRecipe: (recipeId, servings) =>

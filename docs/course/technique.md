@@ -131,9 +131,20 @@ d'import). Le **rayon** d'un item n'est pas stocké : il provient de l'article.
 `POST /lists/:id/items/:itemId/toggle` · `PATCH /lists/:id/items/:itemId` ·
 `DELETE /lists/:id/items/:itemId`
 
+> `PATCH /lists/:id/items/:itemId` accepte `articleId` **ou** `articleName`
+> (article résolu/créé à la volée), en plus de `quantity`, `unit`, `note`,
+> `checked` — utilisé par l'édition inline d'un item.
+
 ### Modèles
 `GET /templates` · `POST /templates` · `GET /templates/:id` ·
 `PATCH /templates/:id` · `DELETE /templates/:id`
+
+### Items d'un modèle
+`POST /templates/:id/items` · `PATCH /templates/:id/items/:itemId` ·
+`DELETE /templates/:id/items/:itemId` — édition item par item d'un modèle,
+comme une liste mais **sans cochage ni agrégation** (chaque ajout crée une ligne ;
+`addTemplateItem` / `updateTemplateItem` / `removeTemplateItem`). `POST` et `PATCH`
+acceptent `articleId` **ou** `articleName` (résolu/créé à la volée).
 
 ### Import recette
 `GET /recipes/:id/preview?servings=N` → aperçu mis à l'échelle avec rapprochement
@@ -146,18 +157,20 @@ d'articles (sans rien créer).
 | Fichier | Rôle |
 |---|---|
 | `src/api/course.js` | Client API (helper `request()` partagé). |
-| `src/pages/CoursePage.jsx` | Board de cartes (façon Alimentation) + section Modèles ; recherche et drag & drop. |
-| `src/pages/ShoppingListPage.jsx` | Détail d'une liste : sections par rayon, cochage, barre d'ajout. |
+| `src/pages/CoursePage.jsx` | Board de cartes (façon Alimentation) + section Modèles ; recherche et drag & drop. Le bouton `+ Liste ▾` propose « Liste vide », « À partir d'une recette… » et « Créer à partir d'un modèle… » (ouvre `TemplatePickerModal` → instanciation puis redirection). Chaque carte de modèle a « Modifier » (→ page d'édition) et « Supprimer ». |
+| `src/pages/ShoppingListPage.jsx` | Détail d'une **liste ou d'un modèle** (prop `template`) : sections par rayon, barre d'ajout **flottante en haut** (sticky), édition inline d'un item (crayon ✎, mêmes champs qu'à l'ajout). En mode modèle : puces au lieu de cases à cocher, compteur d'articles, et masquage des actions propres aux listes (recette, appliquer/enregistrer un modèle, décocher, vider les pris). |
 | `src/components/course/ListCard.jsx` | Carte de liste sur le board (réutilise les classes `.alcard`). |
 | `src/components/course/CourseListFormModal.jsx` | Modale de création / édition (titre + date), façon modale d'entraînement. |
 | `src/components/course/ArticlePicker.jsx` | Autocomplétion d'article + création à la volée. |
 | `src/components/course/ImportRecipeModal.jsx` | Sélection recette + portions + aperçu. |
+| `src/components/course/TemplatePickerModal.jsx` | Modale de choix d'un modèle (`<Combobox>`) pour créer une liste ; instancie puis redirige vers la liste. |
 | `src/components/course/AislesPanel.jsx` | Gestion des rayons (page Référentiel). |
 | `src/components/course/ArticlesPanel.jsx` | Gestion des articles (page Référentiel). |
 | `src/components/course/constants.js` | `COMMON_UNITS`, `groupByAisle`, `formatMeasure`. |
 | `src/pages/CoursePage.css` | Styles du module (accent `--m-course`). |
 
-Routage : `/course` et `/course/:id` (`main.jsx`). Entrée de menu dans
+Routage : `/course`, `/course/:id` (liste) et `/course/template/:id` (édition
+d'un modèle, `<ShoppingListPage template />`) dans `main.jsx`. Entrée de menu dans
 `Layout.jsx` (icône 🛒). Les panneaux Articles/Rayons sont montés dans
 `ReferentialPage.jsx` (onglets `course_article` / `course_aisle`).
 

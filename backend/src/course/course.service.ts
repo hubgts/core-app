@@ -355,6 +355,12 @@ export class CourseService implements OnModuleInit {
     if (input.articleId !== undefined && input.articleId) {
       await this.getArticleOrThrow(input.articleId);
       item.articleId = input.articleId;
+    } else if (input.articleName) {
+      const article = await this.resolveArticleByName(
+        input.articleName,
+        input.unit ?? null,
+      );
+      item.articleId = article.id;
     }
     if (input.quantity !== undefined)
       item.quantity = this.normalizeNumber(input.quantity);
@@ -478,6 +484,70 @@ export class CourseService implements OnModuleInit {
   async removeTemplate(id: string): Promise<void> {
     await this.getTemplateOrThrow(id);
     await this.templates.delete(id);
+  }
+
+  /** Ajoute un item à un modèle (résolution/création d'article, RG-17). */
+  async addTemplateItem(templateId: string, input: ShoppingItemInput) {
+    const t = await this.getTemplateOrThrow(templateId);
+    const article = await this.resolveArticle(input);
+    const unit =
+      input.unit !== undefined
+        ? this.normalizeText(input.unit, UNIT_MAX)
+        : article.unit || null;
+    t.items.push({
+      id: randomUUID(),
+      articleId: article.id,
+      quantity: this.normalizeNumber(input.quantity),
+      unit,
+      note: this.normalizeText(input.note, 200),
+    });
+    t.updatedAt = new Date();
+    return this.templateResponse(
+      await this.templates.save(t),
+      await this.buildContext(),
+    );
+  }
+
+  /** Modifie un item d'un modèle (article, quantité, mesure, note). */
+  async updateTemplateItem(
+    templateId: string,
+    itemId: string,
+    input: ShoppingItemInput,
+  ) {
+    const t = await this.getTemplateOrThrow(templateId);
+    const item = t.items.find((i) => i.id === itemId);
+    if (!item) throw new NotFoundException('Item introuvable.');
+    if (input.articleId !== undefined && input.articleId) {
+      await this.getArticleOrThrow(input.articleId);
+      item.articleId = input.articleId;
+    } else if (input.articleName) {
+      const article = await this.resolveArticleByName(
+        input.articleName,
+        input.unit ?? null,
+      );
+      item.articleId = article.id;
+    }
+    if (input.quantity !== undefined)
+      item.quantity = this.normalizeNumber(input.quantity);
+    if (input.unit !== undefined)
+      item.unit = this.normalizeText(input.unit, UNIT_MAX);
+    if (input.note !== undefined)
+      item.note = this.normalizeText(input.note, 200);
+    t.updatedAt = new Date();
+    return this.templateResponse(
+      await this.templates.save(t),
+      await this.buildContext(),
+    );
+  }
+
+  async removeTemplateItem(templateId: string, itemId: string) {
+    const t = await this.getTemplateOrThrow(templateId);
+    t.items = t.items.filter((i) => i.id !== itemId);
+    t.updatedAt = new Date();
+    return this.templateResponse(
+      await this.templates.save(t),
+      await this.buildContext(),
+    );
   }
 
   /** Crée une liste à partir d'un modèle : copie figée, décochée (RG-06). */

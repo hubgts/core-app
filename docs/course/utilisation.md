@@ -16,7 +16,8 @@ façons :
 1. **À la main** — on choisit un **article** (autocomplétion sur le référentiel)
    ou on le crée à la volée, puis on précise une **quantité** et une **mesure**.
 2. **Depuis une liste type (modèle)** — un gabarit réutilisable (« Essentiels
-   placard », « Apéro »…) que l'on **instancie** en nouvelle liste.
+   placard », « Apéro »…) qui sert **uniquement de base** à la création d'une
+   nouvelle liste.
 3. **Depuis une recette** du module Alimentation — on importe ses ingrédients,
    mis à l'échelle selon le nombre de portions voulu.
 
@@ -39,6 +40,9 @@ Le bouton **+ Liste ▾** propose :
   tu saisis un **titre** et, si tu veux, une **date** ; la liste s'ouvre ensuite.
 - **À partir d'une recette…** — ouvre l'import de recette (choix recette +
   portions), puis crée une nouvelle liste.
+- **Créer à partir d'un modèle…** — ouvre une **modale** : choisis un modèle dans
+  la liste déroulante puis **Créer la liste** ; une nouvelle liste est créée avec
+  ses articles (tous décochés) et s'ouvre aussitôt.
 
 Sur chaque carte (menu ⋮) : **Ouvrir**, **Modifier (titre, date)**,
 **Dupliquer** (cochage remis à zéro), **Supprimer** (confirmation, irréversible).
@@ -53,7 +57,8 @@ mesure, et la désignation.
 
 ### Ajouter un article
 
-La barre en bas de page :
+La barre d'ajout est **flottante en haut** de la liste (elle reste visible même
+en scrollant) :
 
 1. **Désignation** — tape le nom ; une liste d'articles correspondants apparaît.
    Choisis-en un (sa mesure se pré-remplit) ou clique **« Créer l'article … »**
@@ -65,6 +70,12 @@ La barre en bas de page :
 > **Fusion automatique** : si tu ajoutes un article déjà présent **avec la même
 > mesure**, les quantités se **cumulent** au lieu de créer un doublon. Mesures
 > différentes (`500 g` vs `1 kg`) → deux lignes distinctes.
+
+### Modifier un article de la liste
+
+Survole une ligne et clique le crayon **✎** : la ligne passe en édition avec les
+**mêmes champs qu'à l'ajout** (désignation, quantité, mesure). **OK** valide,
+**Annuler** referme sans changement. Le **🗑** supprime l'item.
 
 ### Cocher en magasin
 
@@ -84,13 +95,23 @@ La barre en bas de page :
 
 ## 4. Modèles (listes types)
 
-Un **modèle** est un gabarit qui ne se « fait » pas : il sert de source.
+Un **modèle** est un gabarit qui ne se « fait » pas : il sert **uniquement de
+base** à la création de listes.
 
-- **Instancier** → crée une nouvelle liste, copie des items, tous décochés. Le
-  modèle reste inchangé (copie figée : pas de synchronisation ultérieure).
-- **Appliquer à une liste existante** → ajoute les items du modèle (fusion).
-- Créer un modèle : section **Modèles → + Nouveau modèle** (en bas du board), ou
-  depuis une liste via **Enregistrer comme modèle**.
+- **Créer une liste à partir d'un modèle** → via le bouton **+ Liste → Créer à
+  partir d'un modèle…** (§2), qui ouvre une modale de choix. La nouvelle liste
+  reçoit une copie des articles, tous décochés ; le modèle reste inchangé (copie
+  figée, pas de synchronisation).
+- **Appliquer à une liste existante** → depuis une liste ouverte, **Appliquer un
+  modèle** ajoute ses articles (fusion).
+- **Modifier un modèle** → bouton **Modifier** sur la carte du modèle : ouvre une
+  page d'édition identique à une liste (barre d'ajout flottante, édition et
+  suppression d'articles, renommage), mais **sans les cases à cocher** ni les
+  actions propres aux listes. On y compose le contenu du modèle article par
+  article.
+- **Créer un modèle** : section **Modèles → + Nouveau modèle** (on saisit un nom,
+  puis on le remplit via **Modifier**), ou depuis une liste via **Enregistrer
+  comme modèle**.
 
 ---
 
