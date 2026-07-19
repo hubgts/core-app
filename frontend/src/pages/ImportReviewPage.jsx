@@ -298,13 +298,13 @@ export default function ImportReviewPage() {
 
   return (
     <div className="fpage irev">
-      <header className="fpage__head">
+      <header className="page-head">
         <div className="irev__head-left">
           <button className="irev__back" onClick={leave}>
             ← Imports
           </button>
           <div>
-            <h1 className="fpage__title irev__title">Vérifier l’import</h1>
+            <h1 className="page-head__title irev__title">Vérifier l’import</h1>
             <p className="irev__sub">
               {batch.fileName} · {activeRows.length} opérations ·{' '}
               {groups.length} marchands

@@ -114,8 +114,13 @@ export default function ImportPage() {
 
   return (
     <div className="fpage">
-      <header className="fpage__head">
-        <h1 className="fpage__title">📥 Import</h1>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">📥 Import</h1>
+          <p className="page-head__subtitle">
+            Importe un relevé bancaire et vérifie les transactions.
+          </p>
+        </div>
       </header>
 
       {error && <p className="fpage__error">{error}</p>}

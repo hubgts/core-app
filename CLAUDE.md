@@ -109,6 +109,32 @@ specs/                       # spécifications fonctionnelles de référence
   `var(--…)` (le SVG ne résout pas les variables CSS).
 - **Thème sombre d'abord** (dark-first), dashboard = hub modulaire, tokens
   `--m-*` par module.
+- **En-tête de page — gabarit unique** : toute page de module suit la même
+  structure (réf. Habitudes / Entraînement), avec le CSS partagé `.page-head*`
+  d'`index.css` (ne **pas** redéfinir de classe d'en-tête par module) :
+
+  ```jsx
+  <header className="page-head">
+    <div>
+      <h1 className="page-head__title">🎯 Titre</h1>
+      <p className="page-head__subtitle">Une phrase courte, orientée action.</p>
+    </div>
+    <div className="page__headactions">{/* bouton principal + KebabMenu */}</div>
+  </header>
+  ```
+
+  Le container racine de la page prend **toute la largeur** (`max-width: 100%`,
+  sans `margin: 0 auto` ni padding propre : le padding vient de `.content` dans
+  `Layout.css`). Les pages de détail (sous-pages avec « ← retour ») gardent leur
+  en-tête contextuel mais réutilisent `.page-head` / `.page-head__title`.
+- **État vide de page — composant unique** : quand une page/liste principale n'a
+  aucune entrée, utiliser `<EmptyState>`
+  (`frontend/src/components/EmptyState.jsx`) — rendu plein centré sans bordure
+  (CSS `.empty*` partagé dans `index.css`). Props : `icon` (emoji, optionnel),
+  `title` (optionnel), `action` (nœud, typiquement le bouton de création),
+  `children` (texte descriptif). Ne **pas** recréer de classe `*-empty` par
+  module. Les petits états inline (graphe/section/liste sans données, drawer)
+  restent des micro-états locaux et ne passent pas par ce composant.
 - **Actions secondaires d'une page** (« Gérer les catégories / rayons / types… »
   et autres actions annexes) : ne **jamais** les poser en lien souligné ou bouton
   isolé. Les regrouper dans le menu **`<KebabMenu>`**

@@ -2,7 +2,7 @@
    (définis globalement). Accent module : var(--m-course). */
 
 .course-page {
-  max-width: 1100px;
+  max-width: 100%;
 }
 
 /* --- Création (menu déroulant) --- */

@@ -7,26 +7,12 @@
 }
 
 .bpage__loading,
-.bempty,
 .bpage__error {
   color: var(--text-muted);
   padding: 24px 0;
 }
 .bpage__error {
   color: var(--danger);
-}
-
-.bpage__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-}
-.bpage__title {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
 }
 
 /* Tendances */

@@ -13,6 +13,7 @@ import {
 import './FinancesPage.css';
 import './EnvelopesPage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 /**
  * Page de gestion des enveloppes : grille de cartes par type (réordonnables par
@@ -155,14 +156,14 @@ export default function EnvelopesPage() {
 
   return (
     <div className="fpage">
-      <header className="fpage__head">
-        <div className="fpage__headtext">
-          <h1 className="fpage__title">💰 Enveloppes</h1>
-          <Link className="fsumlink" to="/finances">
-            ← Vue d'ensemble
-          </Link>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">💰 Enveloppes</h1>
+          <p className="page-head__subtitle">
+            Suis le solde de tes enveloppes d'épargne.
+          </p>
         </div>
-        <div className="fpage__headactions">
+        <div className="page__headactions">
           <Link className="btn btn--ghost" to="/finances/bilan">
             🧾 Faire le bilan
           </Link>
@@ -182,10 +183,17 @@ export default function EnvelopesPage() {
       )}
 
       {!loading && groups.length === 0 && (
-        <p className="fempty">
+        <EmptyState
+          icon="💰"
+          action={
+            <button className="btn btn--primary" onClick={() => setModal({})}>
+              + Enveloppe
+            </button>
+          }
+        >
           Aucune enveloppe pour l'instant. Créez votre première enveloppe pour
           commencer à suivre votre patrimoine.
-        </p>
+        </EmptyState>
       )}
 
       {groups.map((g) => (

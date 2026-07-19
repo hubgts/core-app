@@ -2,26 +2,6 @@
   max-width: 100%;
 }
 
-.page-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 22px;
-}
-
-.page-head__title {
-  margin: 0;
-  font-size: 26px;
-  letter-spacing: -0.02em;
-}
-
-.page-head__subtitle {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
 /* --- Barre de contrôle (navigation + sélecteurs vue/période) --- */
 .control-bar {
   display: flex;
@@ -390,24 +370,6 @@
 .kpi__label {
   font-size: 13px;
   color: var(--text-muted);
-}
-
-/* --- État vide --- */
-.empty {
-  text-align: center;
-  padding: 60px 20px;
-  border: 1px dashed var(--border);
-  border-radius: 14px;
-}
-
-.empty__emoji {
-  font-size: 40px;
-  margin-bottom: 12px;
-}
-
-.empty__text {
-  color: var(--text-muted);
-  margin: 0 0 18px;
 }
 
 /* --- Divers --- */

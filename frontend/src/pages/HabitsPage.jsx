@@ -15,6 +15,7 @@ import {
 } from '../utils/date';
 import './HabitsPage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 const MILESTONES_DAYS = [7, 30, 100, 365];
 const MILESTONES_WEEKS = [4, 12, 26, 52];
@@ -311,18 +312,19 @@ export default function HabitsPage() {
       {loading ? (
         <p className="muted">Chargement…</p>
       ) : habits.length === 0 ? (
-        <div className="empty">
-          <div className="empty__emoji">🌱</div>
-          <p className="empty__text">
-            Crée ta première habitude pour commencer à suivre ta régularité.
-          </p>
-          <button
-            className="btn btn--primary"
-            onClick={() => setModal({ open: true, habit: null })}
-          >
-            + Habitude
-          </button>
-        </div>
+        <EmptyState
+          icon="🌱"
+          action={
+            <button
+              className="btn btn--primary"
+              onClick={() => setModal({ open: true, habit: null })}
+            >
+              + Habitude
+            </button>
+          }
+        >
+          Crée ta première habitude pour commencer à suivre ta régularité.
+        </EmptyState>
       ) : showGridYear ? (
         <YearHeatmap
           habits={habits}

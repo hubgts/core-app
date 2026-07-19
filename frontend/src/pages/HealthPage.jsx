@@ -23,6 +23,7 @@ import {
 } from '../utils/date';
 import './HealthPage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 export default function HealthPage() {
   const today = todayStr();
@@ -162,15 +163,15 @@ export default function HealthPage() {
   return (
     <div className="hpage">
       {/* En-tête */}
-      <header className="hpage__head">
+      <header className="page-head">
         <div>
-          <h1 className="hpage__title">📏 Mensuration</h1>
-          <p className="hpage__sub">
+          <h1 className="page-head__title">📏 Mensuration</h1>
+          <p className="page-head__subtitle">
             Poids &amp; mensurations qui évoluent avec le muscle — tendance et
             objectif.
           </p>
         </div>
-        <div className="hpage__actions">
+        <div className="page__headactions">
           <button
             className="btn btn--ghost"
             onClick={() => setProfileModal(true)}
@@ -189,21 +190,22 @@ export default function HealthPage() {
       {error && <p className="hpage__error">{error}</p>}
 
       {!hasData ? (
-        <section className="hempty">
-          <div className="hempty__icon">⚖️</div>
-          <h2 className="hempty__title">Enregistre ta première pesée</h2>
-          <p className="hempty__text">
-            Le poids du jour est bruité : c'est la{' '}
-            <strong>tendance lissée</strong> dans le temps qui compte. Note ton
-            poids régulièrement pour voir la courbe se dessiner.
-          </p>
-          <button
-            className="btn btn--primary"
-            onClick={() => setMeasureModal({})}
-          >
-            + Première mesure
-          </button>
-        </section>
+        <EmptyState
+          icon="⚖️"
+          title="Enregistre ta première pesée"
+          action={
+            <button
+              className="btn btn--primary"
+              onClick={() => setMeasureModal({})}
+            >
+              + Première mesure
+            </button>
+          }
+        >
+          Le poids du jour est bruité : c'est la{' '}
+          <strong>tendance lissée</strong> dans le temps qui compte. Note ton
+          poids régulièrement pour voir la courbe se dessiner.
+        </EmptyState>
       ) : (
         <>
           {/* KPIs */}

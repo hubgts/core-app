@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { alimentationApi } from '../api/alimentation';
 import { confirmDialog } from '../components/dialogs';
 import FoodFormModal from '../components/alimentation/FoodFormModal';
+import EmptyState from '../components/EmptyState';
 import './FoodsPage.css';
 
 /**
@@ -62,9 +63,9 @@ export default function FoodsPage() {
 
   return (
     <div className="foodspage">
-      <header className="alpage__head">
+      <header className="page-head">
         <div>
-          <h1 className="alpage__title">🥑 Aliments</h1>
+          <h1 className="page-head__title">🥑 Aliments</h1>
           <p className="page-head__subtitle">
             Macronutriments et calories pour 100 g/ml. Sert de base de calcul
             aux recettes.
@@ -90,11 +91,20 @@ export default function FoodsPage() {
       {loading ? (
         <p className="ref-empty">Chargement…</p>
       ) : foods.length === 0 ? (
-        <p className="ref-empty">
-          {search
-            ? 'Aucun aliment ne correspond.'
-            : 'Aucun aliment. Ajoutes-en un pour commencer.'}
-        </p>
+        search ? (
+          <EmptyState>Aucun aliment ne correspond.</EmptyState>
+        ) : (
+          <EmptyState
+            icon="🥑"
+            action={
+              <button className="btn btn--primary" onClick={() => setModal({})}>
+                + Aliment
+              </button>
+            }
+          >
+            Aucun aliment. Ajoutes-en un pour commencer.
+          </EmptyState>
+        )
       ) : (
         <div className="foodtable">
           <div className="foodtable__head">

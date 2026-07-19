@@ -1,6 +1,5 @@
 .foodspage {
-  max-width: 920px;
-  margin: 0 auto;
+  max-width: 100%;
 }
 
 .foodspage__search {

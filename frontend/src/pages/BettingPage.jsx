@@ -10,6 +10,7 @@ import {
 } from '../components/betting/constants';
 import './BettingPage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 export default function BettingPage() {
   const navigate = useNavigate();
@@ -51,20 +52,34 @@ export default function BettingPage() {
 
   return (
     <div className="bpage">
-      <header className="bpage__head">
-        <h1 className="bpage__title">🎰 Paris sportifs</h1>
-        <button className="btn btn--primary" onClick={() => setModal(true)}>
-          + Bankroll
-        </button>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">🎰 Paris sportifs</h1>
+          <p className="page-head__subtitle">
+            Gère tes bankrolls et suis ta rentabilité.
+          </p>
+        </div>
+        <div className="page__headactions">
+          <button className="btn btn--primary" onClick={() => setModal(true)}>
+            + Bankroll
+          </button>
+        </div>
       </header>
 
       {error && <p className="bpage__error">{error}</p>}
 
       {bankrolls.length === 0 ? (
-        <p className="bempty">
+        <EmptyState
+          icon="🎰"
+          action={
+            <button className="btn btn--primary" onClick={() => setModal(true)}>
+              + Bankroll
+            </button>
+          }
+        >
           Aucune bankroll pour l'instant. Créez-en une pour commencer à suivre
           vos paris.
-        </p>
+        </EmptyState>
       ) : (
         <div className="bcards">
           {bankrolls.map((b) => {

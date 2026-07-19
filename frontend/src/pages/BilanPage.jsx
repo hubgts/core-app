@@ -100,12 +100,9 @@ export default function BilanPage() {
 
   return (
     <div className="fpage">
-      <header className="fpage__head">
-        <div className="fpage__headtext">
-          <h1 className="fpage__title">🧾 Bilan du mois</h1>
-          <Link className="fsumlink" to="/finances">
-            ← Vue d'ensemble
-          </Link>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">🧾 Bilan du mois</h1>
         </div>
       </header>
 

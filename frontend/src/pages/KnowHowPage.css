@@ -1,23 +1,7 @@
 /* ===== Module Savoir-faire ===== */
 
 .rpage {
-  padding: 28px 32px 60px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.rpage__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-
-.rpage__title {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  max-width: 100%;
 }
 
 .rpage__error {
@@ -377,24 +361,6 @@
 }
 .rmenu__item--danger {
   color: var(--danger);
-}
-
-/* --- État vide --- */
-.rempty {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 60px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-.rempty__icon {
-  font-size: 48px;
-}
-.rempty p {
-  max-width: 420px;
-  margin: 0;
 }
 
 /* ===== Formulaire (réutilise .ffield* des autres modules) ===== */

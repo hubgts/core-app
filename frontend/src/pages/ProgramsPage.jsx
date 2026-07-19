@@ -7,6 +7,7 @@ import StartProgramModal from '../components/training/StartProgramModal';
 import './TrainingPage.css';
 import './ProgramsPage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 export default function ProgramsPage() {
   const [programs, setPrograms] = useState([]);
@@ -89,18 +90,18 @@ export default function ProgramsPage() {
       {loading ? (
         <p className="muted">Chargement…</p>
       ) : programs.length === 0 ? (
-        <div className="prog-empty">
-          <span className="prog-empty__icon">🗓</span>
-          <h2 className="prog-empty__title">Crée ton premier programme</h2>
-          <p className="muted">
-            Un programme ordonne des séances dans le temps : phases, semaines
-            S1…Sn, et un démarrage à la date de ton choix qui remplit le
-            planning.
-          </p>
-          <button className="btn btn--primary" onClick={() => setEditing({})}>
-            + Programme
-          </button>
-        </div>
+        <EmptyState
+          icon="🗓"
+          title="Crée ton premier programme"
+          action={
+            <button className="btn btn--primary" onClick={() => setEditing({})}>
+              + Programme
+            </button>
+          }
+        >
+          Un programme ordonne des séances dans le temps : phases, semaines
+          S1…Sn, et un démarrage à la date de ton choix qui remplit le planning.
+        </EmptyState>
       ) : (
         <div className="prog-grid">
           {programs.map((p) => (

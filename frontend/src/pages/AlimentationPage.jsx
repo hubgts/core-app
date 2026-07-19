@@ -12,6 +12,7 @@ import {
 } from '../components/alimentation/constants';
 import './AlimentationPage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 // Normalisation pour la recherche : minuscule, sans accents.
 const norm = (s) =>
@@ -212,8 +213,13 @@ export default function AlimentationPage() {
 
   return (
     <div className="alpage">
-      <header className="alpage__head">
-        <h1 className="alpage__title">🍽️ Alimentation</h1>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">🍽️ Alimentation</h1>
+          <p className="page-head__subtitle">
+            Tes recettes et leurs valeurs nutritionnelles.
+          </p>
+        </div>
         <div className="page__headactions">
           <button className="btn btn--primary" onClick={() => setModal({})}>
             + Recette
@@ -279,20 +285,26 @@ export default function AlimentationPage() {
       {loading ? (
         <div className="alpage__loading">Chargement…</div>
       ) : recipes.length === 0 ? (
-        <div className="alempty">
-          <div className="alempty__icon">🍽️</div>
-          <p>Ajoute ta première recette : un plat, un dessert, une sauce…</p>
-          <button className="btn btn--primary" onClick={() => setModal({})}>
-            + Recette
-          </button>
-        </div>
+        <EmptyState
+          icon="🍽️"
+          action={
+            <button className="btn btn--primary" onClick={() => setModal({})}>
+              + Recette
+            </button>
+          }
+        >
+          Ajoute ta première recette : un plat, un dessert, une sauce…
+        </EmptyState>
       ) : filtered.length === 0 ? (
-        <div className="alempty">
-          <p>Aucune recette ne correspond à ta recherche.</p>
-          <button className="btn btn--ghost" onClick={resetFilters}>
-            Réinitialiser les filtres
-          </button>
-        </div>
+        <EmptyState
+          action={
+            <button className="btn btn--ghost" onClick={resetFilters}>
+              Réinitialiser les filtres
+            </button>
+          }
+        >
+          Aucune recette ne correspond à ta recherche.
+        </EmptyState>
       ) : (
         <>
           {pinned.length > 0 && (

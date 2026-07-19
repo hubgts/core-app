@@ -9,6 +9,7 @@ import RealizationMode from '../components/knowhow/RealizationMode';
 import { indexCategories, NO_CATEGORY } from '../components/knowhow/constants';
 import './KnowHowPage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 // Normalisation pour la recherche : minuscule, sans accents.
 const norm = (s) =>
@@ -209,8 +210,13 @@ export default function KnowHowPage() {
 
   return (
     <div className="rpage">
-      <header className="rpage__head">
-        <h1 className="rpage__title">🛠️ Savoir-faire</h1>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">🛠️ Savoir-faire</h1>
+          <p className="page-head__subtitle">
+            Capitalise tes compétences et suis ta progression.
+          </p>
+        </div>
         <div className="page__headactions">
           <button className="btn btn--primary" onClick={() => setModal({})}>
             + Savoir-faire
@@ -276,23 +282,27 @@ export default function KnowHowPage() {
       {loading ? (
         <div className="rpage__loading">Chargement…</div>
       ) : recipes.length === 0 ? (
-        <div className="rempty">
-          <div className="rempty__icon">🛠️</div>
-          <p>
-            Capture ton premier savoir-faire : un plat, un produit maison, ou
-            n'importe quel procédé à reproduire.
-          </p>
-          <button className="btn btn--primary" onClick={() => setModal({})}>
-            + Savoir-faire
-          </button>
-        </div>
+        <EmptyState
+          icon="🛠️"
+          action={
+            <button className="btn btn--primary" onClick={() => setModal({})}>
+              + Savoir-faire
+            </button>
+          }
+        >
+          Capture ton premier savoir-faire : un plat, un produit maison, ou
+          n'importe quel procédé à reproduire.
+        </EmptyState>
       ) : filtered.length === 0 ? (
-        <div className="rempty">
-          <p>Aucun savoir-faire ne correspond à ta recherche.</p>
-          <button className="btn btn--ghost" onClick={resetFilters}>
-            Réinitialiser les filtres
-          </button>
-        </div>
+        <EmptyState
+          action={
+            <button className="btn btn--ghost" onClick={resetFilters}>
+              Réinitialiser les filtres
+            </button>
+          }
+        >
+          Aucun savoir-faire ne correspond à ta recherche.
+        </EmptyState>
       ) : (
         <>
           {pinned.length > 0 && (

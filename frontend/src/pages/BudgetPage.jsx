@@ -118,9 +118,14 @@ export default function BudgetPage() {
 
   return (
     <div className="fpage">
-      <header className="fpage__head">
-        <h1 className="fpage__title">🎯 Plan &amp; dépenses</h1>
-        <div className="fpage__headactions">
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">🎯 Plan &amp; dépenses</h1>
+          <p className="page-head__subtitle">
+            Répartis ton budget et suis tes dépenses du mois.
+          </p>
+        </div>
+        <div className="page__headactions">
           <MonthNav month={month} onChange={setMonth} />
           {data?.hasCategories && (
             <>

@@ -27,55 +27,6 @@
   color: var(--text-muted);
 }
 
-/* --- En-tête --- */
-.hpage__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 22px;
-}
-.hpage__title {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-.hpage__sub {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: 14px;
-}
-.hpage__actions {
-  display: flex;
-  gap: 10px;
-  flex: none;
-}
-
-/* --- État vide --- */
-.hempty {
-  text-align: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 48px 24px;
-  max-width: 520px;
-  margin: 40px auto;
-}
-.hempty__icon {
-  font-size: 44px;
-}
-.hempty__title {
-  margin: 12px 0 8px;
-  font-size: 20px;
-}
-.hempty__text {
-  color: var(--text-muted);
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0 0 20px;
-}
-
 /* --- KPIs --- */
 .hkpis {
   display: grid;
@@ -652,9 +603,6 @@
   }
 }
 @media (max-width: 560px) {
-  .hpage__head {
-    flex-direction: column;
-  }
   .hmeasgrid {
     grid-template-columns: 1fr;
   }

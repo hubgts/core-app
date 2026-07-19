@@ -48,9 +48,14 @@ export default function CashflowPage() {
 
   return (
     <div className="fpage">
-      <header className="fpage__head">
-        <h1 className="fpage__title">📊 Vue d'ensemble</h1>
-        <div className="fpage__headactions">
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">📊 Vue d'ensemble</h1>
+          <p className="page-head__subtitle">
+            Entrées, sorties et taux d'épargne du mois.
+          </p>
+        </div>
+        <div className="page__headactions">
           <MonthNav month={month} onChange={setMonth} />
           <Link className="btn btn--primary" to="/budget/plan">
             Plan &amp; dépenses

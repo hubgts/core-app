@@ -118,8 +118,13 @@ export default function FinancesPage() {
 
   return (
     <div className="fpage">
-      <header className="fpage__head">
-        <h1 className="fpage__title">💰 Finances</h1>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">💰 Finances</h1>
+          <p className="page-head__subtitle">
+            Ton patrimoine net et tes objectifs en un coup d'œil.
+          </p>
+        </div>
       </header>
 
       {error && <p className="fpage__error">{error}</p>}

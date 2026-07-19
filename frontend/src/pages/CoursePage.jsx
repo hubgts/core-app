@@ -10,6 +10,7 @@ import KebabMenu from '../components/KebabMenu';
 import '../pages/AlimentationPage.css';
 import './CoursePage.css';
 import { toast } from '../components/toast';
+import EmptyState from '../components/EmptyState';
 
 const norm = (s) =>
   (s ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -137,8 +138,13 @@ export default function CoursePage() {
 
   return (
     <div className="alpage">
-      <header className="alpage__head">
-        <h1 className="alpage__title">🛒 Course</h1>
+      <header className="page-head">
+        <div>
+          <h1 className="page-head__title">🛒 Course</h1>
+          <p className="page-head__subtitle">
+            Prépare tes listes et coche au fur et à mesure.
+          </p>
+        </div>
         <div className="page__headactions">
           <div className="course-create">
             <button
@@ -218,16 +224,19 @@ export default function CoursePage() {
         <>
           <section className="alboard-section">
             {lists.length === 0 ? (
-              <div className="alempty">
-                <div className="alempty__icon">🛒</div>
-                <p>Crée ta première liste : vide, ou à partir d'une recette.</p>
-                <button
-                  className="btn btn--primary"
-                  onClick={() => setModal({})}
-                >
-                  + Liste
-                </button>
-              </div>
+              <EmptyState
+                icon="🛒"
+                action={
+                  <button
+                    className="btn btn--primary"
+                    onClick={() => setModal({})}
+                  >
+                    + Liste
+                  </button>
+                }
+              >
+                Crée ta première liste : vide, ou à partir d'une recette.
+              </EmptyState>
             ) : (
               <>
                 <div className="alboard">

@@ -108,9 +108,9 @@ export default function JournalPage() {
 
   return (
     <div className="journalpage">
-      <header className="alpage__head">
+      <header className="page-head">
         <div>
-          <h1 className="alpage__title">📔 Journal</h1>
+          <h1 className="page-head__title">📔 Journal</h1>
           <p className="page-head__subtitle">
             Ce que tu manges au quotidien, avec le total nutritionnel par jour.
           </p>
