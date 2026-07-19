@@ -1,0 +1,183 @@
+.journalpage {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Navigation semaine --- */
+.jnav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.jnav__label {
+  font-weight: 600;
+  min-width: 160px;
+  text-align: center;
+}
+.jnav__today {
+  margin-left: auto;
+}
+
+/* --- Grille semaine (7 colonnes) --- */
+.jweek {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.jday {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--surface-2, #1b2330);
+  border: 1px solid var(--border, #2a3442);
+  border-radius: 12px;
+  padding: 8px;
+  min-height: 120px;
+}
+.jday--today {
+  border-color: var(--m-alimentation, #f59e0b);
+}
+
+.jday__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border, #2a3442);
+}
+.jday__dow {
+  font-weight: 700;
+  font-size: 13px;
+}
+.jday__date {
+  font-size: 12px;
+  color: var(--text-muted, #8a98a8);
+}
+
+.jday__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.jentry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 5px 6px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.jentry:hover {
+  background: var(--surface-3, #222c3b);
+  border-color: var(--border, #2a3442);
+}
+.jentry__time {
+  font-size: 11px;
+  color: var(--text-muted, #8a98a8);
+  font-variant-numeric: tabular-nums;
+  min-width: 34px;
+}
+.jentry__label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+}
+.jentry__label > :first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.jentry__amount {
+  font-size: 11px;
+  color: var(--text-muted, #8a98a8);
+}
+.jentry__kcal {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--m-alimentation, #f59e0b);
+  font-variant-numeric: tabular-nums;
+  padding-left: 6px;
+  white-space: nowrap;
+}
+
+.jday__total {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 4px;
+  border-top: 1px solid var(--border, #2a3442);
+}
+.jday__kcal {
+  font-weight: 700;
+  color: var(--m-alimentation, #f59e0b);
+}
+.jday__macros {
+  font-size: 11px;
+  color: var(--text-muted, #8a98a8);
+  font-variant-numeric: tabular-nums;
+}
+
+.jday__add {
+  background: transparent;
+  border: 1px dashed var(--border, #2a3442);
+  border-radius: 8px;
+  color: var(--text-muted, #8a98a8);
+  padding: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.jday__add:hover {
+  border-color: var(--m-alimentation, #f59e0b);
+  color: var(--m-alimentation, #f59e0b);
+}
+
+/* --- Segmented control Recette / Aliment (modale) --- */
+.mlseg {
+  display: flex;
+  gap: 6px;
+}
+.mlseg__btn {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--border, #2a3442);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text, #e6edf3);
+  font: inherit;
+  cursor: pointer;
+}
+.mlseg__btn.is-on {
+  border-color: var(--m-alimentation, #f59e0b);
+  background: var(--surface-3, #222c3b);
+  font-weight: 600;
+}
+
+/* Mobile : la semaine passe en liste verticale par jour. */
+@media (max-width: 720px) {
+  .jweek {
+    grid-template-columns: 1fr;
+  }
+  .jday {
+    min-height: 0;
+  }
+  .jnav__label {
+    min-width: 0;
+    flex: 1;
+  }
+}

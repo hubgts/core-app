@@ -365,11 +365,13 @@
 /* --- KPIs --- */
 .kpis {
   display: flex;
+  flex-wrap: wrap; /* sur petit écran, les KPIs passent à la ligne au lieu de déborder */
   gap: 16px;
   margin-top: 18px;
 }
 
 .kpi {
+  flex: 1 1 160px; /* les KPIs se partagent la largeur et retombent proprement */
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;

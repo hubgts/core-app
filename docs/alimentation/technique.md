@@ -121,6 +121,35 @@ macronutriments **pour 100 g/ml** ; les calories en sont dérivées.
 | `position` | `position` | `int` | Ordre d'affichage. |
 | `createdAt` | `created_at` | `timestamptz` | Auto. |
 
+### `MealLogEntryEntity` → table `meal_log_entries`
+Journal alimentaire : une entrée = ce qui a été mangé un jour donné. L'entrée
+référence une recette **ou** un aliment, mais **fige un snapshot** (libellé +
+macros déjà multipliées) à l'ajout : modifier/supprimer la source ensuite ne
+change pas l'historique. Ajouter deux fois le même plat = deux entrées distinctes.
+
+| Propriété | Colonne | Type SQL | Détails |
+|---|---|---|---|
+| `id` | `id` | `uuid` (PK) | Généré. |
+| `date` | `date` | `date` (indexée) | Jour `YYYY-MM-DD` (local, sans heure). |
+| `time` | `time` | `varchar(5) \| null` | Heure `HH:MM` ou `null` (« sans heure », en tête du jour). |
+| `kind` | `kind` | `varchar` | `'recipe' \| 'food'`. |
+| `recipeId` | `recipe_id` | `uuid \| null` | Recette source (FK souple), si `kind=recipe`. |
+| `servings` | `servings` | `numeric(7,2) \| null` | Portions consommées, si `kind=recipe`. |
+| `foodId` | `food_id` | `uuid \| null` | Aliment source (FK souple), si `kind=food`. |
+| `quantity` | `quantity` | `numeric(8,2) \| null` | Quantité g/ml, si `kind=food`. |
+| `unit` | `unit` | `varchar(2) \| null` | Unité figée (`g`/`ml`) pour un aliment ; `null` pour une recette. |
+| `label` | `label` | `varchar(120)` | Libellé **figé** (nom de la recette/aliment à l'ajout). |
+| `carbs/protein/fat/kcal` | idem | `numeric(8,1)` | **Snapshot** des macros de l'entrée (déjà × portions/quantité). |
+| `position` | `position` | `int` | Ordre au sein d'un même jour (départage les mêmes heures). |
+| `createdAt` | `created_at` | `timestamptz` | Auto. |
+
+> **Calcul du snapshot** (`resolveMealLogSnapshot`) à la création/édition :
+> - `kind=food` → `macro/100 × quantité` (défaut quantité = 100) ;
+> - `kind=recipe` → `perServing × servings` (défaut portions = 1 ; fallback sur
+>   le total de la recette si elle n'a pas de portions de référence).
+> Le **total par jour** (kcal + G/P/L) est agrégé **côté frontend** en sommant
+> les snapshots des entrées du jour (aucune colonne dédiée).
+
 **Règles structurelles :**
 - `mealTypeId` est une **FK souple** (pas de contrainte SQL) : à la **suppression
   d'un type**, le service met `meal_type_id = NULL` sur les recettes concernées —
@@ -195,6 +224,18 @@ Base URL : `http://localhost:3000`. Contrôleur :
 | `PUT` | `/alimentation/meal-types/reorder` | `{ ids: string[] }` | Réordonne. |
 | `PATCH` | `/alimentation/meal-types/:id` | `{ name?, icon?, color? }` | Modifie. |
 | `DELETE` | `/alimentation/meal-types/:id` | — | Supprime → recettes rattachées remises à `null`. |
+
+### Journal alimentaire
+| Méthode | Route | Body / Query | Rôle |
+|---|---|---|---|
+| `GET` | `/alimentation/meal-log` | `?from=YYYY-MM-DD&to=YYYY-MM-DD` | Entrées de la plage, triées date → heure (`NULLS FIRST`) → position. |
+| `POST` | `/alimentation/meal-log` | `{ date, time?, kind, recipeId?|foodId?, servings?|quantity? }` | Crée (fige le snapshot). |
+| `PUT` | `/alimentation/meal-log/reorder` | `{ ids: string[] }` | Réordonne (dans un jour). |
+| `PATCH` | `/alimentation/meal-log/:id` | idem (partiel) | Modifie ; re-fige le snapshot si la source/quantité change. |
+| `DELETE` | `/alimentation/meal-log/:id` | — | Supprime l'entrée. |
+
+> ⚠️ **Ordre des routes** : `meal-log/reorder` (statique) déclarée **avant**
+> `meal-log/:id`.
 
 ### Aliments (référentiel nutritionnel)
 | Méthode | Route | Body | Rôle |
@@ -280,6 +321,7 @@ api/alimentation.js                    # endpoints recettes + types de repas + a
 api/client.js                          # helper `request()` fetch partagé
 pages/AlimentationPage.jsx / .css      # board, filtres, orchestration des vues
 pages/FoodsPage.jsx / .css             # page dédiée « Aliments » (tableau macros + kcal, modale)
+pages/JournalPage.jsx / .css           # journal alimentaire (vue semaine + totaux/jour)
 components/alimentation/
   constants.js                         # palette couleurs, icônes, helpers (scale, format durée/portions)
   RecipeCard.jsx                       # carte du board (couleur, épingle, menu ⋮ ; badge kcal/portion)
@@ -289,6 +331,7 @@ components/alimentation/
   FoodFormModal.jsx                    # modale créer/éditer un aliment (kcal live), réutilisée par le quick-add
   MealTypesPanel.jsx                   # gestion des types de repas, monté dans la page Référentiel
   FoodsPanel.jsx                       # onglet « Aliments » du Référentiel → renvoie vers la page dédiée
+  MealLogEntryModal.jsx                # modale ajouter/éditer une entrée du journal (recette|aliment, heure)
 ```
 
 - La gestion des types de repas est rendue **dans la page Référentiel**
@@ -296,9 +339,10 @@ components/alimentation/
   appelle l'API types de repas de `alimentationApi`. Le board y renvoie par un lien
   `/referentiel?kind=meal_type`. Le panneau **réutilise les classes** du panneau
   catégories de savoir-faire (`.ref-*`, `.rcatman__*`).
-- Le module **Alimentation a deux sous-pages** déclarées dans la nav latérale
-  (`components/Layout.jsx`, `children`) : **Recettes** (`/alimentation`, le board)
-  et **Aliments** (`/alimentation/aliments`, `FoodsPage`). L'onglet `food` du
+- Le module **Alimentation a trois sous-pages** déclarées dans la nav latérale
+  (`components/Layout.jsx`, `children`) : **Recettes** (`/alimentation`, le board),
+  **Journal** (`/alimentation/journal`, `JournalPage`) et **Aliments**
+  (`/alimentation/aliments`, `FoodsPage`). L'onglet `food` du
   Référentiel (`FoodsPanel`) renvoie aussi vers la page Aliments. Dans la
   modale de recette, le champ ingrédient est un **`<Combobox>` strict** alimenté
   par la liste d'aliments, avec un bouton **`+`** ouvrant `FoodFormModal` pour
@@ -307,6 +351,13 @@ components/alimentation/
   d'éventuelles recettes **legacy** et restent hors calcul.
 - Le **board** utilise un masonry CSS (`column-count`), bloc épinglées puis autres ;
   classes préfixées `al*` (`AlimentationPage.css`).
+- Le **Journal** (`JournalPage`) est une **vue semaine** (7 colonnes lun→dim)
+  s'appuyant sur `utils/date.js` (`weekDatesOf`, `addDaysStr`, `todayStr`), comme
+  le Planning d'entraînement. Chaque jour liste ses entrées (heure · libellé ·
+  quantité/portions · kcal) et affiche le **total du jour** (kcal + G/P/L) agrégé
+  côté client. Ajout/édition via `MealLogEntryModal` (sélecteur Recette/Aliment +
+  `<Combobox>` + aperçu des macros en direct). Classes préfixées `j*`
+  (`JournalPage.css`) ; retombe en 1 colonne sous 720px.
 - Les modales réutilisent les classes communes `.modal*`, `.btn*` de `index.css`.
 
 ---

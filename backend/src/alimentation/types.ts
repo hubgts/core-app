@@ -13,6 +13,24 @@ export interface FoodInput {
   fat?: number | null;
 }
 
+export type MealLogKind = 'recipe' | 'food';
+
+/**
+ * DTO d'entrée du journal alimentaire. Selon `kind` :
+ *  - 'recipe' → `recipeId` (+ `servings`, défaut 1) ;
+ *  - 'food'   → `foodId` (+ `quantity` en g/ml).
+ * Les macros et le libellé sont figés côté service à partir de la source.
+ */
+export interface MealLogEntryInput {
+  date?: string;
+  time?: string | null;
+  kind?: MealLogKind;
+  recipeId?: string | null;
+  servings?: number | null;
+  foodId?: string | null;
+  quantity?: number | null;
+}
+
 /** Une ligne d'ingrédient. */
 export interface IngredientInput {
   id?: string;

@@ -36,6 +36,7 @@ import { AlimentationModule } from './alimentation/alimentation.module';
 import { RecipeEntity } from './alimentation/entities/recipe.entity';
 import { MealTypeEntity } from './alimentation/entities/meal-type.entity';
 import { FoodEntity } from './alimentation/entities/food.entity';
+import { MealLogEntryEntity } from './alimentation/entities/meal-log-entry.entity';
 import { CourseModule } from './course/course.module';
 import { AisleEntity } from './course/entities/aisle.entity';
 import { ArticleEntity } from './course/entities/article.entity';
@@ -84,6 +85,7 @@ import { BudgetImportEntity } from './budget/entities/budget-import.entity';
         RecipeEntity,
         MealTypeEntity,
         FoodEntity,
+        MealLogEntryEntity,
         AisleEntity,
         ArticleEntity,
         ShoppingListEntity,

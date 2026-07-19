@@ -187,12 +187,31 @@ Les **calories sont calculées automatiquement** à partir des macros
 
 ---
 
-## 10. Bon à savoir
+## 10. Le Journal (suivi quotidien)
+
+La sous-page **📔 Journal** (`/alimentation/journal`, dans la nav du module) sert
+à **suivre ce que tu manges au jour le jour**, avec le **total nutritionnel par
+jour**.
+
+- **Vue semaine** (lundi → dimanche). Les flèches ‹ › changent de semaine,
+  **Aujourd'hui** revient à la semaine courante ; le jour du jour est mis en avant.
+- **Ajouter** (bouton « + Ajouter » sous un jour) : choisir **Recette** (avec un
+  nombre de **portions**) ou **Aliment** (avec une **quantité** en g/ml), et une
+  **heure** optionnelle. Un aperçu des macros s'affiche pendant la saisie.
+- Chaque entrée montre l'heure, le nom, la quantité/les portions et ses calories.
+  Cliquer dessus permet de la **modifier** ou de la **supprimer**.
+- En pied de chaque jour : **total kcal + glucides / protéines / lipides**.
+
+> Les macros d'une entrée sont **figées au moment de l'ajout** : modifier ou
+> supprimer une recette / un aliment plus tard **ne change pas** ce qui est déjà
+> inscrit au journal. Ajouter deux fois le même plat crée deux entrées séparées.
+
+---
+
+## 11. Bon à savoir
 
 - **Aucun compte / connexion** : application mono-utilisateur, données stockées
   côté serveur (PostgreSQL — voir [`technique.md`](./technique.md)).
-- **Pas de planification, pas de photo** : choix assumé de ce socle (voir le
-  backlog de la spec).
 - Le module est accessible via **Alimentation** (`/alimentation`) dans la navigation.
 
 ---

@@ -16,16 +16,20 @@ import {
 } from './entities/recipe.entity';
 import { MealTypeEntity } from './entities/meal-type.entity';
 import { FoodEntity, FoodUnit } from './entities/food.entity';
+import { MealLogEntryEntity } from './entities/meal-log-entry.entity';
 import {
   DEFAULT_MEAL_TYPES,
   FoodInput,
   IngredientInput,
+  MealLogEntryInput,
+  MealLogKind,
   MealTypeInput,
   RecipeDifficulty,
   RecipeInput,
   StepInput,
 } from './types';
 import { round1, round2 } from '../common/round.util';
+import { isValidDateStr, isValidTimeStr } from '../common/date.util';
 
 const TITLE_MAX = 120;
 const MEAL_TYPE_NAME_MAX = 40;
@@ -33,6 +37,7 @@ const FOOD_NAME_MAX = 80;
 const MACRO_MAX = 100; // g pour 100 g/ml
 const FOOD_UNITS: FoodUnit[] = ['g', 'ml'];
 const DIFFICULTIES: RecipeDifficulty[] = ['facile', 'moyen', 'difficile'];
+const MEAL_LOG_KINDS: MealLogKind[] = ['recipe', 'food'];
 
 @Injectable()
 export class AlimentationService implements OnModuleInit {
@@ -43,6 +48,8 @@ export class AlimentationService implements OnModuleInit {
     private readonly mealTypes: Repository<MealTypeEntity>,
     @InjectRepository(FoodEntity)
     private readonly foods: Repository<FoodEntity>,
+    @InjectRepository(MealLogEntryEntity)
+    private readonly mealLog: Repository<MealLogEntryEntity>,
   ) {}
 
   /** Amorce le référentiel de types de repas par défaut au premier démarrage. */
@@ -211,6 +218,99 @@ export class AlimentationService implements OnModuleInit {
   }
 
   // ---------------------------------------------------------------------------
+  // Journal alimentaire
+  // ---------------------------------------------------------------------------
+
+  /** Entrées du journal sur une plage `[from, to]` (dates incluses), triées
+   *  par jour puis heure (les entrées sans heure d'abord) puis position. */
+  async listMealLog(from?: string, to?: string) {
+    if (!isValidDateStr(from) || !isValidDateStr(to)) {
+      throw new BadRequestException('Plage de dates invalide (from/to).');
+    }
+    const rows = await this.mealLog
+      .createQueryBuilder('e')
+      .where('e.date BETWEEN :from AND :to', { from, to })
+      .orderBy('e.date', 'ASC')
+      .addOrderBy('e.time', 'ASC', 'NULLS FIRST')
+      .addOrderBy('e.position', 'ASC')
+      .getMany();
+    return rows.map((e) => this.mealLogResponse(e));
+  }
+
+  async createMealLogEntry(input: MealLogEntryInput) {
+    const date = this.validateLogDate(input.date);
+    const time = this.validateLogTime(input.time);
+    const kind = this.validateLogKind(input.kind);
+    const snapshot = await this.resolveMealLogSnapshot(kind, input);
+    const maxPos = await this.maxMealLogPosition(date);
+
+    const entry = this.mealLog.create({
+      date,
+      time,
+      kind,
+      recipeId: kind === 'recipe' ? snapshot.sourceId : null,
+      servings: kind === 'recipe' ? snapshot.amount : null,
+      foodId: kind === 'food' ? snapshot.sourceId : null,
+      quantity: kind === 'food' ? snapshot.amount : null,
+      unit: snapshot.unit,
+      label: snapshot.label,
+      carbs: snapshot.carbs,
+      protein: snapshot.protein,
+      fat: snapshot.fat,
+      kcal: snapshot.kcal,
+      position: maxPos + 1,
+    });
+    return this.mealLogResponse(await this.mealLog.save(entry));
+  }
+
+  /** Édite une entrée. Si la nature/source/quantité change, les macros et le
+   *  libellé sont re-figés à partir de la source actuelle. */
+  async updateMealLogEntry(id: string, input: MealLogEntryInput) {
+    const entry = await this.getMealLogOrThrow(id);
+    if (input.date !== undefined) entry.date = this.validateLogDate(input.date);
+    if (input.time !== undefined) entry.time = this.validateLogTime(input.time);
+
+    // Le contenu change si l'un des champs de source est fourni.
+    const contentTouched =
+      input.kind !== undefined ||
+      input.recipeId !== undefined ||
+      input.servings !== undefined ||
+      input.foodId !== undefined ||
+      input.quantity !== undefined;
+
+    if (contentTouched) {
+      const kind = this.validateLogKind(input.kind ?? entry.kind);
+      const snapshot = await this.resolveMealLogSnapshot(kind, {
+        recipeId: input.recipeId ?? entry.recipeId,
+        servings: input.servings ?? entry.servings,
+        foodId: input.foodId ?? entry.foodId,
+        quantity: input.quantity ?? entry.quantity,
+      });
+      entry.kind = kind;
+      entry.recipeId = kind === 'recipe' ? snapshot.sourceId : null;
+      entry.servings = kind === 'recipe' ? snapshot.amount : null;
+      entry.foodId = kind === 'food' ? snapshot.sourceId : null;
+      entry.quantity = kind === 'food' ? snapshot.amount : null;
+      entry.unit = snapshot.unit;
+      entry.label = snapshot.label;
+      entry.carbs = snapshot.carbs;
+      entry.protein = snapshot.protein;
+      entry.fat = snapshot.fat;
+      entry.kcal = snapshot.kcal;
+    }
+    return this.mealLogResponse(await this.mealLog.save(entry));
+  }
+
+  async removeMealLogEntry(id: string): Promise<void> {
+    await this.getMealLogOrThrow(id);
+    await this.mealLog.delete(id);
+  }
+
+  async reorderMealLog(ids: string[]) {
+    await applyReorder(this.mealLog, ids);
+  }
+
+  // ---------------------------------------------------------------------------
   // Recettes — lecture
   // ---------------------------------------------------------------------------
 
@@ -222,7 +322,7 @@ export class AlimentationService implements OnModuleInit {
       order: { pinned: 'DESC', position: 'ASC', updatedAt: 'DESC' },
     });
     const foodMap = await this.loadFoodMap(items.flatMap((r) => r.ingredients));
-    return items.map((r) => this.toResponse(r, foodMap));
+    return Promise.all(items.map((r) => this.toResponse(r, foodMap)));
   }
 
   async get(id: string) {
@@ -585,6 +685,148 @@ export class AlimentationService implements OnModuleInit {
   /** Calories d'Atwater : 4·glucides + 4·protéines + 9·lipides (pour 100 g/ml). */
   private computeKcal(carbs: number, protein: number, fat: number): number {
     return round1(4 * carbs + 4 * protein + 9 * fat);
+  }
+
+  // --- Journal alimentaire ---
+
+  private mealLogResponse(e: MealLogEntryEntity) {
+    return {
+      id: e.id,
+      date: e.date,
+      time: e.time,
+      kind: e.kind,
+      recipeId: e.recipeId,
+      servings: e.servings != null ? Number(e.servings) : null,
+      foodId: e.foodId,
+      quantity: e.quantity != null ? Number(e.quantity) : null,
+      unit: e.unit,
+      label: e.label,
+      carbs: Number(e.carbs),
+      protein: Number(e.protein),
+      fat: Number(e.fat),
+      kcal: Number(e.kcal),
+      position: e.position,
+    };
+  }
+
+  private async getMealLogOrThrow(id: string): Promise<MealLogEntryEntity> {
+    const entry = await this.mealLog.findOne({ where: { id } });
+    if (!entry) throw new NotFoundException('Entrée de journal introuvable.');
+    return entry;
+  }
+
+  private validateLogDate(date?: string): string {
+    if (!isValidDateStr(date)) {
+      throw new BadRequestException('Date invalide (attendu YYYY-MM-DD).');
+    }
+    return date;
+  }
+
+  private validateLogTime(time?: string | null): string | null {
+    if (time == null || time === '') return null;
+    if (!isValidTimeStr(time)) {
+      throw new BadRequestException('Heure invalide (attendu HH:MM).');
+    }
+    return time;
+  }
+
+  private validateLogKind(kind?: MealLogKind): MealLogKind {
+    if (!kind || !MEAL_LOG_KINDS.includes(kind)) {
+      throw new BadRequestException('Type d’entrée invalide (recipe | food).');
+    }
+    return kind;
+  }
+
+  /**
+   * Calcule le snapshot (libellé + macros consommées) d'une entrée à partir de
+   * sa source. Recette : `perServing × servings` (fallback total si la recette
+   * n'a pas de portions). Aliment : `macro/100 × quantité`.
+   */
+  private async resolveMealLogSnapshot(
+    kind: MealLogKind,
+    input: Pick<
+      MealLogEntryInput,
+      'recipeId' | 'servings' | 'foodId' | 'quantity'
+    >,
+  ): Promise<{
+    sourceId: string;
+    amount: number;
+    label: string;
+    unit: string | null;
+    carbs: number;
+    protein: number;
+    fat: number;
+    kcal: number;
+  }> {
+    if (kind === 'recipe') {
+      if (!input.recipeId) {
+        throw new BadRequestException(
+          'recipeId est obligatoire (kind=recipe).',
+        );
+      }
+      const recipe = await this.recipes.findOne({
+        where: { id: input.recipeId },
+      });
+      if (!recipe) throw new BadRequestException('Recette inconnue.');
+      const servings = this.normalizePositive(input.servings, 1);
+      const foodMap = await this.loadFoodMap(recipe.ingredients ?? []);
+      const nut = this.computeNutrition(recipe, foodMap);
+      // perServing si la recette a des portions ; sinon la recette entière = 1 part.
+      const per = nut.perServing ?? {
+        carbs: nut.carbs,
+        protein: nut.protein,
+        fat: nut.fat,
+        kcal: nut.kcal,
+      };
+      return {
+        sourceId: recipe.id,
+        amount: servings,
+        label: recipe.title,
+        unit: null,
+        carbs: round1(per.carbs * servings),
+        protein: round1(per.protein * servings),
+        fat: round1(per.fat * servings),
+        kcal: round1(per.kcal * servings),
+      };
+    }
+
+    // kind === 'food'
+    if (!input.foodId) {
+      throw new BadRequestException('foodId est obligatoire (kind=food).');
+    }
+    const food = await this.foods.findOne({ where: { id: input.foodId } });
+    if (!food) throw new BadRequestException('Aliment inconnu.');
+    const quantity = this.normalizePositive(input.quantity, 100);
+    const factor = quantity / 100;
+    return {
+      sourceId: food.id,
+      amount: quantity,
+      label: food.name,
+      unit: food.unit,
+      carbs: round1(Number(food.carbs) * factor),
+      protein: round1(Number(food.protein) * factor),
+      fat: round1(Number(food.fat) * factor),
+      kcal: round1(Number(food.kcal) * factor),
+    };
+  }
+
+  /** Nombre > 0 (portions/quantité) ; défaut si absent, borné/arrondi à 0,01. */
+  private normalizePositive(value: number | null | undefined, def: number) {
+    if (value === null || value === undefined || (value as unknown) === '') {
+      return def;
+    }
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) return def;
+    return round2(n);
+  }
+
+  private async maxMealLogPosition(date: string): Promise<number> {
+    const row = await this.mealLog
+      .createQueryBuilder('e')
+      .select('MAX(e.position)', 'max')
+      .where('e.date = :date', { date })
+      .getRawOne<{ max: number | null }>();
+    return row?.max ?? -1;
   }
 
   private normalizeDifficulty(

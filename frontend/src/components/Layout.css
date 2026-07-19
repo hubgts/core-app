@@ -24,6 +24,27 @@
   padding: 6px 10px 22px;
 }
 
+/* Bouton de repli (desktop uniquement) */
+.sidebar__collapse {
+  margin-left: auto;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(226, 232, 240, 0.7);
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.sidebar__collapse:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
 .sidebar__brandtext {
   display: flex;
   flex-direction: column;
@@ -128,6 +149,44 @@
   color: rgba(148, 163, 184, 0.55);
 }
 
+/* ---- Sidebar repliée (desktop) : réduite aux icônes ---- */
+.sidebar--collapsed {
+  width: 68px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.sidebar--collapsed .sidebar__brandtext {
+  display: none;
+}
+.sidebar--collapsed .sidebar__brand {
+  gap: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+  justify-content: center;
+}
+/* Bouton centré sous le logo une fois replié (le brand passe en colonne) */
+.sidebar--collapsed .sidebar__brand {
+  flex-direction: column;
+  gap: 12px;
+}
+.sidebar--collapsed .sidebar__collapse {
+  margin-left: 0;
+}
+.sidebar--collapsed .nav-item {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+.sidebar--collapsed .nav-item__label {
+  display: none;
+}
+.sidebar--collapsed .nav-item--active::before {
+  left: 0;
+}
+.sidebar--collapsed .sidebar__footer {
+  display: none;
+}
+
 .content {
   flex: 1;
   min-width: 0;
@@ -192,6 +251,34 @@
   .sidebar--open {
     transform: translateX(0);
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Le repli desktop ne s'applique pas au tiroir mobile : on neutralise. */
+  .sidebar--collapsed {
+    width: 270px;
+    max-width: 82vw;
+    padding: 20px 14px;
+  }
+  .sidebar--collapsed .sidebar__brand {
+    flex-direction: row;
+    gap: 11px;
+    justify-content: flex-start;
+    padding: 6px 10px 22px;
+  }
+  .sidebar--collapsed .sidebar__brandtext,
+  .sidebar--collapsed .nav-item__label,
+  .sidebar--collapsed .sidebar__footer {
+    display: initial;
+  }
+  .sidebar--collapsed .sidebar__brandtext {
+    display: flex;
+  }
+  .sidebar--collapsed .nav-item {
+    justify-content: flex-start;
+    padding: 10px 12px;
+  }
+  .sidebar__collapse {
+    display: none;
   }
 
   .nav-scrim {

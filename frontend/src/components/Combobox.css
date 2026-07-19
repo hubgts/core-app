@@ -57,6 +57,11 @@
   border-radius: 12px;
   padding: 6px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  /* Line-height explicite : le panneau peut être ancré dans un contexte au
+     line-height écrasé (ex. ligne d'ingrédient en flex), que `font: inherit`
+     propagerait aux options — écrasant leur hauteur et les faisant se
+     chevaucher. On repart d'une valeur saine ici. */
+  line-height: 1.4;
 }
 .combo--inline .combo__panel {
   left: auto;
@@ -91,6 +96,10 @@
 .combo__opt {
   display: block;
   width: 100%;
+  /* La liste est un conteneur flex à hauteur bornée : sans `flex-shrink: 0`,
+     quand les options dépassent la hauteur max, flexbox les compresse (contenu
+     réduit à 0 → lignes qui se chevauchent). On empêche tout écrasement. */
+  flex: 0 0 auto;
   text-align: left;
   padding: 9px 10px;
   border: none;
@@ -98,6 +107,7 @@
   color: var(--text);
   font: inherit;
   font-size: 14px;
+  line-height: 1.4;
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;

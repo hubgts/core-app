@@ -39,7 +39,9 @@ export default function Combobox({
   const listRef = useRef(null);
 
   const selected = options.find((o) => String(o.value) === String(value));
-  const showSearch = searchable ?? options.length > 7;
+  // La recherche apparaît au-delà de 7 options, ou dès qu'on a commencé à taper
+  // (type-to-search au clavier, même sur une liste courte).
+  const showSearch = searchable ?? (options.length > 7 || query !== '');
 
   const norm = (s) =>
     String(s ?? '')
@@ -90,6 +92,22 @@ export default function Combobox({
     triggerRef.current?.focus();
   }
 
+  // Clavier sur le déclencheur (au focus via Tab) : les flèches ouvrent la
+  // liste, et taper un caractère l'ouvre en amorçant la recherche — comme un
+  // <select> natif, mais avec autocomplétion.
+  function onTriggerKeyDown(e) {
+    if (open) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === ' ') {
+      e.preventDefault();
+      setOpen(true);
+    } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      setQuery(e.key);
+      setActive(0);
+      setOpen(true);
+    }
+  }
+
   function onKeyDown(e) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -124,6 +142,7 @@ export default function Combobox({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => (open ? close() : setOpen(true))}
+        onKeyDown={onTriggerKeyDown}
       >
         <span className={`combo__value${selected ? '' : ' combo__value--ph'}`}>
           {selected ? selected.label : placeholder}

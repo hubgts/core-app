@@ -10,7 +10,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { AlimentationService } from './alimentation.service';
-import { FoodInput, MealTypeInput, RecipeInput } from './types';
+import {
+  FoodInput,
+  MealLogEntryInput,
+  MealTypeInput,
+  RecipeInput,
+} from './types';
 
 @Controller('alimentation')
 export class AlimentationController {
@@ -64,6 +69,34 @@ export class AlimentationController {
   @Delete('foods/:id')
   async removeFood(@Param('id') id: string) {
     await this.alimentation.removeFood(id);
+    return { ok: true };
+  }
+
+  // --- Journal alimentaire (routes statiques avant les paramétrées) ---
+
+  @Get('meal-log')
+  listMealLog(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.alimentation.listMealLog(from, to);
+  }
+
+  @Post('meal-log')
+  createMealLogEntry(@Body() body: MealLogEntryInput) {
+    return this.alimentation.createMealLogEntry(body ?? {});
+  }
+
+  @Put('meal-log/reorder')
+  reorderMealLog(@Body() body: { ids: string[] }) {
+    return this.alimentation.reorderMealLog(body?.ids);
+  }
+
+  @Patch('meal-log/:id')
+  updateMealLogEntry(@Param('id') id: string, @Body() body: MealLogEntryInput) {
+    return this.alimentation.updateMealLogEntry(id, body ?? {});
+  }
+
+  @Delete('meal-log/:id')
+  async removeMealLogEntry(@Param('id') id: string) {
+    await this.alimentation.removeMealLogEntry(id);
     return { ok: true };
   }
 

@@ -83,4 +83,25 @@ export const alimentationApi = {
 
   removeFood: (id) =>
     request(`/alimentation/foods/${id}`, { method: 'DELETE' }),
+
+  // --- Journal alimentaire ---
+  mealLog: (from, to) =>
+    request(
+      `/alimentation/meal-log?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
+    ),
+
+  createMealLogEntry: (data) =>
+    request('/alimentation/meal-log', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateMealLogEntry: (id, data) =>
+    request(`/alimentation/meal-log/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  removeMealLogEntry: (id) =>
+    request(`/alimentation/meal-log/${id}`, { method: 'DELETE' }),
 };

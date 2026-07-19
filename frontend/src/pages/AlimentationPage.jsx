@@ -58,7 +58,7 @@ export default function AlimentationPage() {
   const allLabels = useMemo(() => {
     const seen = new Map();
     for (const r of recipes)
-      for (const l of r.labels)
+      for (const l of r.labels ?? [])
         if (!seen.has(l.toLowerCase())) seen.set(l.toLowerCase(), l);
     return [...seen.values()].sort((a, b) => a.localeCompare(b, 'fr'));
   }, [recipes]);

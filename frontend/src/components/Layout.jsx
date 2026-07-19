@@ -46,6 +46,7 @@ const NAV_ITEMS = [
     icon: '🍽️',
     children: [
       { to: '/alimentation', label: 'Recettes', end: true },
+      { to: '/alimentation/journal', label: 'Journal' },
       { to: '/alimentation/aliments', label: 'Aliments' },
     ],
   },
@@ -57,14 +58,22 @@ const NAV_ITEMS = [
 export default function Layout() {
   const location = useLocation();
   const [navOpen, setNavOpen] = useState(false);
+  // Repli desktop : sidebar réduite aux icônes. Persisté entre les sessions.
+  const [collapsed, setCollapsed] = useState(
+    () => localStorage.getItem('sidebar-collapsed') === '1',
+  );
 
   // Referme le tiroir mobile à chaque changement de page.
   useEffect(() => {
     setNavOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0');
+  }, [collapsed]);
+
   return (
-    <div className="app-shell">
+    <div className={`app-shell${collapsed ? ' app-shell--collapsed' : ''}`}>
       {/* Barre supérieure (mobile uniquement) */}
       <header className="topbar">
         <button
@@ -82,12 +91,22 @@ export default function Layout() {
         <div className="nav-scrim" onClick={() => setNavOpen(false)} />
       )}
 
-      <aside className={`sidebar${navOpen ? ' sidebar--open' : ''}`}>
+      <aside
+        className={`sidebar${navOpen ? ' sidebar--open' : ''}${collapsed ? ' sidebar--collapsed' : ''}`}
+      >
         <div className="sidebar__brand">
           <Logo size={36} />
           <div className="sidebar__brandtext">
             <span className="sidebar__title">Core</span>
           </div>
+          <button
+            className="sidebar__collapse"
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={collapsed ? 'Déplier le menu' : 'Replier le menu'}
+            title={collapsed ? 'Déplier' : 'Replier'}
+          >
+            {collapsed ? '›' : '‹'}
+          </button>
           <button
             className="sidebar__close"
             onClick={() => setNavOpen(false)}
@@ -104,6 +123,7 @@ export default function Layout() {
               <div key={item.to} className="nav-group">
                 <NavLink
                   to={item.to}
+                  title={item.label}
                   className={({ isActive }) =>
                     `nav-item${isActive ? ' nav-item--active' : ''}`
                   }
@@ -111,7 +131,7 @@ export default function Layout() {
                   <span className="nav-item__icon">{item.icon}</span>
                   <span className="nav-item__label">{item.label}</span>
                 </NavLink>
-                {item.children && sectionActive && (
+                {item.children && sectionActive && !collapsed && (
                   <div className="nav-sub">
                     {item.children.map((child) => (
                       <NavLink
